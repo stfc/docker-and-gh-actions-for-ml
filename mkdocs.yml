@@ -1,7 +1,7 @@
 site_name: Continuous Delivery and Containers
 site_author: Drew Silcock, STFC Hartree Centre
 copyright: Copyright &copy; 2020 - STFC Hartee Centre
-site_url: todo
+site_url: http://gitlab.com/drewsilcock/go-with-the-flow
 repo_name: drewsilcock/ida-cloud-day-docs
 repo_url: https://gitlab.com/drewsilcock/ida-cloud-day-docs
 
