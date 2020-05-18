@@ -38,7 +38,7 @@ There's no way that another container or process outside of the container runtim
 
 As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be a just few kilobytes instead of gigabytes.
 
-![Virtual machines vs. containers. From: https://blog.netapp.com/blogs/containers-vs-vms/](/images/vm-vs-container.png)
+![Virtual machines vs. containers. From: https://blog.netapp.com/blogs/containers-vs-vms/](images/vm-vs-container.png)
 
 From: https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
