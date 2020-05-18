@@ -1,17 +1,17 @@
-# Welcome to MkDocs
+# Intro
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+## :wave: Welcome
 
-## Commands
+Welcome to Module 4 of the the [Industrial Digitilisation Accelerator's](https://www.hartree.stfc.ac.uk/Pages/IDA.aspx) Guide to Industry 4.0!
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+In this tutorial, you're going to get some hands-on experience utilising the power of continuous deployment with the git flow branching model to host modern, cloud-native, 12-factor web services on the cloud.
 
-## Project layout
+This tutorial is designed to be taken at your own pace depending on your own experience. If you feel like you already understand a particular section and won't gain much from going through the steps for it, feel free to skip forward to the next section. You can get to the starting code for a particular section by checking out the branch `tutorial/section-X` where `X` is the section number that you want to get working on.
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## :speech_balloon: Giving feedback and getting help
+
+The best way to get help or provide feedback is to message us directly.
+
+You can also comment on any of these tutorial sections[^1] using Disqus - any and all feedback, corrections or questions are very welcome!
+
+[^1]: Apart from this intro page :slightly_smiling_face:

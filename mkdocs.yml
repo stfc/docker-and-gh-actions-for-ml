@@ -1,9 +1,11 @@
-site_name: Continuous Delivery and Containers
+site_name: Go With The Flow
+# - An Introduction to Git Flow, Continuous Delivery and Containers
 site_author: Drew Silcock, STFC Hartree Centre
 copyright: Copyright &copy; 2020 - STFC Hartee Centre
-site_url: http://gitlab.com/drewsilcock/go-with-the-flow
-repo_name: drewsilcock/ida-cloud-day-docs
-repo_url: https://gitlab.com/drewsilcock/ida-cloud-day-docs
+site_url: https://go-with-the-flow.netlify.app
+repo_name: drewsilcock/go-with-the-flow-code
+repo_url: https://gitlab.com/drewsilcock/go-with-the-flow-code
+edit_uri: ""
 
 theme:
   name: material
@@ -15,16 +17,14 @@ theme:
   logo: images/stfc.png
   favicon: images/favicon.ico
 
-nav:
-  - index.md
-
 markdown_extensions:
   - toc:
-      permalink: "#"
+      permalink: true
+  - attr_list
   - smarty
   - admonition
-  - footnotes
   - codehilite
+  - footnotes
   - pymdownx.arithmatex
   - pymdownx.betterem:
       smart_enable: all
@@ -32,7 +32,8 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.inlinehilite
   - pymdownx.magiclink
   - pymdownx.mark
@@ -40,10 +41,19 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.tabbed
   - pymdownx.tilde
   - fontawesome_markdown
 
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - git-revision-date-localized
+
 extra:
+  # This is annoying when developing - just remember to uncomment this when the content is finished.
+  #disqus: go-with-the-flow
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/drewsilcock
