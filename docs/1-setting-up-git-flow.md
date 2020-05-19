@@ -132,4 +132,5 @@ git checkout -b dev
 git push --set-upstream origin dev
 ```
 
-With this out the way, we've got our repo in a good starting state to use git flow for our future development.
+!!! success
+    With this out the way, we've got our repo in a good starting state to use git flow to complete our first feature!
