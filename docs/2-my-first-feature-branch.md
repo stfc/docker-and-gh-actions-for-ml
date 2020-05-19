@@ -10,21 +10,16 @@ Now that we've got our repo forked and cloned with our git flow skeleton in plac
 
 Before we add our first, let's first get our server compiled and running so that we can make sure that we've got our system set up with all the dependencies.
 
-If you look in the repo, you'll see a `Makefile` in there. Don't worry about the generic stuff in there - the important bit is the targets:
+If you look in the repo, you'll see a `Makefile` in there. Don't worry about the generic stuff in there - the important bit is the build target:
 
-```makefile
+```makefile linenums="39"
 ## build: Build the server
-build:
+build: code-gen
     @$(call log,Building binary...)
     @GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build -o $(OUTBINDIR)/$(PROJECTNAME) $(GOFILES) || (\
         $(call log-error,Failed to build $(PROJECTNAME).) \
         && false \
     )
-
-## clean: Clean build files.
-clean:
-    @-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
-    @GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
 ```
 
 This tells that that in order to build our server, we need to run:
