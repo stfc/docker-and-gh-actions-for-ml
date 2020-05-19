@@ -8,6 +8,7 @@ This tutorial requires the following to be installed:
 
 - git
 - make
+- curl
 - Go
 - Docker
 
@@ -92,6 +93,48 @@ This tutorial requires the following to be installed:
 
 === "Windows"
     Go to [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) and download & run the setup link containing "Complete package, except sources". Once this is installed, you should be able to run `make` from either cmd or PowerShell. (As before, you may need to restart your terminal to reload the `PATH` environment variable.)
+
+## Curl
+
+=== "Linux"
+    Ubuntu / Debian:
+
+    ```sh
+    sudo apt update
+    sudo apt install curl
+    ```
+
+    Fedora / RHEL / CentOS:
+
+    ```sh
+    sudo dnf install curl
+    ```
+
+=== "macOS"
+    Curl comes pre-installed with macOS. If you want to make sure you have the latest and greatest version of curl installed, you can always install with Homebrew:
+
+    ```sh
+    brew install curl
+    ```
+
+=== "Windows"
+    If you're using Windows, you'll have PowerShell installed. You can get the same functionality as you would from curl by using PowerShell's built-in [`Invoke-RestMethod`](https://discoposse.com/2012/06/30/powershell-invoke-restmethod-putting-the-curl-in-your-shell/):
+
+    ```powershell
+    Invoke-RestMethod -Uri localhost:8000 -Method Get
+    ```
+
+    If you've not used PowerShell before, you should try it out! It's a pretty neat piece of software. I'd also highly recommend installing the new [Windows Terminal](https://github.com/microsoft/terminal).
+
+    If you're using Choco or Scoop, you can also just install curl like so:
+
+    ```sh
+    # If you're using Chocolatey
+    choco install curl
+
+    # If you're using Scoop
+    scoop install curl
+    ```
 
 ## Go
 
