@@ -1,8 +1,8 @@
 ---
-title: 1. Installing dependencies
+title: 0. Installing dependencies
 ---
 
-# 1. :construction: Installing dependencies
+# 0. :construction: Installing dependencies
 
 This tutorial requires the following to be installed:
 
@@ -100,15 +100,15 @@ The best thing to do here is follow the instructions at the Golang website: http
 These are summarised below, but the Golang site has more detailed instructions.
 
 === "Linux"
-    Download the archive from https://golang.org/dl/ and run:
-    ```sh
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-    ```
-    where `$VERSION` is set to the version of Go that you're downloading.
-
-    At the time of writing, that would be:
+    Download the archive from https://golang.org/dl/.
+    
+    You should set the `GO_VERSION` environment variable to whichever version it is you're installing. For instance, at the time of writing, you would do:
     ```sh
     export GO_VERSION=1.14.3
+    ```
+    You can then run:
+    ```sh
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
     ```
 
 === "macOS"
@@ -124,16 +124,14 @@ These are summarised below, but the Golang site has more detailed instructions.
 ## Docker
 
 === "Linux"
-    Ubuntu / Debian:
-    ```sh
-    sudo apt update
-    sudo apt install build-essential
-    ```
+    Go to https://docs.docker.com/engine/install/ and click on the Linux distro that you're using in the "Server" table. This will contain distro-specific instructions on setting up the relevant repositories and installing the required packages.
+    
+    For example:
 
-    CentOS:
-    ```sh
-    sudo yum install make
-    ```
+    - Ubuntu - https://docs.docker.com/engine/install/ubuntu/
+    - Debian - https://docs.docker.com/engine/install/debian/
+    - Fedora - https://docs.docker.com/engine/install/fedora/
+    - CentOS - https://docs.docker.com/engine/install/centos/
 
 === "macOS"
     Go to https://docs.docker.com/docker-for-mac/install/ and download "Docker Desktop for Mac".
