@@ -11,7 +11,7 @@ Our next step is going to be to take our API and containerise it - in other word
 Before we start coding away, let's first explain what containers are and how they work.
 
 !!! note
-    If you're already familiar with this, feel free to skip ahead to the [next section](#making-the-dockerfile).
+    If you're already familiar with this, feel free to skip ahead to the [next bit](#making-the-dockerfile).
 
 ### Terminology
 
@@ -43,7 +43,7 @@ There's no way that another container or process outside of the container runtim
 
 As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be a just few kilobytes instead of gigabytes.
 
-![Virtual machines vs. containers. From: https://blog.netapp.com/blogs/containers-vs-vms/](images/vm-vs-container.png)
+![Virtual machines vs. containers. From: https://blog.netapp.com/blogs/containers-vs-vms/](/images/containerise-it/vm-vs-container.png)
 
 From: https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
@@ -56,7 +56,7 @@ As far as container runtimes go, there's a whale of a market dominator, and a fe
 
 #### Docker
 
-![Docker logo](images/docker.png){: style="height: 100px; float: right;"}
+![Docker logo](/images/containerise-it/docker.png){: style="height: 100px; float: right;"}
 
 This is the main player in the container world, by far. The metaphorical whale. (It's also the one with the whale logo.) Docker was the company that popularised containerisation, which means the formats created by Docker had a massive impact on the container landscape.
 
@@ -66,7 +66,7 @@ In June 2015, Docker and other container companies established the [Open Contain
 
 #### Podman
 
-![Podman logo](images/podman.svg){: style="height: 100px; float: right;"}
+![Podman logo](/images/containerise-it/podman.svg){: style="height: 100px; float: right;"}
 
 Even though it dominates the market, Docker isn't the only container runtime around with a logo of a happy cute sea animal!
 
@@ -79,7 +79,7 @@ The main differentiator between Docker and Podman is that Podman doesn't need a 
 
 #### Singularity
 
-![Singularity logo](images/singularity.svg){: style="height: 100px; float: right;"}
+![Singularity logo](/images/containerise-it/singularity.svg){: style="height: 100px; float: right;"}
 
 Singularity is similar to Podman in arising out of a need for a rootless container runtime. Singularity also maintains full support for Docker images (they really are the de-facto standard).
 
@@ -87,7 +87,7 @@ The main difference is that Singularity is aimed at the scientific computing mar
 
 #### Rkt
 
-![Rkt logo](images/rkt.svg){: style="height: 100px; float: right;"}
+![Rkt logo](/images/containerise-it/rkt.svg){: style="height: 100px; float: right;"}
 
 [Rkt](https://coreos.com/rkt/) is developed by CoreOS to be compatible with Docker images but with more of a focus on better security through customisable isolation. It's mainly advertised as a container runtime replacement for large production-ready Kubernetes clusters. Recently, Red Hat acquired CoreOS and as a result development of Rkt stopped and the [GitHub Repository](https://github.com/rkt/rkt) was archived.
 
@@ -303,7 +303,7 @@ $ docker images
 
 ## Tagging the image with the version
 
-If you remember back to [Section 1](/setting-up-git-flow/), we used `git describe` to automatically get the version in semver format from our git flow.
+If you remember back to [Section 1](/1-setting-up-git-flow/), we used `git describe` to automatically get the version in semver format from our git flow.
 
 We can use this same tactic to automatically tag our Docker images with their version!
 
@@ -346,5 +346,100 @@ This does require a small change to the Dockerfile so that we can pass the versi
 
 ## Let's create our private repository
 
+Next we're going to upload our images to a private repository in IBM Cloud - this will allow us to run our API from the image hosted in our private repository.
+
+This assumes that you've logged into the CLI as per the instructions in [Section 0](/0-installing-dependencies/) - make sure you've done this before proceeding. (If logged in a while ago, you may need to do it again to refresh the access token.)
+
+Firstly, we need to set up the IBM Cloud CLI to work with our container registry:
+
+```bash
+# The container registry CLI functionality is kept in a separate plugin which needs to be installed.
+$ ibmcloud plugin install container-registry -r 'IBM Cloud'
+
+# Set our region to UK South (i.e. London) - if you're using a different region you'll
+# need to update this accordingly.
+$ ibmcloud cr region-set uk-south
+
+# If this fails, you may need to re-run `ibmcloud login --sso`.
+$ ibmcloud cr login
+
+# Create a namespace to put our images in - make sure to replace this with something
+# meaningful to your organisation.
+$ ibmcloud cr namespace-add my-org
+
+# Check that our namespace is there.
+$ ibmcloud cr namespaces
+> Listing namespaces for account '(your account)' in registry 'uk.icr.io'...
+>
+> Namespace
+> my-org
+```
+
+!!! tip
+    If you aren't able to run these commands on the container registry, your IBM Cloud account might not have the necessary permissions to interact with the Kubernetes part of IBM Cloud, which is required to use the container registry.
+
+    If that's the case, get in contact ASAP so that we can give you the permissions you need!
+
+If you can see your namespace in the output of that final command then congratulations, you've created your container registry namespace!
+
 ## Time to upload our image
 
+Now we're going to upload our image into the registry. We're going to use the `Makefile` so that we can re-use our automatic version detection.
+
+This means adding a new target like so:
+
+!!! example "`Makefile`"
+    At the beginning of the file:
+    ```Makefile linenums="3" hl_lines="4"
+    SHELL := /bin/bash
+
+    PROJECTNAME := hbaas-server
+    DOCKERREGISTRY := uk.icr.io/my-org
+
+    # Go related variables.
+    GOBASE := $(shell pwd)
+    ```
+
+    Towards the end of the file:
+
+    ```Makefile linenums="70" hl_lines="6-7 13-26"
+    ## build-image: Build Docker container image for API.
+    build-image:
+    	$(call log,Building Docker image...)
+    	docker build \
+    		--build-arg version=$(VERSION) \
+    		--tag $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) \
+    		--tag $(DOCKERREGISTRY)/$(PROJECTNAME):latest . || \
+    	(\
+    	    $(call log-error,Unable to build Docker image.) \
+    	    && false \
+    	)
+
+    ## upload-image: Build Docker image and upload to private registry.
+    upload-image: build-image
+    	$(call log,Uploading Docker image...)
+    	ibmcloud cr login
+    	docker push $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) || \
+    	(\
+    	    $(call log-error,Unable to deploy Docker image to repository.) \
+    	    && false \
+    	)
+    	docker push $(DOCKERREGISTRY)/$(PROJECTNAME):latest || \
+    	(\
+    	    $(call log-error,Unable to deploy Docker image to repository.) \
+    	    && false \
+    	)
+
+    .PHONY: clean
+    ## clean: Clean up all build files.
+    clean:
+    ```
+
+If you now run `make upload-image`, you should see something like this:
+
+![upload image output](/images/containerise-it/upload-image-output.png)
+
+!!! success
+    Great work! Now you've containerised your application and uploaded the image to your private container registry.
+
+    Now you're ready to start automating all these tasks using continuous integration.
