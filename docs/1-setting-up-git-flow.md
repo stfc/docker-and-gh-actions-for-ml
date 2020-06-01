@@ -8,7 +8,7 @@ title: 1. Setting up git flow
 
 The branching model we're going to be using is the following:
 
-![git flow branching model](images/git-flow.png)
+![git flow branching model](/images/setting-up-git-flow/git-flow.png)
 
 This is a very common and very popular branching model (although many people adapt or extend it).
 
@@ -27,7 +27,7 @@ Some of you might not have encountered Semantic Versioning or SemVer before - th
 
 Each version has 3 numbers, separated by full-stops, and an optional label at the end, like this:
 
-![SemVer Demo](images/semver.png)
+![SemVer Demo](/images/setting-up-git-flow/semver.png)
 
 From: https://forums.ubports.com/topic/1822/semantic-versioning-for-ut
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
@@ -252,7 +252,7 @@ If we make a small adjustment to our `Makefile`, we can include the version in t
 !!! note
     If you're wondering why the `VERSION ?= $(...)` variable has a `?=` instead of a `:=`, that's not a typo! It means that we only assign the variable if it's not already defined.
 
-    I'll explain why this is needed further on in [Section 3](/containerise-it/) where we'll be containerising our application.
+    I'll explain why this is needed further on in [Section 3](/3-containerise-it/) where we'll be containerising our application.
 
 !!! tip
     If you are developing an API which is consumer-facing, you'll need to implement some kind of versioning for the API itself so that updating from v1 to v2 doesn't break all of your consumers' applications.

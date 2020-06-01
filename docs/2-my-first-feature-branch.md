@@ -32,13 +32,13 @@ So let's give it a go!
 
 You should see something like this:
 
-![make build output](images/section-2/make-build.png)
+![make build output](/images/my-first-feature-branch/make-build.png)
 
 If you've got this far, you've successfully built your Go web service!
 
 One of the best things about Go is that everything happens at built time - the output of this build is a single file, which contains everything we need for our web server:
 
-![built server executable](images/section-2/built-exe.png)
+![built server executable](/images/my-first-feature-branch/built-exe.png)
 
 As our application gets more complication and includes more and more functionality, everything will still always be bundled up in this single executable. This might not seen like a big deal now, but when we get onto the containerisation later, you'll see how much easier this makes our lives!
 
@@ -54,7 +54,7 @@ We can run our server simply by running our built executable file:
 
 You should see something like this:
 
-![server output](images/section-2/server-output.png)
+![server output](/images/my-first-feature-branch/server-output.png)
 
 Let's try querying our API to see what's going on:
 
