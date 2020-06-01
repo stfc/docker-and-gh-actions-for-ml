@@ -11,6 +11,7 @@ This tutorial requires the following to be installed:
 - curl
 - Go
 - Docker
+- IBM Cloud CLI
 
 !!! note "Note on Windows"
     There are a few different routes you can go down for Windows:
@@ -191,6 +192,34 @@ These are summarised below, but the Golang site has more detailed instructions.
         Go to https://docs.docker.com/docker-for-windows/wsl/ and follow all the instructions there to get Docker Desktop on Windows to use the Linux subsytem within Windows.
 
         This allows you to run Docker images without any emulation, which is actually pretty clever!
+
+## IBM Cloud CLI
+
+Install the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cli-getting-started) if you haven't already got it by running:
+
+=== "Linux / macOS"
+    ```bash
+    $ curl -sL https://ibm.biz/idt-installer | bash
+    ```
+
+=== "Windows"
+    ```powershell
+    $ [Net.ServicePointManager]::SecurityProtocol = "Tls12, Tls11, Tls, Ssl3"; iex(New-Object Net.WebClient).DownloadString('https://ibm.biz/idt-win-installer')
+    ```
+
+Once you've done this, verify your installation with:
+
+```bash
+$ ibmcloud dev help
+```
+
+Now you can log into your IBM Cloud account (which you should have set up for this tutorial) by running:
+
+```bash
+$ ibmcloud login --sso
+```
+
+You can now log into IBM Cloud using your web browser and it will authenticate your CLI.
 
 ## Please do ask if you get stuck!
 
