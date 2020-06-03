@@ -114,7 +114,7 @@ type Context struct {
 What this means is that we've already got an object that maps the date of birth to the people with that birthday!
 
 !!! info
-    If you want to see where this is populated frmo, take a look at the `data/people.csv` file. This CSV file is bundled into the executable and loaded in when the server starts up.
+    If you want to see where this is populated from, take a look at the `data/people.csv` file. This CSV file is bundled into the executable and loaded in when the server starts up.
 
     Obviously, in a real world application we would want our people and birthdays to exist in a database instead of being statically bundled with the API executable, but this goes to show how easy it is in Go to bundle stuff into the final executable without needing to rely on any files at run-time!
 
@@ -178,7 +178,7 @@ make build
 
 # In another terminal
 curl localhost:8000/date/2-November
-> {"Message":"Happy birthday to David Schwimmer!"}
+> {"message":"Happy birthday to David Schwimmer!"}
 ```
 
 !!! tip

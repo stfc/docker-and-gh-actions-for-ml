@@ -42,6 +42,10 @@ One of the big advantages of GitHub Actions is that because it's built into GitH
 
 [^1]: A case in point here is that GitHub Actions configuration files changed entirely from using a domain-specific language (DSL) to using YAML (like all the other CI solutions), which means searching around for documentation still brings up the old DSL solution instead of the new YAML solution.
 
+Something that sets GitHub Actions apart from all the competitors is it's support for code annotations that will label issues with your code directly in the pull request, which is a pretty useful feature.
+
+This and the ability to leverage pipelines other people have written (via the [GitHub Marketplace](https://github.com/marketplace?type=actions)) to made your CI configuration easier means that Actions will likely be used more and more over the next few years, especially for open source projects.
+
 ### Jenkins
 
 TODO: Get logo
@@ -241,7 +245,7 @@ Now if you go to the "CI / CD" > "Pipelines" page, you should have a dropdown al
 
 ## Let's build, tag and upload our images automatically!
 
-Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/3-containerise-it/).
+Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/containerise-it/).
 
 As we need to have access to our private repository, we need to get an API key from IBM Cloud and put it into the "secrets" in GitLab. This means that when we do `ibmcloud login`, the IBM Cloud CLI takes our API key from the runner environment and uses it to authenticate against the IBM Cloud so that it can upload our image. Neat!
 
@@ -294,8 +298,30 @@ It's important that you call the key `IBMCLOUD_API_KEY` precisely, otherwise the
 Once you've done this, we can update our GitLab CI YAML to add an extra stage for our Docker stuff and add a job that will upload a Docker image every time a commit is pushed to the `dev` or `master` branches:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="12 32-38"
+    ```yaml linenums="1" hl_lines="3-23 34 54-70"
     image: golang
+
+    variables:
+      # When using dind service we need to instruct docker, to talk with the
+      # daemon started inside of the service. The daemon is available with
+      # a network connection instead of the default /var/run/docker.sock socket.
+      #
+      # The 'docker' hostname is the alias of the service container as described at
+      # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
+      #
+      # Note that if you're using the Kubernetes executor, the variable should be set to
+      # tcp://localhost:2375 because of how the Kubernetes executor connects services
+      # to the job container
+      # DOCKER_HOST: tcp://localhost:2375
+      #
+      # For non-Kubernetes executors, we use tcp://docker:2375
+      # DOCKER_HOST: tcp://docker:2375
+      #
+      # This will instruct Docker not to start over TLS.
+      DOCKER_TLS_CERTDIR: "/certs"
+
+    services:
+      - name: docker:19.03.1-dind
 
     cache:
       key: ${CI_COMMIT_REF_SLUG}
@@ -328,16 +354,27 @@ Once you've done this, we can update our GitLab CI YAML to add an extra stage fo
 
     upload-image:
       stage: docker
+      image: docker:19.03.1
       before_script:
+        - apk add --update alpine-sdk bash
+        - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+        - ibmcloud plugin install container-registry -r 'IBM Cloud'
+        # Latest CF is not compatible with IBM Cloud (seemingly) because the IBM Cloud CF
+        # instance doesn't have log cache installed on it.
+        - ibmcloud cf install --version 6.49.0 --force
         - ibmcloud login --no-region
         - ibmcloud cr login
       script:
         - make upload-image
-      ## TODO: Is this the correct syntax?
-      branches:
+      only:
         - dev
         - master
     ```
+
+!!! note
+    You might notice that we had to use a separate image for the upload job, and that we need to add a variable and service to the config.
+
+    This is because the job is running inside a Docker image, which means we need to allow the Docker in the job inside the container to contact the Docker daemon running outside the container. This is known as d-in-d or Docker-in-Docker.
 
 Commit and push this change to your GitLab repo and you should see your images built, tagged and uploaded to your private repository.
 
