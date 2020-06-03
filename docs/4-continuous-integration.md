@@ -18,8 +18,7 @@ There are a bunch of different CI tools out there. Here's a quick overview of th
 
 ### GitLab CI
 
-TODO: Get logo
-![GitLab CI / CD](/images/continuous-integration/gitlab-ci-cd.png)
+![GitLab CI / CD](/images/continuous-integration/gitlab-ci-cd.png){: style="height: 200px; float: right;"}
 
 GitLab CI is what we're going to be using for this demo for a few reasons:
 
@@ -31,8 +30,7 @@ Overall, GitLab CI is a very sophisticated, well designed and battle-hardened CI
 
 ### GitHub Actions
 
-TODO: Get logo
-![GitHub Actions](/images/continuous-integration/github-actions.png)
+![GitHub Actions](/images/continuous-integration/github-actions.jpg){: style="height: 200px; float: right; margin: 0 0 15px 15px;"}
 
 GitHub Actions is the new kid on the block here - it started its public beta a few months ago and it now available for widespread use.
 
@@ -48,8 +46,7 @@ This and the ability to leverage pipelines other people have written (via the [G
 
 ### Jenkins
 
-TODO: Get logo
-![Jenkins](/images/continuous-integration/jenkins.png)
+![Jenkins](/images/continuous-integration/jenkins.png){: style="height: 200px; float: right;"}
 
 Jenkins is, like DroneCI, designed to be hosted by the consumer themselves. Compared to all the others, it is the ancient behemonth, hardened by years of heavy use.
 
@@ -61,8 +58,7 @@ This does mean that it doesn't provide out-of-the-box support for many things, a
 
 ### TravisCI
 
-TODO: Get logo
-![TravisCI](/images/continuous-integration/travis-ci.png)
+![TravisCI](/images/continuous-integration/travis-ci.png){: style="height: 200px; float: right;"}
 
 TravisCI was one of the first CI solutions out there. It used to be the market leader by a long way, and you'd find almost all open source projects using TravisCI, as well as lot's of proprietary projects.
 
@@ -70,8 +66,7 @@ It's certainly well used, well loved and well established, but it doesn't have t
 
 ### CircleCI
 
-TODO: Get logo
-![CircleCI](/images/continuous-integration/circle-ci.png)
+![CircleCI](/images/continuous-integration/circle-ci.png){: style="height: 200px; float: right;"}
 
 CircleCI is similar to TravisCI is many ways, with two important differences:
 
@@ -84,8 +79,7 @@ Regardless, CircleCI remains a very popular choice for it's relative cheapness, 
 
 ### DroneCI
 
-TODO: Get logo
-![DroneCI](/images/continuous-integration/drone-ci.png)
+![DroneCI](/images/continuous-integration/drone-ci.png){: style="height: 200px; float: right;"}
 
 DroneCI is a another new kid on the block. It's a self-hosted solution designed to be container-native from the offset - everything runs in containers, from the jobs to the DroneCI server to the job runners.
 
