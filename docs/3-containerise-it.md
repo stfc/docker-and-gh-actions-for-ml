@@ -48,7 +48,7 @@ As all the running containers on your machine share the same kernel, there's muc
 From: https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
 
-If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/) and [zines](https://wizardzines.com/zines/containers/) by [Julia Evans](https://twitter.com/b0rk)
+If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/) and [zines](https://wizardzines.com/zines/containers/) by [Julia Evans](https://twitter.com/b0rk).
 
 ### Container technologies
 

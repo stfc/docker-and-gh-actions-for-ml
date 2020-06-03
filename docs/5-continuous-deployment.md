@@ -388,6 +388,10 @@ $ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/version
 
 $ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/status
 > {"message":"The time is 59 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."}
+
+# Just for fun, output will depend on when you run it!
+$ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/date/$(date +"%d-%B")
+> {"message":"Happy birthday to Clint Eastwood!"}
 ```
 
 !!! success

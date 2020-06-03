@@ -30,32 +30,32 @@ This tutorial requires the following to be installed:
     If you're using Linux, you've probably already got git installed. If not, don't worry, it's easy!
 
     Debian/Ubuntu:
-    ```sh
-    sudo apt update
-    sudo apt install git
+    ```bash
+    $ sudo apt update
+    $ sudo apt install git
     ```
 
     Fedora / RHEL / CentOS:
-    ```sh
-    sudo dnf install git
+    ```bash
+    $ sudo dnf install git
     ```
 
 === "macOS"
     There are two options for installing git on macOS. You can install the Xcode command line tools or you can install it using Homebrew. I would recommend using Homebrew because installing the Xcode command line tools can take a *long time* if you haven't done it already.
 
     To install [Homebrew](https://brew.sh), run:
-    ```sh
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    ```bash
+    $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     ```
 
     You can then install git by running:
-    ```sh
-    brew install git
+    ```bash
+    $ brew install git
     ```
 
     Alternatively, you can install the Xcode command line tools by running:
-    ```sh
-    xcode-select --install
+    ```bash
+    $ xcode-select --install
     ```
 
     !!! warning
@@ -70,25 +70,25 @@ This tutorial requires the following to be installed:
 
 === "Linux"
     Ubuntu / Debian:
-    ```sh
-    sudo apt update
-    sudo apt install build-essential
+    ```bash
+    $ sudo apt update
+    $ sudo apt install build-essential
     ```
 
     Fedora / RHEL / CentOS:
-    ```sh
-    sudo dnf install make
+    ```bash
+    $ sudo dnf install make
     ```
 
 === "macOS"
     If you've got Homebrew installed, you should already have make! You can check this:
-    ```sh
-    which make
+    ```bash
+    $ which make
     ```
 
     If you don't for whatever reason or there's a problem, you can run:
-    ```sh
-    brew install make
+    ```bash
+    $ brew install make
     ```
     which will install GNU make as `gmake`, which means you can run `gmake` whenever you would otherwise use `make`.
 
@@ -100,41 +100,41 @@ This tutorial requires the following to be installed:
 === "Linux"
     Ubuntu / Debian:
 
-    ```sh
-    sudo apt update
-    sudo apt install curl
+    ```bash
+    $ sudo apt update
+    $ sudo apt install curl
     ```
 
     Fedora / RHEL / CentOS:
 
-    ```sh
-    sudo dnf install curl
+    ```bash
+    $ sudo dnf install curl
     ```
 
 === "macOS"
     Curl comes pre-installed with macOS. If you want to make sure you have the latest and greatest version of curl installed, you can always install with Homebrew:
 
-    ```sh
-    brew install curl
+    ```bash
+    $ brew install curl
     ```
 
 === "Windows"
     If you're using Windows, you'll have PowerShell installed. You can get the same functionality as you would from curl by using PowerShell's built-in [`Invoke-RestMethod`](https://discoposse.com/2012/06/30/powershell-invoke-restmethod-putting-the-curl-in-your-shell/):
 
     ```powershell
-    Invoke-RestMethod -Uri localhost:8000 -Method Get
+    $ Invoke-RestMethod -Uri localhost:8000 -Method Get
     ```
 
     If you've not used PowerShell before, you should try it out! It's a pretty neat piece of software. I'd also highly recommend installing the new [Windows Terminal](https://github.com/microsoft/terminal).
 
     If you're using Choco or Scoop, you can also just install curl like so:
 
-    ```sh
+    ```bash
     # If you're using Chocolatey
-    choco install curl
+    $ choco install curl
 
     # If you're using Scoop
-    scoop install curl
+    $ scoop install curl
     ```
 
 ## Go
@@ -147,12 +147,15 @@ These are summarised below, but the Golang site has more detailed instructions.
     Download the archive from https://golang.org/dl/.
     
     You should set the `GO_VERSION` environment variable to whichever version it is you're installing. For instance, at the time of writing, you would do:
-    ```sh
-    export GO_VERSION=1.14.3
+
+    ```bash
+    $ export GO_VERSION=1.14.3
     ```
+
     You can then run:
-    ```sh
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+
+    ```bash
+    $ tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
     ```
 
 === "macOS"
