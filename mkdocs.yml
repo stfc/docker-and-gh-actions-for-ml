@@ -55,8 +55,7 @@ extra_css:
   - styles.css
 
 extra:
-  # This is annoying when developing - just remember to uncomment this when the content is finished.
-  #disqus: go-with-the-flow
+  disqus: go-with-the-flow
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/drewsilcock
