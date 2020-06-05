@@ -132,6 +132,16 @@ $ git checkout -b dev
 $ git push --set-upstream origin dev
 ```
 
+## GitLab default branch
+
+One last thing you'll want to do before moving on - the GitLab repository has a default remote branch - you'll want to change this to either dev or master.
+
+I usually put dev as the default branch as it makes it the default target for merge requests, but making master your default branch is a perfectly reasonable choice too, as it represents the most up-to-date release of your project.
+
+To do this, go to "Settings" > "Repository" > "Default Branch":
+
+![choosing default branch](/images/setting-up-git-flow/default-branch.png)
+
 ## Setting the API version
 
 We want to be able to specify the version inside our application so that we can check what version the API is running dynamically.
