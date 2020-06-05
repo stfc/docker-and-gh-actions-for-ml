@@ -8,7 +8,7 @@ In this tutorial, you're going to get some hands-on experience utilising the pow
 
 This tutorial is designed to be taken at your own pace depending on your own experience. If you feel like you already understand a particular section and won't gain much from going through the steps for it, feel free to skip forward to the next section.
 
-You can get to the starting code for a particular section by checking out the branch `tutorial/section-X` where `X` is the section number that you want to get working on. The final code that you should end up with after the tutorial can be found in the `completed` branch.
+You can get to the starting code for a particular section by checking out the branch `tutorial/section-X` where `X` is the section number that you want to get working on. The final code that you should end up with after the tutorial can be found in the `tutorial/completed` branch.
 
 !!! info
     Tempting as it might be, you'll get a lot more out of this tutorial if you go through all the commands and code modifications yourself, rather than just skipping ahead. :slightly_smiling_face:

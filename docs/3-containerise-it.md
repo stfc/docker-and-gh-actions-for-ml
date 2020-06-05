@@ -308,7 +308,7 @@ If you remember back to [Section 1](/1-setting-up-git-flow/), we used `git descr
 We can use this same tactic to automatically tag our Docker images with their version!
 
 !!! example "`Makefile`"
-    ```Makefile linenums="65" hl_lines="4-15"
+    ```Makefile linenums="65" hl_lines="4-14"
         GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod download
         test -e $(GOBIN)/go-bindata || GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/kevinburke/go-bindata/...
 
