@@ -129,7 +129,6 @@ $ make deploy-dev
 
 If all is successful, you should see some output indicating that your app has been successfully deployed, like so:
 
-TODO: Take this screenshot
 ![dev app deployed output](/images/continuous-deployment/dev-app-deployed-output.png)
 
 !!! tip
@@ -143,7 +142,7 @@ Let's give our newly deployed app a go:
 # You'll need to change this URL depending on what you put as your route in the
 # `manifest.yaml`.
 $ curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/version
-> {"build_time":"2020-06-03T10:28:28Z","version":"v1.0.0"}
+> {"build_time":"2020-06-03T10:28:28Z","version":"v1.0.0-16-g232c588"}
 ```
 
 ## Continuously deploying our dev instance
@@ -151,7 +150,7 @@ $ curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/version
 Now that we've got our deployment working, let's extend our GitLab CI pipeline to enable us to re-deploy our dev CloudFoundry app instance:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="13 46-59"
+    ```yaml linenums="1" hl_lines="13 47-65"
     image: golang
 
     cache:
@@ -194,6 +193,7 @@ Now that we've got our deployment working, let's extend our GitLab CI pipeline t
         # instance doesn't have log cache installed on it.
         - ibmcloud cf install --version 6.49.0 --force
         - ibmcloud login --no-region
+        - ibmcloud cr region-set uk-south
       script:
         - make upload-image
 
@@ -208,6 +208,7 @@ Now that we've got our deployment working, let's extend our GitLab CI pipeline t
         # instance doesn't have log cache installed on it.
         - ibmcloud cf install --version 6.49.0 --force
         - ibmcloud login --no-region
+        - ibmcloud cr region-set uk-south
 
     deploy-dev:
       <<: *deploy-template
@@ -220,19 +221,22 @@ Now that we've got our deployment working, let's extend our GitLab CI pipeline t
 !!! info
     We're using a YAML anchor here to implement a template for the deployment that we can use later for our prod deployment.
 
-    If you're using a newer version of GitLab, you can use the [GitLab CI-specific template syntax TODO](TODO), which is generally nicer.
+    If you're using a newer version of GitLab, you can use the [GitLab CI-specific template syntax](https://docs.gitlab.com/ee/ci/yaml/#extends), which is generally nicer.
 
 Commit and push this up and you should see the extra stage added to your CI pipeline:
 
-TODO
 ![CI pipeline deploy dev](/images/continuous-deployment/ci-pipeline-deploy-dev.png)
+
+Examining the job output for our new "deploy-dev" should show a successful dev deployment:
+
+![CI pipeline successful dev deploy](/images/continuous-deployment/ci-pipeline-successful-dev-deploy.png)
 
 ## Continuously deploying our prod instance
 
 Now that we've got our dev instance continuously deploying from our GitLab, the only thing left to do is add another job to the CD pipeline within the deploy stage to deploy our production instance whenever we tag a new release:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="46" hl_lines="20-25"
+    ```yaml linenums="46" hl_lines="21-26"
     .deploy-template: &deploy-template
       stage: deploy
       image: docker:19.03.1
@@ -244,9 +248,14 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
         # instance doesn't have log cache installed on it.
         - ibmcloud cf install --version 6.49.0 --force
         - ibmcloud login --no-region
+        - ibmcloud cr region-set uk-south
 
     deploy-dev:
       <<: *deploy-template
+      environment:
+        name: HBaaS Dev
+        # Change this depending on your route.
+        url: https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud
       script:
         - make deploy-dev
       only:
@@ -254,6 +263,10 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
 
     deploy-prod:
       <<: *deploy-template
+      environment:
+        name: HBaaS Prod
+        # Change this depending on your route.
+        url: https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud
       script:
         - make deploy-prod
       only:
@@ -265,21 +278,38 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
 
     Sometimes you might need to use tags for other purposes as well - this is fine! You just need to modify the `only` block to do one or multiple of the following:
 
-    - Only run when tag matches semantic version, e.g. `v1.2.3`, `v1.2.3-abc` (this is what I'd recommend)
+    - Only run when tag matches semantic version, e.g. `v1.2.3`, `v1.2.3-abc` (this is what I'd recommend[^semver-regex])
     - Only run when tag in on master branch (this has important caveats to consider[^caveats])
 
-    For more info on how to set this up, check out: [TODO conjunction logic for GitLab CI job condition](TODO).
+    For more info on how to set this up, check out: [conjunction logic for GitLab CI job condition](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818).
+
+[^semver-regex]:
+    The way to do this would be to utilise the [official semver regex](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) like so:
+
+    ```yaml
+    only:
+      refs:
+        - tags
+      variables:
+        # If you don't use a `v` before your semver, just remove the first `v` in this regex.
+        - $CI_COMMIT_TAG =~ ^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+    ```
+
+    I haven't tested this with GitLab CI, but it should work.
 
 [^caveats]:
     Technically, tags and branches are both just pointers to commits. This means that running on tag and master is not reproducible because another commit on the master branch will move the commit that master points to and thus would mean that the tag && master condition no longer applies.
 
     This breaks a pretty important principle of CD which is that you can simply repeat a pipeline and have the exact same thing happen. This reproducibility is what makes rolling back to specific versions so easy.
 
-    This is discussed more on the [GitLab issue for this topic TODO LINK](TODO).
+    This is discussed more on the [GitLab issue for this topic](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818).
+
+!!! note
+    Notice how we specify an "environment" for each deployment - we'll take a look at what this can do later.
 
 Go ahead and commit and push this up - we're going to test it out in the next section.
 
-## Trying it out
+## Triggering our deployments
 
 Now that we've got our dev and prod API instances continuous deploying, let's try out adding a new feature so that we can do a version bump and see our CD pipeline in action!
 
@@ -340,12 +370,10 @@ $ git push --set-upstream origin feature/add-status-endpoint
 
 Now if you go to your GitLab repository and check out the merge request you just opened, you should see a nice green tick show up indicating the MR passed the CI checks:
 
-TODO
 ![MR CI checks passing](/images/continuous-deployment/mr-ci-checks-passing.png)
 
 Now if you merge this in using the GitLab UI (or alternatively merge it in using the local command-line), you should see your dev deployment trigger:
 
-TODO
 ![dev CD running](images/continuous-deployment/dev-deployment-running.png)
 
 Once that's done, we can check that it's properly deployed the dev app by hitting our new status endpoint:
@@ -360,12 +388,20 @@ Great! Now let's do a release onto master so that our prod instance updates. If 
 
 To do this, let's create another merge request, this time from dev to master:
 
-TODO
 ![dev to master MR](/images/continuous-deployment/dev-to-master-mr.png)
 
 Once that's created, make sure the CI tests pass and then merge it in!
 
-Once that's done, all we need to do is create our new version tag on master and push it up and that'll trigger our prod deployment. Note that as we're adding a new non-breaking feature, this would correspond to a minor version update. Assuming you were previously still on `v1.0.0` as per [Section 1](/1-setting-up-git-flow/):
+!!! warning
+    Make sure that you've got the "Delete source branch" unticked in the merge request on GitLab! You don't want the merge to get rid of our dev branch.
+
+### Creating releases
+
+Once that's done, all we need to do is create our new version tag on master and push it up and that'll trigger our prod deployment. Note that as we're adding a new non-breaking feature, this would correspond to a minor version update.
+
+There are two ways to do this. There's the good ol' fashioned command-line way and the fancy GitLab UI way.
+
+#### The good ol' fashioned command-line way
 
 ```bash
 $ git checkout master
@@ -374,10 +410,38 @@ $ git tag -a "v1.1.0" -m "Release v1.1.0: add status endpoint"
 $ git push --tags
 ```
 
+Simple and easy.
+
+#### The fancy GitLab UI way
+
+There's another option though - GitLab provides a nice UI for creating new tags which allows you to add "Release notes" which appear under "Releases" in the project overview in GitLab.
+
+Go to "Repository" > "Tags" in your GitLab project and click "New Tag". Here's the equivalent as above using the fancy GitLab UI:
+
+![creating the GitLab tag](/images/continuous-deployment/gitlab-creating-tag.png)
+
+To see your fancy new release, go to "Project overview" > "Releases":
+
+![GitLab show releases](/images/continuous-deployment/gitlab-show-release.png)
+
 Now sit back and watch as your CD pipeline automatically deploys our updated API:
 
-TODO
-![prod deployment running](/images/continuous-deployment/prod-deploymeny-running.png)
+![CI pipeline with deploy prod](/images/continuous-deployment/ci-pipeline-with-deploy-prod.png)
+
+![CI pipeline successful prod deploy](/images/continuous-deployment/ci-pipeline-successful-prod-deploy.png)
+
+### Understanding GitLab environments
+
+We saw earlier that we could specify an "environment" for each of our deployments. What this does is allow us to go into GitLab and see when each environment has been deployed, easily open the URL for the environment and to easily re-run deployments on a per-environment basis:
+
+![GitLab environments](/images/continuous-deployment/gitlab-environments.png)
+
+!!! info
+    If you're using a more advanced deployment system utilising Kubernetes, GitLab will integrate these environments with your Kubernetes instance.
+
+    For more info on this, check out [the GitLab docs on Kubernetes integration](https://docs.gitlab.com/ee/user/project/clusters/index.html).
+
+## Let's give it a whirl!
 
 Once that's done, let's try it out!
 
@@ -389,10 +453,12 @@ $ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/version
 $ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/status
 > {"message":"The time is 59 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."}
 
-# Just for fun, output will depend on when you run it!
+# Just for fun - output will depend on when you run it!
 $ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/date/$(date +"%d-%B")
 > {"message":"Happy birthday to Clint Eastwood!"}
 ```
 
 !!! success
-    Congratulations! With this done, you've got all the knowledge, skills and environment set up to further develop your API.
+    Congratulations, you've successfully set up a full continuous deployment pipeline!
+    
+    With this done, you can sit back and watch as GitLab CI takes care of all the hard-work when it comes to running and managing multiple deployments. All you need to do is code using this sensible git flow model and the rest will take care of itself!

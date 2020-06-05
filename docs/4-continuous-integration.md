@@ -357,7 +357,7 @@ Once you've done this, we can update our GitLab CI YAML to add an extra stage fo
         # instance doesn't have log cache installed on it.
         - ibmcloud cf install --version 6.49.0 --force
         - ibmcloud login --no-region
-        - ibmcloud cr login
+        - ibmcloud cr region-set uk-south
       script:
         - make upload-image
       only:
@@ -372,6 +372,8 @@ Once you've done this, we can update our GitLab CI YAML to add an extra stage fo
 
 Commit and push this change to your GitLab repo and you should see your images built, tagged and uploaded to your private repository.
 
+![upload image CI pipeline](/images/continuous-integration/upload-image-ci-pipeline.png)
+
 This'll work regardless of whether it's running on `dev` or `master` - you don't want this running on other branches, otherwise you'll end up with images in your private repository from your feature and bugfix branches cluttering up your private registry.
 
 !!! note
@@ -382,11 +384,19 @@ This'll work regardless of whether it's running on `dev` or `master` - you don't
 !!! tip
     Making the CI play nicely with the IBM Cloud private repository can be fernickity so please do reach out if you encounter any problems here!
 
+If you check your "upload-image" job in GitLab, you should see an output that looks something like this:
+
+![image upload job output](/images/continuous-integration/image-upload-job-output.png)
+
 You can check to make sure that your images have uploaded properly by checking the GitLab CI job logs and by running:
 
 ```bash
 $ ibmcloud cr images
-> TODO: Output of this command
+> Listing images...
+>
+> Repository                                     Tag                                Digest         Namespace               Created          Size     Security status
+> uk.icr.io/my-org/hbaas-server                  latest                             135777eaee3a   my-org                  12 minutes ago   13 MB    No Issues
+> uk.icr.io/my-org/hbaas-server                  v1.0.0-16-g232c588                 a4ba15b7e419   my-org                  2 days ago       13 MB    No Issues
 ```
 
 !!! success
