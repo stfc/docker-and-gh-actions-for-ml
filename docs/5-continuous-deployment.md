@@ -150,7 +150,7 @@ $ curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/version
 Now that we've got our deployment working, let's extend our GitLab CI pipeline to enable us to re-deploy our dev CloudFoundry app instance:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="13 47-65"
+    ```yaml linenums="1" hl_lines="13 47-69"
     image: golang
 
     cache:
@@ -212,6 +212,10 @@ Now that we've got our deployment working, let's extend our GitLab CI pipeline t
 
     deploy-dev:
       <<: *deploy-template
+      environment:
+        name: HBaaS Dev
+        # Change this depending on your route.
+        url: https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud
       script:
         - make deploy-dev
       only:
@@ -236,7 +240,7 @@ Examining the job output for our new "deploy-dev" should show a successful dev d
 Now that we've got our dev instance continuously deploying from our GitLab, the only thing left to do is add another job to the CD pipeline within the deploy stage to deploy our production instance whenever we tag a new release:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="46" hl_lines="21-26"
+    ```yaml linenums="46" hl_lines="25-34"
     .deploy-template: &deploy-template
       stage: deploy
       image: docker:19.03.1
