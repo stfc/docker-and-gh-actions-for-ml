@@ -6,7 +6,17 @@ Welcome to Module 4 of the the [Industrial Digitilisation Accelerator's](https:/
 
 In this tutorial, you're going to get some hands-on experience utilising the power of continuous deployment with the git flow branching model to host modern, cloud-native, 12-factor web services on the cloud.
 
-This tutorial is designed to be taken at your own pace depending on your own experience. If you feel like you already understand a particular section and won't gain much from going through the steps for it, feel free to skip forward to the next section. You can get to the starting code for a particular section by checking out the branch `tutorial/section-X` where `X` is the section number that you want to get working on.
+This tutorial is designed to be taken at your own pace depending on your own experience. If you feel like you already understand a particular section and won't gain much from going through the steps for it, feel free to skip forward to the next section.
+
+You can get to the starting code for a particular section by checking out the branch `tutorial/section-X` where `X` is the section number that you want to get working on. The final code that you should end up with after the tutorial can be found in the `completed` branch.
+
+!!! info
+    Tempting as it might be, you'll get a lot more out of this tutorial if you go through all the commands and code modifications yourself, rather than just skipping ahead. :slightly_smiling_face:
+
+    I'd also suggest typing out the code and commands youself instead of simply copy & pasting - by typing everything out, you'll do two things:
+
+    1. Better process what you're typing
+    2. Probably make typos - this is great! Making mistakes and fixing them is the best way to learn.
 
 This tutorial will expect you to know your way around a terminal and how git branches work. Any experience using make, Go, GitLab CI and IBM Cloud would be helpful, but you should be able to going without any prior experience using these.
 

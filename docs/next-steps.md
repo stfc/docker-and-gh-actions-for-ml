@@ -6,7 +6,9 @@ title: Next steps
 
 ## Congrats!
 
-You've successfully completed this tutorial as part of Module 4 of the IDA's Guide to Industry 4.0 - _well done!_
+![well done](/images/well-done.webp){: style="height: 200px; float: right;"}
+
+You've successfully completed this tutorial as part of Module 4 of the IDA's Guide to Industry 4.0 - _good job!_
 
 If you want to use any of the code from this tutorial, it's all under an MIT licence so feel free.
 
