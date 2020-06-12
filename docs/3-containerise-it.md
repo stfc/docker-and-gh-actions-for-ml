@@ -250,7 +250,7 @@ Considering all we need at the end is our 14 MB `hbaas-server` executable, 1.11 
 We'll need to make some changes to our `Dockerfile`:
 
 !!! example "`Dockerfile`"
-    ```Dockerfile linenums="1" hl_lines="1-6 21-34"
+    ```Dockerfile linenums="1" hl_lines="1-8 21-34"
     # Builder stage
     # =============
 
