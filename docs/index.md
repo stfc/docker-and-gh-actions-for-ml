@@ -22,8 +22,10 @@ This tutorial will expect you to know your way around a terminal and how git bra
 
 ## :speech_balloon: Giving feedback and getting help
 
-The best way to get help or provide feedback is to message us directly.
+If you get stuck or encounter a problem, the first thing to check out is the [Troubleshooting](/troubleshooting) page - you might find that someone else has already encountered your problem and this page contains a big list of all the errors that people have encountered along with their solutions.
 
-You can also comment on any of these tutorial sections[^1] using Disqus - any and all feedback, corrections or questions are very welcome!
+The next port of call is to message us directly.
 
-[^1]: Apart from this intro page :slightly_smiling_face:
+You can also comment on any of these tutorial sections[^disqus] using Disqus - any and all feedback, corrections or questions are very welcome!
+
+[^disqus]: Apart from this intro page :slightly_smiling_face:
