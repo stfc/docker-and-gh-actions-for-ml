@@ -148,7 +148,7 @@ We want to be able to specify the version inside our application so that we can 
 
 Well there's good news - we can get git to do this for us automatically!
 
-Ie you've set up your git flow and you're on either your master or dev branches, we can get our current version in semver format by simply running:
+If you've set up your git flow and you're on either your master or dev branches, we can get our current version in semver format by simply running:
 
 ```bash
 $ git describe --tags --always
