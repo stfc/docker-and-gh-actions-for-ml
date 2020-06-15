@@ -218,45 +218,45 @@ If we make a small adjustment to our `Makefile`, we can include the version in t
 
     ## build: Build the server executable.
     build: code-gen
-        $(call log,Building binary...)
-        GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) || (\
-            $(call log-error,Failed to build $(PROJECTNAME).) \
-            && false \
-        )
+    	$(call log,Building binary...)
+    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) || (\
+    	    $(call log-error,Failed to build $(PROJECTNAME).) \
+    	    && false \
+    	)
 
     ## build-linux: Build the server executable in the Linux ELF format.
     build-linux:
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make build
+    	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make build
 
     ## code-gen: Generate code before compilation, such as bundled data.
     code-gen: download-dependencies
-        $(call log,Generating code...)
-        cd data && $(GOBIN)/go-bindata -pkg data . || (\
-            $(call log-error,Unable to build data package.) \
-            && false \
-        )
+    	$(call log,Generating code...)
+    	cd data && $(GOBIN)/go-bindata -pkg data . || (\
+    	    $(call log-error,Unable to build data package.) \
+    	    && false \
+    	)
 
     ## download-dependencies: Download all library and binary dependencies.
     download-dependencies:
-        $(call log,Downloading dependencies...)
-        GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod download
-        test -e $(GOBIN)/go-bindata || GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/kevinburke/go-bindata/...
+    	$(call log,Downloading dependencies...)
+    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod download
+    	test -e $(GOBIN)/go-bindata || GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/kevinburke/go-bindata/...
 
     .PHONY: clean
     ## clean: Clean up all build files.
     clean:
-        @-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
-        GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
-        @-rm ./**/bindata.go 2> /dev/null
+    	@-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
+    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
+    	@-rm ./**/bindata.go 2> /dev/null
 
     .PHONY: help
     all: help
     help: Makefile
-        echo
-        echo "Choose a command run in "$(PROJECTNAME)":"
-        echo
-        sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
-        echo
+    	echo
+    	echo "Choose a command run in "$(PROJECTNAME)":"
+    	echo
+    	sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
+    	echo
     ```
 
 !!! note

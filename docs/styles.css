@@ -2,6 +2,11 @@ html .md-typeset .admonition.example .highlighttable {
     margin: 0 -0.6rem 0 -0.6rem;
 }
 
+pre {
+    -moz-tab-size: 4;
+    tab-size: 4;
+}
+
 input::after,
 input::before,
 select::after,

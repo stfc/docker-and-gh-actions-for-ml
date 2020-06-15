@@ -309,20 +309,20 @@ We can use this same tactic to automatically tag our Docker images with their ve
 
 !!! example "`Makefile`"
     ```Makefile linenums="65" hl_lines="4-14"
-        GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod download
-        test -e $(GOBIN)/go-bindata || GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/kevinburke/go-bindata/...
+    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod download
+    	test -e $(GOBIN)/go-bindata || GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/kevinburke/go-bindata/...
 
     ## build-image: Build Docker container image for API.
     build-image:
-        $(call log,Building Docker image...)
-        docker build \
-            --build-arg version=$(VERSION) \
-            --tag $(PROJECTNAME):latest . \
-            --tag $(PROJECTNAME):$(VERSION) . || \
-        (\
-            $(call log-error,Unable to build Docker image.) \
-            && false \
-        )
+    	$(call log,Building Docker image...)
+    	docker build \
+    	    --build-arg version=$(VERSION) \
+    	    --tag $(PROJECTNAME):latest . \
+    	    --tag $(PROJECTNAME):$(VERSION) . || \
+    	(\
+    	    $(call log-error,Unable to build Docker image.) \
+    	    && false \
+    	)
 
     .PHONY: clean
     ## clean: Clean up all build files.
@@ -407,9 +407,9 @@ This means adding a new target like so:
     build-image:
     	$(call log,Building Docker image...)
     	docker build \
-    		--build-arg version=$(VERSION) \
-    		--tag $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) \
-    		--tag $(DOCKERREGISTRY)/$(PROJECTNAME):latest . || \
+    	    --build-arg version=$(VERSION) \
+    	    --tag $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) \
+    	    --tag $(DOCKERREGISTRY)/$(PROJECTNAME):latest . || \
     	(\
     	    $(call log-error,Unable to build Docker image.) \
     	    && false \

@@ -96,14 +96,14 @@ Notice that the `BirthdayHandler` type has a `Context`, and that context has a `
 !!! example "`handlers/birthday.go`"
     ```go linenums="13"
     type BirthdayHandler struct {
-        Context context.Context
+    	Context context.Context
     }
     ```
 
 !!! example "`context/context.go`"
     ```go linenums="17"
     type Context struct {
-        PeopleByBirthday map[BirthDay][]string
+    	PeopleByBirthday map[BirthDay][]string
     }
     ```
 
@@ -121,62 +121,62 @@ Okay, so let's add another endpoint for our date-based happy birthday wishes:
     package handlers
 
     import (
-        "fmt"
-        "net/http"
-        "strings"
-        "time"
+    	"fmt"
+    	"net/http"
+    	"strings"
+    	"time"
 
-        "github.com/labstack/echo/v4"
-        "hartree.stfc.ac.uk/hbaas-server/context"
+    	"github.com/labstack/echo/v4"
+    	"hartree.stfc.ac.uk/hbaas-server/context"
     )
 
     type BirthdayHandler struct {
-        Context context.Context
+    	Context context.Context
     }
 
     func (h BirthdayHandler) registerEndpoints(g *echo.Group) {
-        g.GET("", h.sayHello)
-        g.GET("name/:name", h.sayHappyBirthdayToName)
-        g.GET("date/:date", h.sayHappyBirthdayByDate)
+    	g.GET("", h.sayHello)
+    	g.GET("name/:name", h.sayHappyBirthdayToName)
+    	g.GET("date/:date", h.sayHappyBirthdayByDate)
     }
 
     func (h BirthdayHandler) sayHello(c echo.Context) error {
-        message := fmt.Sprintf("Welcome! Try sending a request to '/name/{some-name}' to get started!")
-        return c.JSON(
-            http.StatusOK,
-            NewAPIMessage(message),
-        )
+    	message := fmt.Sprintf("Welcome! Try sending a request to '/name/{some-name}' to get started!")
+    	return c.JSON(
+    		http.StatusOK,
+    		NewAPIMessage(message),
+    	)
     }
 
     func (h BirthdayHandler) sayHappyBirthdayToName(c echo.Context) error {
-        name := c.Param("name")
-        message := fmt.Sprintf("Happy birthday %s!", name)
-        return c.JSON(
-            http.StatusOK,
-            NewAPIMessage(message),
-        )
+    	name := c.Param("name")
+    	message := fmt.Sprintf("Happy birthday %s!", name)
+    	return c.JSON(
+    		http.StatusOK,
+    		NewAPIMessage(message),
+    	)
     }
 
     func (h BirthdayHandler) sayHappyBirthdayByDate(c echo.Context) error {
-        date := c.Param("date")
+    	date := c.Param("date")
 
-        dateTime, err := time.Parse("2-January", date)
-        if err != nil {
-            return echo.ErrBadRequest
-        }
+    	dateTime, err := time.Parse("2-January", date)
+    	if err != nil {
+    		return echo.ErrBadRequest
+    	}
 
-        message := "It doesn't look like I know of anyone with that birthday!"
+    	message := "It doesn't look like I know of anyone with that birthday!"
 
-        birthDay := context.NewBirthDay(dateTime)
-        peopleWithBirthday, exists := h.Context.PeopleByBirthday[birthDay]
-        if exists {
-            message = fmt.Sprintf(
-                "Happy birthday to %s!",
-                strings.Join(peopleWithBirthday, ", "),
-            )
-        }
+    	birthDay := context.NewBirthDay(dateTime)
+    	peopleWithBirthday, exists := h.Context.PeopleByBirthday[birthDay]
+    	if exists {
+    		message = fmt.Sprintf(
+    			"Happy birthday to %s!",
+    			strings.Join(peopleWithBirthday, ", "),
+    		)
+    	}
 
-        return c.JSON(http.StatusOK, NewAPIMessage(message))
+    	return c.JSON(http.StatusOK, NewAPIMessage(message))
     }
     ```
 

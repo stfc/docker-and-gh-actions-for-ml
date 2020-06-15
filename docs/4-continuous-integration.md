@@ -141,10 +141,10 @@ Based on this, we can see that we have a string that is inside a call to `fmt.Sp
     }
 
     func (h BirthdayHandler) sayHello(c echo.Context) error {
-        message := "Welcome! Try sending a request to '/{some-name}' to get started!"
-        return c.JSON(
-            http.StatusOK,
-            NewAPIMessage(message),
+    	message := "Welcome! Try sending a request to '/{some-name}' to get started!"
+    	return c.JSON(
+    		http.StatusOK,
+    		NewAPIMessage(message),
     ```
 
 If you commit this fix and push your change, you should get that lovely nice green tick:

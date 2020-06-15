@@ -85,34 +85,34 @@ Let's update our `Makefile` to allow us to easily deploy our dev and prod APIs:
     Towards the bottom of the file:
 
     ```Makefile linenums="111" hl_lines="5-24"
-          $(call log-error,Unable to deploy Docker image to repository.) \
-          && false \
-      )
+    	    $(call log-error,Unable to deploy Docker image to repository.) \
+    	    && false \
+    	)
 
     ## deploy-dev: Build and deploy Cloud Foundry development app instance.
     deploy-dev:
-        APPTODEPLOY=$(PROJECTNAME)-dev make deploy-app
+    	APPTODEPLOY=$(PROJECTNAME)-dev make deploy-app
 
     ## deploy-prod: Build and deploy Cloud Foundry production app instance.
     deploy-prod:
-        APPTODEPLOY=$(PROJECTNAME)-prod make deploy-app
+    	APPTODEPLOY=$(PROJECTNAME)-prod make deploy-app
 
     deploy-app: upload-image
-        @$(call log,Deploying app $(APPTODEPLOY) $(VERSION) to Cloud Foundry...)
-        ibmcloud target --cf -s $(CFSPACE) -r $(CFREGION)
-        ibmcloud cr login
-        CF_DOCKER_PASSWORD=${IBMCLOUD_API_KEY} ibmcloud cf push \
-            -f manifest.yaml $(APPTODEPLOY) \
-            --docker-image $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) \
-            --docker-username iamapikey || \
-        (\
-            $(call log-error,Unable to deploy Cloud Foundry app.) \
-            && false \
-        )
+    	@$(call log,Deploying app $(APPTODEPLOY) $(VERSION) to Cloud Foundry...)
+    	ibmcloud target --cf -s $(CFSPACE) -r $(CFREGION)
+    	ibmcloud cr login
+    	CF_DOCKER_PASSWORD=${IBMCLOUD_API_KEY} ibmcloud	push \
+    	    -f manifest.yaml $(APPTODEPLOY) \
+    	    --docker-image $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) \
+    	    --docker-username iamapikey || \
+    	(\
+    	    $(call log-error,Unable to deploy Cloud Foundry app.) \
+    	    && false \
+    	)
 
     ## clean: Clean build files. Runs `go clean` internally.
     clean:
-        @-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
+    	@-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
     ```
 
 Importantly, in order to deploy our app to CloudFoundry from our private registry, we need our IBM Cloud API key from [Section 4](/4-continuous-integration) in our environment. This is because CloudFoundry needs the key to get access to your private repository to pull our application image.
@@ -324,41 +324,41 @@ Firsly, let's add another endoint that'll work as a health check for our API:
     package handlers
 
     import (
-        "fmt"
-        "net/http"
-        "time"
+    	"fmt"
+    	"net/http"
+    	"time"
 
-        "github.com/labstack/echo/v4"
-        "hartree.stfc.ac.uk/hbaas-server/version"
+    	"github.com/labstack/echo/v4"
+    	"hartree.stfc.ac.uk/hbaas-server/version"
     )
 
     type MaintenanceHandler struct{}
 
     func (h MaintenanceHandler) registerEndpoints(g *echo.Group) {
-        g.GET("version", h.showVersion)
-        g.GET("status", h.status)
+    	g.GET("version", h.showVersion)
+    	g.GET("status", h.status)
     }
 
     func (h MaintenanceHandler) showVersion(c echo.Context) error {
-        return c.JSON(
-            http.StatusOK,
-            map[string]string{
-                "version":    version.Version,
-                "build_time": version.BuildTime,
-            },
-        )
+    	return c.JSON(
+    		http.StatusOK,
+    		map[string]string{
+    			"version":    version.Version,
+    			"build_time": version.BuildTime,
+    		},
+    	)
     }
 
     func (h MaintenanceHandler) status(c echo.Context) error {
-        now := time.Now()
-        message := fmt.Sprintf(
-            "The time is %s and all is well.",
-            now.Format("4 minutes past the 15 hour on the Monday 2 January 2006"),
-        )
-        return c.JSON(
-            http.StatusOK,
-            NewAPIMessage(message),
-        )
+    	now := time.Now()
+    	message := fmt.Sprintf(
+    		"The time is %s and all is well.",
+    		now.Format("4 minutes past the 15 hour on the Monday 2 January 2006"),
+    	)
+    	return c.JSON(
+    		http.StatusOK,
+    		NewAPIMessage(message),
+    	)
     }
     ```
 
