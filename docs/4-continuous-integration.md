@@ -24,7 +24,7 @@ GitLab CI is what we're going to be using for this demo for a few reasons:
 
 - GitLab is an incredibly popular tool for companies hosting their own version control system. This makes it prevelant in business which don't want their IP-sensitive company code on a publicly hosted systems.
 - GitLab CI comes built into GitLab - all you need to do to set up a Runner (i.e. computer which runs our pipelines) is run a simple script.
-- GitLab CI is free to use on the publicly hosted [gitlab.com](https://gitlab.com) GitLab instance and works out of the box without needing to install, setup or enable anything whatsoever. This means that it's both free and easy to use for this tutorial.
+- GitLab CI is free to use on the publicly hosted [gitlab.com](https://gitlab.com){target="_blank" rel="noopener noreferrer"} GitLab instance and works out of the box without needing to install, setup or enable anything whatsoever. This means that it's both free and easy to use for this tutorial.
 
 Overall, GitLab CI is a very sophisticated, well designed and battle-hardened CI solution.
 
@@ -42,7 +42,7 @@ One of the big advantages of GitHub Actions is that because it's built into GitH
 
 Something that sets GitHub Actions apart from all the competitors is it's support for code annotations that will label issues with your code directly in the pull request, which is a pretty useful feature.
 
-This and the ability to leverage pipelines other people have written (via the [GitHub Marketplace](https://github.com/marketplace?type=actions)) to made your CI configuration easier means that Actions will likely be used more and more over the next few years, especially for open source projects.
+This and the ability to leverage pipelines other people have written (via the [GitHub Marketplace](https://github.com/marketplace?type=actions){target="_blank" rel="noopener noreferrer"}) to made your CI configuration easier means that Actions will likely be used more and more over the next few years, especially for open source projects.
 
 ### Jenkins
 
@@ -91,7 +91,7 @@ DroneCI is a very simple and slick solution that's good if you want to be able t
 
 The first thing we're going to want to do in our continuous integration is _lint_ our code. This means automatically checking to make sure it is correctly formatted and doesn't fall victim to common programming mistakes.
 
-In Go, the most popular tool for CI linting is [golangci-lint](https://golangci-lint.run) - this combines a bunch of different checkers into one single tool which is easy to install in CI pipelines. It'll check for common programming mistakes, style inconsistencies and it'll verify whether we've remember to run `go fmt` to automatically format our code.
+In Go, the most popular tool for CI linting is [golangci-lint](https://golangci-lint.run){target="_blank" rel="noopener noreferrer"} - this combines a bunch of different checkers into one single tool which is easy to install in CI pipelines. It'll check for common programming mistakes, style inconsistencies and it'll verify whether we've remember to run `go fmt` to automatically format our code.
 
 To get started with our CI, we first have to make our `.gitlab-ci.yml` file:
 
@@ -231,7 +231,7 @@ This is _super_ useful for regressing bugs because you can run the application a
     ```
 
 !!! tip
-    GitLab CI also supports natively displaying the [results of unit tests](https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#artifactsreportsjunit). If you're testing your software (which is almost always a really good idea) then you can use this same `artifact` to collect unit testing reports.
+    GitLab CI also supports natively displaying the [results of unit tests](https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#artifactsreportsjunit){target="_blank" rel="noopener noreferrer"}. If you're testing your software (which is almost always a really good idea) then you can use this same `artifact` to collect unit testing reports.
 
     These unit tests will also be shown in merge requests so that you can check over them before merging feature or fixes into your dev branch.
 

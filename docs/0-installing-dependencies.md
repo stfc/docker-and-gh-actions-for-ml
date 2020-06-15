@@ -16,8 +16,8 @@ This tutorial requires the following to be installed:
 !!! note "Note on Windows"
     There are a few different routes you can go down for Windows:
 
-    - The best and easiest is to [install the Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10). Note that is requires admin privileges, and it may take a while to get it all set up.
-    - If you can't do this, the next easiest thing to do is install [VirtualBox](https://www.virtualbox.org/) and run an Ubuntu VM through that.
+    - The best and easiest is to [install the Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10){target="_blank" rel="noopener noreferrer"}. Note that is requires admin privileges, and it may take a while to get it all set up.
+    - If you can't do this, the next easiest thing to do is install [VirtualBox](https://www.virtualbox.org/){target="_blank" rel="noopener noreferrer"} and run an Ubuntu VM through that.
     - You should be able to do everything in this tutorial using PowerShell or cmd[^1]. I've not tried this myself so if you go down this route, please let me know how easy / difficult you find it!
 
     If you go down either of the first two routes, you should just be following the instructions under "Linux". If you take the latter option, check out the "Windows" tabs for instructions.
@@ -43,7 +43,7 @@ This tutorial requires the following to be installed:
 === "macOS"
     There are two options for installing git on macOS. You can install the Xcode command line tools or you can install it using Homebrew. I would recommend using Homebrew because installing the Xcode command line tools can take a *long time* if you haven't done it already.
 
-    To install [Homebrew](https://brew.sh), run:
+    To install [Homebrew](https://brew.sh){target="_blank" rel="noopener noreferrer"}, run:
     ```bash
     $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     ```
@@ -93,7 +93,7 @@ This tutorial requires the following to be installed:
     which will install GNU make as `gmake`, which means you can run `gmake` whenever you would otherwise use `make`.
 
 === "Windows"
-    Go to [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) and download & run the setup link containing "Complete package, except sources". Once this is installed, you should be able to run `make` from either cmd or PowerShell. (As before, you may need to restart your terminal to reload the `PATH` environment variable.)
+    Go to [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm){target="_blank" rel="noopener noreferrer"} and download & run the setup link containing "Complete package, except sources". Once this is installed, you should be able to run `make` from either cmd or PowerShell. (As before, you may need to restart your terminal to reload the `PATH` environment variable.)
 
 ## Curl
 
@@ -119,13 +119,13 @@ This tutorial requires the following to be installed:
     ```
 
 === "Windows"
-    If you're using Windows, you'll have PowerShell installed. You can get the same functionality as you would from curl by using PowerShell's built-in [`Invoke-RestMethod`](https://discoposse.com/2012/06/30/powershell-invoke-restmethod-putting-the-curl-in-your-shell/):
+    If you're using Windows, you'll have PowerShell installed. You can get the same functionality as you would from curl by using PowerShell's built-in [`Invoke-RestMethod`](https://discoposse.com/2012/06/30/powershell-invoke-restmethod-putting-the-curl-in-your-shell/){target="_blank" rel="noopener noreferrer"}:
 
     ```powershell
     $ Invoke-RestMethod -Uri localhost:8000 -Method Get
     ```
 
-    If you've not used PowerShell before, you should try it out! It's a pretty neat piece of software. I'd also highly recommend installing the new [Windows Terminal](https://github.com/microsoft/terminal).
+    If you've not used PowerShell before, you should try it out! It's a pretty neat piece of software. I'd also highly recommend installing the new [Windows Terminal](https://github.com/microsoft/terminal){target="_blank" rel="noopener noreferrer"}.
 
     If you're using Choco or Scoop, you can also just install curl like so:
 
@@ -198,7 +198,7 @@ These are summarised below, but the Golang site has more detailed instructions.
 
 ## IBM Cloud CLI
 
-Install the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cli-getting-started) if you haven't already got it by running:
+Install the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cli-getting-started){target="_blank" rel="noopener noreferrer"} if you haven't already got it by running:
 
 === "Linux / macOS"
     ```bash

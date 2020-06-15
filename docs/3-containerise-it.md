@@ -21,11 +21,11 @@ First of all, let's get a bit of terminology out of the way:
 
 **Container** - a running instance of a container image. You can run as many container instances as you want from a single image, and once the container is running you can access a shell in that container and run whatever commands you want like any other command line[^1]. This can be super useful for debugging any problems!
 
-[^1]: This assumes that the image you're working with has a shell installed - if you have an image using the [scratch](https://hub.docker.com/_/scratch) image, you won't have *anything* like this. It's precisely for this reason that using this image isn't recommended unless you specifically need *very very* small Docker images.
+[^1]: This assumes that the image you're working with has a shell installed - if you have an image using the [scratch](https://hub.docker.com/_/scratch){target="_blank" rel="noopener noreferrer"} image, you won't have *anything* like this. It's precisely for this reason that using this image isn't recommended unless you specifically need *very very* small Docker images.
 
 **Container engine** - The software that handles all the container-related tasks like building images, running containers, killing containers, etc.
 
-**Container registry** - This is a server that acts as a library for storing and retrieving images. There are public ones like [Docker Hub](https://hub.docker.com/) and [Singularity Hub](https://singularityhub.com/), but we're gonna be spinning up and using our own private registry, because we don't want to have our API images open to the public!
+**Container registry** - This is a server that acts as a library for storing and retrieving images. There are public ones like [Docker Hub](https://hub.docker.com/){target="_blank" rel="noopener noreferrer"} and [Singularity Hub](https://singularityhub.com/){target="_blank" rel="noopener noreferrer"}, but we're gonna be spinning up and using our own private registry, because we don't want to have our API images open to the public!
 
 **Tag** - This is a label that you apply to an image. This is usually a version but it can be anything you want! There's one special tag, though: `latest`. This should point to the latest, greatest version of your image. If you're looking for most up-to-date version of any other application's image, you can always look for that `latest` tag.
 
@@ -48,7 +48,7 @@ As all the running containers on your machine share the same kernel, there's muc
 From: https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
 
-If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/) and [zines](https://wizardzines.com/zines/containers/) by [Julia Evans](https://twitter.com/b0rk).
+If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/){target="_blank" rel="noopener noreferrer"} and [zines](https://wizardzines.com/zines/containers/){target="_blank" rel="noopener noreferrer"} by [Julia Evans](https://twitter.com/b0rk){target="_blank" rel="noopener noreferrer"}.
 
 ### Container technologies
 
@@ -60,9 +60,9 @@ As far as container runtimes go, there's a whale of a market dominator, and a fe
 
 This is the main player in the container world, by far. The metaphorical whale. (It's also the one with the whale logo.) Docker was the company that popularised containerisation, which means the formats created by Docker had a massive impact on the container landscape.
 
-While Docker Inc. is a private company, all of the code behind it is [Open Source](https://github.com/docker/). They also spun out their [core container runtime](https://containerd.io/) functionality into a separate component and donated it to the care of the [Cloud Native Computing Foundation](https://www.cncf.io/), a part of the non-profit [Linux Foundation](https://www.linuxfoundation.org/).
+While Docker Inc. is a private company, all of the code behind it is [Open Source](https://github.com/docker/){target="_blank" rel="noopener noreferrer"}. They also spun out their [core container runtime](https://containerd.io/){target="_blank" rel="noopener noreferrer"} functionality into a separate component and donated it to the care of the [Cloud Native Computing Foundation](https://www.cncf.io/){target="_blank" rel="noopener noreferrer"}, a part of the non-profit [Linux Foundation](https://www.linuxfoundation.org/){target="_blank" rel="noopener noreferrer"}.
 
-In June 2015, Docker and other container companies established the [Open Container Initiative](https://www.opencontainers.org/) - this organisation is also a Linux Foundation project and designs the specifications for the container runtime - [runtime-spec](https://github.com/opencontainers/runtime-spec) and image format - [image-spec](https://github.com/opencontainers/image-spec).
+In June 2015, Docker and other container companies established the [Open Container Initiative](https://www.opencontainers.org/){target="_blank" rel="noopener noreferrer"} - this organisation is also a Linux Foundation project and designs the specifications for the container runtime - [runtime-spec](https://github.com/opencontainers/runtime-spec){target="_blank" rel="noopener noreferrer"} and image format - [image-spec](https://github.com/opencontainers/image-spec){target="_blank" rel="noopener noreferrer"}.
 
 #### Podman
 
@@ -89,7 +89,7 @@ The main difference is that Singularity is aimed at the scientific computing mar
 
 ![Rkt logo](/images/containerise-it/rkt.svg){: style="height: 100px; float: right;"}
 
-[Rkt](https://coreos.com/rkt/) is developed by CoreOS to be compatible with Docker images but with more of a focus on better security through customisable isolation. It's mainly advertised as a container runtime replacement for large production-ready Kubernetes clusters. Recently, Red Hat acquired CoreOS and as a result development of Rkt stopped and the [GitHub Repository](https://github.com/rkt/rkt) was archived.
+[Rkt](https://coreos.com/rkt/){target="_blank" rel="noopener noreferrer"} is developed by CoreOS to be compatible with Docker images but with more of a focus on better security through customisable isolation. It's mainly advertised as a container runtime replacement for large production-ready Kubernetes clusters. Recently, Red Hat acquired CoreOS and as a result development of Rkt stopped and the [GitHub Repository](https://github.com/rkt/rkt){target="_blank" rel="noopener noreferrer"} was archived.
 
 ## Making the Dockerfile
 
@@ -124,7 +124,7 @@ These Dockerfiles are pretty simple - each line is a command to Docker that are 
 
 What this Dockerfile will do is take the Go Docker image from [Docker Hub](https://hub.docker.com/), copy all of our code into the image from the directory we're in, build the app and specify the image entry point (i.e. the command that it'll run when you run the container).
 
-We're also going to add a [`.dockerignore` file](https://docs.docker.com/engine/reference/builder/#dockerignore-file) - this is exactly like a `.gitignore` but tells Docker that, even if we say `COPY . .`, we don't need to worry about certain files. Let's create one and put a few standards things in (this'll speed up the image build time and often reduces the output image size too[^5]):
+We're also going to add a [`.dockerignore` file](https://docs.docker.com/engine/reference/builder/#dockerignore-file){target="_blank" rel="noopener noreferrer"} - this is exactly like a `.gitignore` but tells Docker that, even if we say `COPY . .`, we don't need to worry about certain files. Let's create one and put a few standards things in (this'll speed up the image build time and often reduces the output image size too[^5]):
 
 [^5]: In this particular case, we'll be using a builder image separate from the output image at the end, so it won't have an image on the final image size. In general though, the more you can ignore with the `.dockerignore`, the better!
 
@@ -297,7 +297,7 @@ $ docker images
 ```
 
 !!! note
-    We're using the [Alpine](https://alpinelinux.org/) image here which is basically a super-lightweight Linux distro which is really popular for making Docker images because of it's tiny size. We can see here that it's adding around 10 MB on top of our executable. Not bad!
+    We're using the [Alpine](https://alpinelinux.org/){target="_blank" rel="noopener noreferrer"} image here which is basically a super-lightweight Linux distro which is really popular for making Docker images because of it's tiny size. We can see here that it's adding around 10 MB on top of our executable. Not bad!
 
     In fact, technically we don't even need Alpine! We could equally have done `FROM scratch` instead which would contain literally no other files! The only reason we're not doing this is that cloud providers (such as IBM Cloud) often require basic utilities like Bash installed to work properly.
 

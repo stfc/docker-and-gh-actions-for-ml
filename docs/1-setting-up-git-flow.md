@@ -15,7 +15,7 @@ This is a very common and very popular branching model (although many people ada
 The main important info about this branching model to bear in mind when thinking about how the git repository represents the service you're building is:
 
 - The `master` branch always represents the _production-ready_, released version of the code.
-- All merges into the `master` branch should be tagged with the version number, according to the [Semantic Versioning (SemVer)](https://semver.org/) standard.
+- All merges into the `master` branch should be tagged with the version number, according to the [Semantic Versioning (SemVer)](https://semver.org/){target="_blank" rel="noopener noreferrer"} standard.
 - The `dev` (or `development`) branch represents the current tip of the development effort for your code. It should contain the latest updates in a working state (but if your dev branch is broken for a while, it's not a big deal).
 - No work should be done directly on the `dev` or `master` branches - instead, they should be branches out, completed and then merging back in (preferably after a pull request and peer review).
 - Features and non-urgent bug fixes should be branched from the `dev` branch.
@@ -123,7 +123,7 @@ $ git push --tags
 
     While code signing is thoroughly recommended, setting up the relevant keys is outside the scope of this tutorial.
 
-    For more information, GitHub has [plenty of info on GPG and git](https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key).
+    For more information, GitHub has [plenty of info on GPG and git](https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key){target="_blank" rel="noopener noreferrer"}.
 
 Next, let's create our `dev` branch.
 
@@ -171,7 +171,7 @@ $ git describe --tags --always
 
     Here the `2` indicates that we are 2 commits ahead of tag `v0.6.3` and the `g1a64609` is the shortened hash of the commit that we're on.
 
-If we make a small adjustment to our `Makefile`, we can include the version in the application using [special flags for the linker](https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications) (you only need to add the highlighted lines, don't worry too much about the rest):
+If we make a small adjustment to our `Makefile`, we can include the version in the application using [special flags for the linker](https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications){target="_blank" rel="noopener noreferrer"} (you only need to add the highlighted lines, don't worry too much about the rest):
 
 !!! example "`Makefile`"
     ```Makefile linenums="1" hl_lines="15-19 45"
@@ -273,7 +273,7 @@ If we make a small adjustment to our `Makefile`, we can include the version in t
     - Versioning using a custom HTTP header, e.g. `Accept-Version: v1` and `Accept-Version: v2`.
     - Using the standard `Accept` header, e.g. `Accept: application/vnd.mycompany.myapp.myapi-v1+json` and `Accept: application/vnd.mycompany.myapp.myapi-v1+json`.
 
-    Setting this up is outside the scope of this tutorial, but if this is something you need to think about, there's [plenty](https://stackoverflow.com/questions/389169/best-practices-for-api-versioning) of [resources](https://www.xmatters.com/blog/devops/blog-four-rest-api-versioning-strategies/) [online](https://restfulapi.net/versioning/) talking about it and arguing about which one is the Right Way^®^.
+    Setting this up is outside the scope of this tutorial, but if this is something you need to think about, there's [plenty](https://stackoverflow.com/questions/389169/best-practices-for-api-versioning){target="_blank" rel="noopener noreferrer"} of [resources](https://www.xmatters.com/blog/devops/blog-four-rest-api-versioning-strategies/){target="_blank" rel="noopener noreferrer"} [online](https://restfulapi.net/versioning/){target="_blank" rel="noopener noreferrer"} talking about it and arguing about which one is the Right Way^®^.
 
 We can test to make sure our build version is linked correctly into the API by calling a special `/version` endpoint:
 
