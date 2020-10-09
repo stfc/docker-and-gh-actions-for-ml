@@ -49,6 +49,18 @@ If I change the input for an existing endpoint so that people have to change the
 
     When you release version 1.0.0, you're essentially announcing to the world that you will adhere to the SemVer guidelines going forwards.
 
+## What makes a good commit?
+
+Before we dive into our practical exercise, it's worth first talking about what makes a particular git commit _good_, and what makes one _bad_.
+
+It's sometimes tempting to use commit messages like "updated /hello endpoint" or "Changes to backend", but really these messages don't convey a lot of information that's really useful to someone trying to understand what's going on in a repository.
+
+Here are a few tips on creating the most useful commit messages you can:
+
+- **Be specific** - If someone reads a commit that says "changes to backend", the first thing we want to know is: what changes did you make! By being as specific as possible, it makes it massively easier to trace back through a commit history and find where a particular feature was added (or conversely where it was broken!). For an example of this, think about "Add date filtering to /hello endpoint". Now someone who's wondering why the date filtering isn't working can look through the history and immediately pick out the commit that they need!
+- **Explain intent** - We can see into the commit and look at what files you changed and how - the important thing to get across in your commit message is _why_ you made the changes that you did. For instance, instead of saying "Changes to backend"
+- **Be consistent** - It's not particularly important which specific format you use for your commits. whether you choose to phrase your commits like "Add x to y" or "Added x to y" (although there are endless debates online) doesn't really make any change anything about anything! As with the code itself, the important thing is to be consistent - choose an approach and stick to it (and make sure that other people stick to it as well).
+
 ## Cloning the repo
 
 Now that we've got the theory out the way, let's get started!
