@@ -60,6 +60,16 @@ Here are a few tips on creating the most useful commit messages you can:
 - **Be specific** - If someone reads a commit that says "changes to backend", the first thing we want to know is: what changes did you make! By being as specific as possible, it makes it massively easier to trace back through a commit history and find where a particular feature was added (or conversely where it was broken!). For an example of this, think about "Add date filtering to /hello endpoint". Now someone who's wondering why the date filtering isn't working can look through the history and immediately pick out the commit that they need!
 - **Explain intent** - We can see into the commit and look at what files you changed and how - the important thing to get across in your commit message is _why_ you made the changes that you did. For instance, instead of saying "Changes to backend"
 - **Be consistent** - It's not particularly important which specific format you use for your commits. whether you choose to phrase your commits like "Add x to y" or "Added x to y" (although there are endless debates online) doesn't really make any change anything about anything! As with the code itself, the important thing is to be consistent - choose an approach and stick to it (and make sure that other people stick to it as well).
+- **When appropriate, include extra detail** - There's a standard format for git commits. They look like this:
+
+    ```git
+    Add date filtering to /hello endpoint.
+
+    Now you can pass in `start_date` or `end_date` as query parameters to the `/hello`
+    endpoint and the results will be filtering accordingly.
+    ```
+
+    While the first line should be a brief summary of the changes, you can add additional info including a full description or any other salient points - simply add an empty line after the first one and put your description after that.
 
 ## Cloning the repo
 
