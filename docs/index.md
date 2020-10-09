@@ -2,7 +2,7 @@
 
 ## :wave: Welcome
 
-Welcome to Module 4 of the the [Industrial Digitilisation Accelerator's](https://www.hartree.stfc.ac.uk/Pages/IDA.aspx) Guide to Industry 4.0!
+Welcome to Module 4 of the the [Industrial Digitilisation Accelerator's](https://www.hartree.stfc.ac.uk/Pages/IDA.aspx){target="_blank" rel="noopener noreferrer"} Guide to Industry 4.0!
 
 In this tutorial, you're going to get some hands-on experience utilising the power of continuous deployment with the git flow branching model to host modern, cloud-native, 12-factor web services on the cloud.
 

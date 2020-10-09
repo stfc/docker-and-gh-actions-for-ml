@@ -144,11 +144,11 @@ To do this, go to "Settings" > "Repository" > "Default Branch":
 
 ![choosing default branch](/images/setting-up-git-flow/default-branch.png)
 
-## Setting the API version
+## Getting the API version
 
-We want to be able to specify the version inside our application so that we can check what version the API is running dynamically.
+We want to be able to get the version of our app automatically, without needing to manually modify a file each time we want a new version.
 
-Well there's good news - we can get git to do this for us automatically!
+Well there's good news - we can get this out of git automatically!
 
 If you've set up your git flow and you're on either your master or dev branches, we can get our current version in semver format by simply running:
 
@@ -157,7 +157,7 @@ git describe --tags --always
 ```
 
 !!! info
-    To make sure that `git describe` always gives you the correct information on both master and dev branches, there's a slight modification required to the git flow. That is, once you've merged dev into the master branch and tagged the release, you should merge back into the develop branch.
+    To make sure that `git describe` always gives you the correct information on both master and dev branches, there's a slight modification required to the git flow. That is, once you've merged dev into the master branch and tagged the release, you should merge back into the develop branch. Also, all merges should be done using `--no-ff` which ensures that merges always create a commit.
 
     What this does is ensure that the tagged commit (i.e. the merge into master) is present on both master and dev, which ensures that git can accurately get the version from both branches.
 
@@ -173,98 +173,16 @@ git describe --tags --always
 
     Here the `2` indicates that we are 2 commits ahead of tag `v0.6.3` and the `g1a64609` is the shortened hash of the commit that we're on.
 
-If we make a small adjustment to our `Makefile`, we can include the version in the application using [special flags for the linker](https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications){target="_blank" rel="noopener noreferrer"} (you only need to add the highlighted lines, don't worry too much about the rest):
+Now, we've already got some [clever linking](https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications){target="_blank" rel="noopener noreferrer"} going on in the app so we can check whether we've correctly set up our branching model using the app itself! All we need to do is make a request to the special `/version` endpoint:
 
-!!! example "`Makefile`"
-    ```Makefile linenums="1" hl_lines="15-19 45"
-    -include .env
+```bash
+make build
+./hbaas-server
 
-    SHELL := /bin/bash
-
-    PROJECTNAME := hbaas-server
-
-    # Go related variables.
-    GOBASE := $(shell pwd)
-    GOPATH := $(GOBASE)/.go-pkg:$(GOBASE)
-    GOBIN := $(GOBASE)/.go-bin
-    GOFILES := $(wildcard *.go)
-
-    PACKAGENAME := $(shell go list)
-
-    VERSION ?= $(shell git describe --tags --always)
-    BUILDTIME := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-    LDFLAGS := -ldflags "-X '$(PACKAGENAME)/version.Version=$(VERSION)' \
-                         -X '$(PACKAGENAME)/version.BuildTime=$(BUILDTIME)'"
-
-    # Make is verbose in Linux. Make it silent.
-    MAKEFLAGS += --silent
-
-    IS_INTERACTIVE := $(shell [ -t 0 ] && echo 1)
-
-    ifdef IS_INTERACTIVE
-    LOG_INFO := $(shell tput setaf 12)
-    LOG_ERROR := $(shell tput setaf 9)
-    LOG_END := $(shell tput sgr0)
-    endif
-
-    define log
-    echo -e "$(LOG_INFO)⇛ $(1)$(LOG_END)"
-    endef
-
-    define log-error
-    echo -e "$(LOG_ERROR)⇛ $(1)$(LOG_END)"
-    endef
-
-    default: build
-
-    ## build: Build the server executable.
-    build: code-gen
-    	$(call log,Building binary...)
-    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) || (\
-    	    $(call log-error,Failed to build $(PROJECTNAME).) \
-    	    && false \
-    	)
-
-    ## build-linux: Build the server executable in the Linux ELF format.
-    build-linux:
-    	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make build
-
-    ## code-gen: Generate code before compilation, such as bundled data.
-    code-gen: download-dependencies
-    	$(call log,Generating code...)
-    	cd data && $(GOBIN)/go-bindata -pkg data . || (\
-    	    $(call log-error,Unable to build data package.) \
-    	    && false \
-    	)
-
-    ## download-dependencies: Download all library and binary dependencies.
-    download-dependencies:
-    	$(call log,Downloading dependencies...)
-    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod download
-    	test -e $(GOBIN)/go-bindata || GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/kevinburke/go-bindata/...
-
-    .PHONY: clean
-    ## clean: Clean up all build files.
-    clean:
-    	@-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
-    	GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
-    	@-rm ./**/bindata.go 2> /dev/null
-
-    .PHONY: help
-    all: help
-    help: Makefile
-    	echo
-    	echo "Choose a command run in "$(PROJECTNAME)":"
-    	echo
-    	sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
-    	echo
-    ```
-
-!!! note
-    If you're wondering why the `VERSION ?= $(...)` variable has a `?=` instead of a `:=`, that's not a typo! It means that we only assign the variable if it's not already defined.
-
-    I'll explain why this is needed further on in [Section 3](/3-containerise-it/) where we'll be containerising our application.
+# In another terminal:
+curl localhost:8000/version
+> {"build_time":"2020-06-01T09:08:38Z","version":"v1.0.0"}
+```
 
 !!! tip
     If you are developing an API which is consumer-facing, you'll need to implement some kind of versioning for the API itself so that updating from v1 to v2 doesn't break all of your consumers' applications.
@@ -276,17 +194,6 @@ If we make a small adjustment to our `Makefile`, we can include the version in t
     - Using the standard `Accept` header, e.g. `Accept: application/vnd.mycompany.myapp.myapi-v1+json` and `Accept: application/vnd.mycompany.myapp.myapi-v1+json`.
 
     Setting this up is outside the scope of this tutorial, but if this is something you need to think about, there's [plenty](https://stackoverflow.com/questions/389169/best-practices-for-api-versioning){target="_blank" rel="noopener noreferrer"} of [resources](https://www.xmatters.com/blog/devops/blog-four-rest-api-versioning-strategies/){target="_blank" rel="noopener noreferrer"} [online](https://restfulapi.net/versioning/){target="_blank" rel="noopener noreferrer"} talking about it and arguing about which one is the Right Way^®^.
-
-We can test to make sure our build version is linked correctly into the API by calling a special `/version` endpoint:
-
-```bash
-make build
-./hbaas-server
-
-# In another terminal
-curl localhost:8000/version
-> {"build_time":"2020-06-01T09:08:38Z","version":"v1.0.0"}
-```
 
 !!! success
     With this out the way, we've got our repo in a good starting state to use git flow to complete our first feature!
