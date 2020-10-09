@@ -317,7 +317,7 @@ We can use this same tactic to automatically tag our Docker images with their ve
     	$(call log,Building Docker image...)
     	docker build \
     	    --build-arg version=$(VERSION) \
-    	    --tag $(PROJECTNAME):latest . \
+    	    --tag $(PROJECTNAME):latest \
     	    --tag $(PROJECTNAME):$(VERSION) . || \
     	(\
     	    $(call log-error,Unable to build Docker image.) \
