@@ -285,7 +285,7 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
     - Only run when tag matches semantic version, e.g. `v1.2.3`, `v1.2.3-abc` (this is what I'd recommend[^semver-regex])
     - Only run when tag in on master branch (this has important caveats to consider[^caveats])
 
-    For more info on how to set this up, check out: [conjunction logic for GitLab CI job condition](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818).
+    For more info on how to set this up, check out: [conjunction logic for GitLab CI job condition](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){: style="height: 100px; float: right;"}.
 
 [^semver-regex]:
     The way to do this would be to utilise the [official semver regex](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) like so:
@@ -296,17 +296,17 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
         - tags
       variables:
         # If you don't use a `v` before your semver, just remove the first `v` in this regex.
-        - $CI_COMMIT_TAG =~ ^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        - $CI_COMMIT_TAG =~ /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
     ```
 
-    I haven't tested this with GitLab CI, but it should work.
+    Note that this syntax won't work on some much older versions of GitLab.
 
 [^caveats]:
     Technically, tags and branches are both just pointers to commits. This means that running on tag and master is not reproducible because another commit on the master branch will move the commit that master points to and thus would mean that the tag && master condition no longer applies.
 
     This breaks a pretty important principle of CD which is that you can simply repeat a pipeline and have the exact same thing happen. This reproducibility is what makes rolling back to specific versions so easy.
 
-    This is discussed more on the [GitLab issue for this topic](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818).
+    This is discussed more on the [GitLab issue for this topic](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){: style="height: 100px; float: right;"}.
 
 !!! note
     Notice how we specify an "environment" for each deployment - we'll take a look at what this can do later.
@@ -443,7 +443,7 @@ We saw earlier that we could specify an "environment" for each of our deployment
 !!! info
     If you're using a more advanced deployment system utilising Kubernetes, GitLab will integrate these environments with your Kubernetes instance.
 
-    For more info on this, check out [the GitLab docs on Kubernetes integration](https://docs.gitlab.com/ee/user/project/clusters/index.html).
+    For more info on this, check out [the GitLab docs on Kubernetes integration](https://docs.gitlab.com/ee/user/project/clusters/index.html){: style="height: 100px; float: right;"}.
 
 ## Let's give it a whirl!
 

@@ -70,12 +70,12 @@ In June 2015, Docker and other container companies established the [Open Contain
 
 Even though it dominates the market, Docker isn't the only container runtime around with a logo of a happy cute sea animal!
 
-Enter [Podman](https://podman.io/).
+Enter [Podman](https://podman.io/){: style="height: 100px; float: right;"}.
 
 The main differentiator between Docker and Podman is that Podman doesn't need a daemon running as root in the background[^3]
 
 [^3]:
-    In fact, the Docker daemon *can* run in [rootless mode](https://docs.docker.com/engine/security/rootless/), but this is very early stage and still has some big limitations.
+    In fact, the Docker daemon *can* run in [rootless mode](https://docs.docker.com/engine/security/rootless/){: style="height: 100px; float: right;"}, but this is very early stage and still has some big limitations.
 
 #### Singularity
 
@@ -122,7 +122,7 @@ Our API is written in Go, and there's already a Docker image for building Go cod
 
 These Dockerfiles are pretty simple - each line is a command to Docker that are run in the order that they're written. You can find a full list of all the Dockerfile commands, along with the full explanations, at: https://docs.docker.com/engine/reference/builder/
 
-What this Dockerfile will do is take the Go Docker image from [Docker Hub](https://hub.docker.com/), copy all of our code into the image from the directory we're in, build the app and specify the image entry point (i.e. the command that it'll run when you run the container).
+What this Dockerfile will do is take the Go Docker image from [Docker Hub](https://hub.docker.com/){: style="height: 100px; float: right;"}, copy all of our code into the image from the directory we're in, build the app and specify the image entry point (i.e. the command that it'll run when you run the container).
 
 We're also going to add a [`.dockerignore` file](https://docs.docker.com/engine/reference/builder/#dockerignore-file){target="_blank" rel="noopener noreferrer"} - this is exactly like a `.gitignore` but tells Docker that, even if we say `COPY . .`, we don't need to worry about certain files. Let's create one and put a few standards things in (this'll speed up the image build time and often reduces the output image size too[^5]):
 
