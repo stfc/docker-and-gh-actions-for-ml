@@ -10,16 +10,18 @@ The branching model we're going to be using is the following:
 
 ![git flow branching model](/images/setting-up-git-flow/git-flow.png)
 
-This is a very common and very popular branching model (although many people adapt or extend it).
+Now, there's a lot going on in this diagram if you haven't seen it before, so don't panic if this doesn't make much sense to you - we're going to be going through it in practice step-by-step so hopefully this will make more sense to you by the end of this tutorial.
 
-The main important info about this branching model to bear in mind when thinking about how the git repository represents the service you're building is:
+The main important things to know about this are:
 
-- The `master` branch always represents the _production-ready_, released version of the code.
+- The `master` branch always represents the _production ready_, released version of the code.
 - All merges into the `master` branch should be tagged with the version number, according to the [Semantic Versioning (SemVer)](https://semver.org/){target="_blank" rel="noopener noreferrer"} standard.
-- The `dev` (or `development`) branch represents the current tip of the development effort for your code. It should contain the latest updates in a working state (but if your dev branch is broken for a while, it's not a big deal).
+- The `dev` branch represents the current tip of the development effort for your code. It should contain the latest updates in a working state (but if your dev branch is broken for a while, it's not a big deal).
 - No work should be done directly on the `dev` or `master` branches - instead, they should be branches out, completed and then merging back in (preferably after a pull request and peer review).
 - Features and non-urgent bug fixes should be branched from the `dev` branch.
 - Urgent bug fixes (a.k.a. hotfixes) that need to be immediately updated on the production code should be branched from the `master` branch, and merged into both the `master` and `dev` branches when ready.
+
+This particular branching model, known commonly as "git flow", is a very popular choice (although many adapt or extend it).
 
 ## Quick explanation of SemVer
 
