@@ -248,7 +248,7 @@ First things first, let's get our API key from IBM Cloud.
 You can do this [using the IBM Cloud website](https://cloud.ibm.com/docs/iam?topic=iam-userapikey#create_user_key), but we're going to use the CLI because it's easier and faster:
 
 ```bash
-$ ibmcloud iam api-key-create GitLabCIKey -d "API key for GitLab CI / CD." --file gitlab_ci_key.json
+ibmcloud iam api-key-create GitLabCIKey -d "API key for GitLab CI / CD." --file gitlab_ci_key.json
 ```
 
 If you look in the output `gitlab_ci_key.json` file, you should see something like this:
@@ -391,7 +391,7 @@ If you check your "upload-image" job in GitLab, you should see an output that lo
 You can check to make sure that your images have uploaded properly by checking the GitLab CI job logs and by running:
 
 ```bash
-$ ibmcloud cr images
+ibmcloud cr images
 > Listing images...
 >
 > Repository                                     Tag                                Digest         Namespace               Created          Size     Security status

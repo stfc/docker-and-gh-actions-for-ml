@@ -122,9 +122,9 @@ We also need to specify the space and region that we're targeting for CloudFound
 Let's give it a whirl!
 
 ```bash
-$ export IBMCLOUD_API_KEY={you value from last section}
+export IBMCLOUD_API_KEY={you value from last section}
 # As before, you'll need to re-run `ibmcloud login` if you haven't run it in while.
-$ make deploy-dev
+make deploy-dev
 ```
 
 If all is successful, you should see some output indicating that your app has been successfully deployed, like so:
@@ -141,7 +141,7 @@ Let's give our newly deployed app a go:
 ```bash
 # You'll need to change this URL depending on what you put as your route in the
 # `manifest.yaml`.
-$ curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/version
+curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/version
 > {"build_time":"2020-06-03T10:28:28Z","version":"v1.0.0-16-g232c588"}
 ```
 
@@ -365,11 +365,11 @@ Firsly, let's add another endoint that'll work as a health check for our API:
 Great, now let's do another feature branch for this:
 
 ```bash
-$ git checkout dev
-$ git checkout -b feature/add-status-endpoint
-$ git add handlers/maintenance.go
-$ git commit -m "Add status endpoint that acts as health check."
-$ git push --set-upstream origin feature/add-status-endpoint
+git checkout dev
+git checkout -b feature/add-status-endpoint
+git add handlers/maintenance.go
+git commit -m "Add status endpoint that acts as health check."
+git push --set-upstream origin feature/add-status-endpoint
 ```
 
 Now if you go to your GitLab repository and check out the merge request you just opened, you should see a nice green tick show up indicating the MR passed the CI checks:
@@ -384,7 +384,7 @@ Once that's done, we can check that it's properly deployed the dev app by hittin
 
 ```bash
 # Remember to change this endpoint depending on your route in your `manifest.yaml`.
-$ curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/status
+curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/status
 > {"message":"The time is 41 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."}
 ```
 
@@ -408,10 +408,10 @@ There are two ways to do this. There's the good ol' fashioned command-line way a
 #### The good ol' fashioned command-line way
 
 ```bash
-$ git checkout master
-$ git pull
-$ git tag -a "v1.1.0" -m "Release v1.1.0: add status endpoint"
-$ git push --tags
+git checkout master
+git pull
+git tag -a "v1.1.0" -m "Release v1.1.0: add status endpoint"
+git push --tags
 ```
 
 Simple and easy.
@@ -451,14 +451,14 @@ Once that's done, let's try it out!
 
 ```bash
 # Remember to change this endpoint depending on your route in your `manifest.yaml`.
-$ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/version
+curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/version
 > {"build_time":"2020-06-03T10:40:59Z","version":"v1.1.0"}
 
-$ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/status
+curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/status
 > {"message":"The time is 59 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."}
 
 # Just for fun - output will depend on when you run it!
-$ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/date/$(date +"%d-%B")
+curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/date/$(date +"%d-%B")
 > {"message":"Happy birthday to Clint Eastwood!"}
 ```
 

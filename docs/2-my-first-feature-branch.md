@@ -13,7 +13,7 @@ Before we add our first, let's first get our server compiled and running so that
 The entrypoint to our various build commands is the `Makefile` - let's see what options we've got:
 
 ```bash
-$ make help
+make help
 >
 > Choose a command run in hbaas-server:
 > 
@@ -27,7 +27,7 @@ $ make help
 This tells that that in order to build our server, we need to run:
 
 ```bash
-$ make build
+make build
 ```
 
 So let's give it a go!
@@ -51,7 +51,7 @@ You might be wondering at this point what exactly this `hbaas-server` is - let's
 We can run our server simply by running our built executable file:
 
 ```bash
-$ ./hbaas-server
+./hbaas-server
 ```
 
 You should see something like this:
@@ -61,7 +61,7 @@ You should see something like this:
 Let's try querying our API to see what's going on:
 
 ```bash
-$ curl localhost:8000
+curl localhost:8000
 > {"message":"Welcome! Try sending a request to '/{some-name}' to get started!"}
 ```
 
@@ -69,7 +69,7 @@ $ curl localhost:8000
     If you're on Windows using PowerShell without curl, this should be:
 
     ```powershell
-    $ Invoke-RestMethod -Uri localhost:8000 -Method Get
+    Invoke-RestMethod -Uri localhost:8000 -Method Get
     ```
 
     In the rest of this tutorial, I'm find to just refer to the curl commands for brevity - just mentally replace this with the `Invoke-RestMethod` equivalent if you're using PowerShell :slightly_smiling_face:
@@ -77,7 +77,7 @@ $ curl localhost:8000
 If you see this message coming back welcome you, that means we're in business! Let's try following the suggestion:
 
 ```bash
-$ curl localhost:8000/name/Benedict%20Cumberbatch
+curl localhost:8000/name/Benedict%20Cumberbatch
 > {"message":"Happy birthday Benedict Cumberbatch!"}
 ```
 
@@ -185,11 +185,11 @@ The specifics of this code isn't enormously important, other than that this is a
 Now that we've got that endpoint added, we can recompile our server and try it out!
 
 ```bash
-$ make build
-$ ./hbaas-server
+make build
+./hbaas-server
 
 # In another terminal
-$ curl localhost:8000/date/2-November
+curl localhost:8000/date/2-November
 > {"message":"Happy birthday to David Schwimmer!"}
 ```
 
@@ -200,15 +200,15 @@ Now that this feature is implemented and working, we're ready to merge it back i
 
 ```bash
 # Make sure we're branching our feature branch out from dev
-$ git checkout dev
+git checkout dev
 
 # Create our new feature branch
-$ git checkout -b feature/add-happy-birthday-by-date
+git checkout -b feature/add-happy-birthday-by-date
 
-$ git add handlers/birthday.go
-$ git commit -m "Add endpoint for wishing people happy birthday by date."
+git add handlers/birthday.go
+git commit -m "Add endpoint for wishing people happy birthday by date."
 
-$ git push --set-upstream origin feature/add-happy-birthday-by-date
+git push --set-upstream origin feature/add-happy-birthday-by-date
 ```
 
 If you now go to your repository in GitLab, you should create a merge request from this new feature branch to the dev branch.

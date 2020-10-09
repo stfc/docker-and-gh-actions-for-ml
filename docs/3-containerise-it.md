@@ -157,7 +157,7 @@ Now, let's give it a build (replace `my-org` with the name of your organisation)
 ```bash
 # The `-t` specifies the 'tag', which is used when we upload the image to our
 # repository a bit later.
-$ docker build -t my-org/hbaas:latest .
+docker build -t my-org/hbaas:latest .
 ```
 
 !!! info
@@ -240,7 +240,7 @@ What this means is that we can download all of our dependencies before we do the
 If we take a look at the image that we've generated using this Dockerfile, we can see that it's _pretty big_:
 
 ```bash
-$ docker images
+docker images
 > REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 > my-org/hbaas        latest              7a564cc27629        2 minutes ago       1.11GB
 ```
@@ -290,8 +290,8 @@ We'll need to make some changes to our `Dockerfile`:
 Now if we check our image sizes now with our fancy new multi-stage build, we can see a _significant_ improvement:
 
 ```bash
-$ docker build -t hbaas-server .
-$ docker images
+docker build -t hbaas-server .
+docker images
 > REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 > hbaas-server        latest              7518b4973c75        33 seconds ago      24.5MB
 ```
@@ -354,21 +354,21 @@ Firstly, we need to set up the IBM Cloud CLI to work with our container registry
 
 ```bash
 # The container registry CLI functionality is kept in a separate plugin which needs to be installed.
-$ ibmcloud plugin install container-registry -r 'IBM Cloud'
+ibmcloud plugin install container-registry -r 'IBM Cloud'
 
 # Set our region to UK South (i.e. London) - if you're using a different region you'll
 # need to update this accordingly.
-$ ibmcloud cr region-set uk-south
+ibmcloud cr region-set uk-south
 
 # If this fails, you may need to re-run `ibmcloud login --sso`.
-$ ibmcloud cr login
+ibmcloud cr login
 
 # Create a namespace to put our images in - make sure to replace this with something
 # meaningful to your organisation.
-$ ibmcloud cr namespace-add my-org
+ibmcloud cr namespace-add my-org
 
 # Check that our namespace is there.
-$ ibmcloud cr namespaces
+ibmcloud cr namespaces
 > Listing namespaces for account '(your account)' in registry 'uk.icr.io'...
 >
 > Namespace
