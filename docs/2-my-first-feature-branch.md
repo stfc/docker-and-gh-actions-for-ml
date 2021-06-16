@@ -211,10 +211,12 @@ git commit -m "Add endpoint for wishing people happy birthday by date."
 git push --set-upstream origin feature/add-happy-birthday-by-date
 ```
 
-If you now go to your repository in GitLab, you should create a merge request from this new feature branch to the dev branch.
+If you now go to your repository in GitLab, you should create a merge request from this new feature branch to the dev branch. (If you set the default branch to be dev as per instructions in previous section, then dev should be the default target of your merge requests).
+
+At this point, if you're working in a wider team, you'll want to assign a designated teammate to review the code and approve it. Once it's been approved, you can merge in the changes.
 
 !!! note
     Even if you're working on your own (i.e. without peer review), it's still a good idea to get into the habit of creating merge requests for features and bug fixes - if nothing else, it gives you an opportunity to add additional comments into the merge request to document your development thought process, which is really valuable going forwards.
 
 !!! success
-    Congratulations, you've completed your first feature branch!
+    Congratulations, you've completed your first feature branch! :tada:
