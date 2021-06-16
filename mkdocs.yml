@@ -12,9 +12,9 @@ theme:
   features:
     - instant
   palette:
-    primary: cyan
-    accent: pink
-  logo: images/stfc.png
+    primary: "#1e5df8"
+    accent: "#ff5a5a"
+  logo: images/ukri.svg
   favicon: images/favicon.ico
 
 markdown_extensions:

@@ -1,3 +1,13 @@
+.md-header .md-header-nav .md-logo {
+    margin: 0;
+    padding: 0;
+}
+
+.md-header .md-header-nav .md-logo > img {
+    width: 2.2rem;
+    height: 2.2rem;
+}
+
 html .md-typeset .admonition.example .highlighttable {
     margin: 0 -0.6rem 0 -0.6rem;
 }
