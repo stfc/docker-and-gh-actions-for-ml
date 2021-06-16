@@ -78,17 +78,8 @@ Now that we've got the theory out the way, let's get started!
 First things first, let's clone the repository containing the code that we'll be working with for this tutorial, and get it set up on our system.
 
 ```bash
-git clone git@gitlab.com:drewsilcock/go-with-the-flow-code.git
+git clone https://gitlab.com/drewsilcock/go-with-the-flow-code.git
 ```
-
-!!! info
-    If you haven't set up an SSH key to use with git, I'd highly recommend doing so by following the instructions here: https://docs.gitlab.com/ee/ssh/.
-
-    If you have issues with this, you can always clone from the HTTPS URL instead of the SSH endpoint:
-
-    ```bash
-    git clone https://gitlab.com/drewsilcock/go-with-the-flow-code.git
-    ```
 
 If you look at the current structure of the repo, there are a bunch of branches called `tutorial/section-X` where `X` corresponds to one of these sections - you'll start of on branch `tutorial/section-1`, because that's where the tutorial starts! :slightly_smiling_face:
 
@@ -109,7 +100,8 @@ Next, head over to https://gitlab.com/drewsilcock/go-with-the-flow-code and clic
 Once we've forked the repo into our own account space, we want to set our git remotes so that we can push up to your new forked repo:
 
 ```bash
-git remote set-url origin git@gitlab.com:{my-username}/go-with-the-flow-code.git
+# Remember to replace '{my-username}' with your GitLab username.
+git remote set-url origin https://gitlab.com/{my-username}/go-with-the-flow-code.git
 
 # You can double check that your origin is pointing to the right location like so:
 git remote -v
