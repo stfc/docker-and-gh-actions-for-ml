@@ -139,7 +139,7 @@ This tutorial requires the following to be installed:
 
 ## Go
 
-The best thing to do here is follow the instructions at the Golang website: https://golang.org/doc/install.
+The best thing to do here is follow the instructions at the Golang website: https://golang.org/doc/install{target="_blank" rel="noopener noreferrer"}.
 
 These are summarised below, but the Golang site has more detailed instructions.
 
