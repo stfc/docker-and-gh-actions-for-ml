@@ -130,7 +130,7 @@ Great. Now that we've got a master branch, let's tag out very first release:
 
 ```bash
 git checkout master
-git tag -a v1.0.0
+git tag -a v1.0.0 -m "Release v1.0.0 - Initial app launch."
 git push --tags
 ```
 
