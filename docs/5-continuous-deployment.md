@@ -4,7 +4,7 @@ title: 5. Setting up continuous deployment
 
 # 5. :rocket: Setting up continuous deployment
 
-We've done some really cool things with our git flow, semantic versioning and continuous integration, but I'm sure you're wondering when we're going to actually put this API up for people to use.
+We've done some really cool things with our git-flow, semantic versioning and continuous integration, but I'm sure you're wondering when we're going to actually put this API up for people to use.
 
 Well, fear not, because this last section is going to talk you through extending our existing CI pipeline to add continuous deployment!
 
@@ -285,7 +285,7 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
     - Only run when tag matches semantic version, e.g. `v1.2.3`, `v1.2.3-abc` (this is what I'd recommend[^semver-regex])
     - Only run when tag in on master branch (this has important caveats to consider[^caveats])
 
-    For more info on how to set this up, check out: [conjunction logic for GitLab CI job condition](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){: style="height: 100px; float: right;"}.
+    For more info on how to set this up, check out: [conjunction logic for GitLab CI job condition](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){target="_blank" rel="noopener noreferrer"}.
 
 [^semver-regex]:
     The way to do this would be to utilise the [official semver regex](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string) like so:
@@ -306,7 +306,7 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
 
     This breaks a pretty important principle of CD which is that you can simply repeat a pipeline and have the exact same thing happen. This reproducibility is what makes rolling back to specific versions so easy.
 
-    This is discussed more on the [GitLab issue for this topic](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){: style="height: 100px; float: right;"}.
+    This is discussed more on the [GitLab issue for this topic](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){target="_blank" rel="noopener noreferrer"}.
 
 !!! note
     Notice how we specify an "environment" for each deployment - we'll take a look at what this can do later.
@@ -443,7 +443,7 @@ We saw earlier that we could specify an "environment" for each of our deployment
 !!! info
     If you're using a more advanced deployment system utilising Kubernetes, GitLab will integrate these environments with your Kubernetes instance.
 
-    For more info on this, check out [the GitLab docs on Kubernetes integration](https://docs.gitlab.com/ee/user/project/clusters/index.html){: style="height: 100px; float: right;"}.
+    For more info on this, check out [the GitLab docs on Kubernetes integration](https://docs.gitlab.com/ee/user/project/clusters/index.html){target="_blank" rel="noopener noreferrer"}.
 
 ## Let's give it a whirl!
 
@@ -465,4 +465,4 @@ curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/date/$(date +"%d-%B")
 !!! success
     Congratulations, you've successfully set up a full continuous deployment pipeline!
     
-    With this done, you can sit back and watch as GitLab CI takes care of all the hard-work when it comes to running and managing multiple deployments. All you need to do is code using this sensible git flow model and the rest will take care of itself!
+    With this done, you can sit back and watch as GitLab CI takes care of all the hard-work when it comes to running and managing multiple deployments. All you need to do is code using this sensible git-flow model and the rest will take care of itself!

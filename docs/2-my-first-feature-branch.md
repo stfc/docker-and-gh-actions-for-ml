@@ -4,81 +4,32 @@ title: 2. My first feature branch
 
 # 2. :sparkles: My first feature branch
 
-Now that we've got our repo forked and cloned with our git flow skeleton in place, we can see the flow in action by completing our first feature!
+Now that we've got our repo forked and cloned with our git-flow skeleton in place, we can see the flow in action by completing our first feature!
 
-## Compiling our server
+## Calling our API endpoints
 
-Before we add our first, let's first get our server compiled and running so that we can make sure that we've got our system set up with all the dependencies.
+Let's try and figure out what `hbaas` API is doing after all, then!
 
-The entrypoint to our various build commands is the `Makefile` - let's see what options we've got:
+Make sure the API is running with `./hbaas-server` if it isn't already and let's check out what the root endpoint gives us:
 
 ```bash
-make help
->
-> Choose a command run in hbaas-server:
-> 
->   build                   Build the server executable.
->   build-linux             Build the server executable in the Linux ELF format.
->   code-gen                Generate code before compilation, such as bundled data.
->   download-dependencies   Download all library and binary dependencies.
->   clean                   Clean up all build files.
+curl -s localhost:8000 | jq
+```
+```json
+{
+	"message": "Welcome! Try sending a request to '/name/{some-name}' to get started!"
+}
 ```
 
-This tells that that in order to build our server, we need to run:
+It looks like the endpoint `/name/{value}` is a valid endpoint, so let's try giving that a go:
 
 ```bash
-make build
+curl -s localhost:8000/name/Benedict%20Cumberbatch | jq
 ```
-
-So let's give it a go!
-
-You should see something like this:
-
-![make build output](/images/my-first-feature-branch/make-build.png)
-
-If you've got this far, you've successfully built your Go web service!
-
-One of the best things about Go is that everything happens at built time - the output of this build is a single file, which contains everything we need for our web server:
-
-![built server executable](/images/my-first-feature-branch/built-exe.png)
-
-As our application gets more complication and includes more and more functionality, everything will still always be bundled up in this single executable. This might not seen like a big deal now, but when we get onto the containerisation later, you'll see how much easier this makes our lives!
-
-## Running the server
-
-You might be wondering at this point what exactly this `hbaas-server` is - let's find out!
-
-We can run our server simply by running our built executable file:
-
-```bash
-./hbaas-server
-```
-
-You should see something like this:
-
-![server output](/images/my-first-feature-branch/server-output.png)
-
-Let's try querying our API to see what's going on:
-
-```bash
-curl localhost:8000
-> {"message":"Welcome! Try sending a request to '/{some-name}' to get started!"}
-```
-
-!!! info
-    If you're on Windows using PowerShell without curl, this should be:
-
-    ```powershell
-    Invoke-RestMethod -Uri localhost:8000 -Method Get
-    ```
-
-    In the rest of this tutorial, I'm find to just refer to the curl commands for brevity - just mentally replace this with the `Invoke-RestMethod` equivalent if you're using PowerShell :slightly_smiling_face:
-
-If you see this message coming back welcome you, that means we're in business! Let's try following the suggestion:
-
-```bash
-curl localhost:8000/name/Benedict%20Cumberbatch
-> {"message":"Happy birthday Benedict Cumberbatch!"}
+```json
+{
+	"message": "Happy birthday Benedict Cumberbatch!"
+}
 ```
 
 Now we can see what the our API is doing - it's providing Happy Birthday as a Service (HBaaS)!
@@ -87,37 +38,92 @@ Now we can see what the our API is doing - it's providing Happy Birthday as a Se
 
 So we've got our endpoint to wish anyone we want happy birthday, but we want to be able to do more than that!
 
-We're going to add a new endpoint to this API that will enable us to wish people a happy birthday by specifying the *date* - the API will then look up all the people with the specified birthday and wish them a happy birthday!
+We're going to add a new endpoint to this API that will enable us to wish people a happy birthday by specifying a *date* - the API will then look up all the people with the specified birthday and wish them a happy birthday!
 
 Luckily for us, most of the hard work for this feature is already there - if you look at `handlers/birthday.go`, you'll see the code that implements the endpoints that we've got at the moment.
 
-Notice that the `BirthdayHandler` type has a `Context`, and that context has a `PeopleByBirthday` map:
+!!! question "Exercise 2.1"
+	Somewhere in the code is a mapping from a particular day to a list of people's names. Where in this codebase is that mapping?
 
-!!! example "`handlers/birthday.go`"
-    ```go linenums="13"
-    type BirthdayHandler struct {
-    	Context context.Context
-    }
-    ```
+??? hint "Hint 2.1 - click to reveal"
+	In Go:
+	
+	* Types are specified after the variable name mappings, e.g. `my_variable string`.
+	* Mappings use the type `map[KeyType]ValueType`, where `KeyType` is the type of the mapping key and `ValueType` is the type of the mapping value.
+	* Lists or arrays in Go looks like `[]type`.
+	
+	This means we're looking for something that looks like `map[BirthDay][]string`. Both grep and ripgrep are pre-installed on the VM, so you can use these to find the code.
 
-!!! example "`context/context.go`"
-    ```go linenums="17"
-    type Context struct {
-    	PeopleByBirthday map[BirthDay][]string
-    }
-    ```
+??? answers "Answers 2.1 - click to reveal"
+	The actual endpoints are in `handlers/birthday.go`. If you look at line 13, you can see that the handler has a `Context` variable:
 
-What this means is that we've already got an object that maps the date of birth to the people with that birthday!
+	!!! example "`handlers/birthday.go`"
+		```go linenums="9" hl_lines="6-8"
+			"github.com/labstack/echo/v4"
+
+			"hartree.stfc.ac.uk/hbaas-server/context"
+		)
+
+		type BirthdayHandler struct {
+			Context context.Context
+		}
+
+		func (h BirthdayHandler) registerEndpoints(g *echo.Group) {
+			g.GET("", h.sayHello)
+			g.GET("name/:name", h.sayHappyBirthdayToName)
+		}
+		```
+
+	We can see from the import on line 11 that this `context.Context` type comes from the `context` package. If we check that out, we can see our mapping right there ready to use:
+
+	!!! example "`context/context.go`"
+		```go linenums="1" hl_lines="18"
+		package context
+
+		import "time"
+
+		type BirthDay struct {
+			Day   int
+			Month time.Month
+		}
+
+		func NewBirthDay(date time.Time) BirthDay {
+			return BirthDay{
+				Day:   date.Day(),
+				Month: date.Month(),
+			}
+		}
+
+		type Context struct {
+			PeopleByBirthday map[BirthDay][]string
+		}
+		```
+
+	You could also have found the mapping using ripgrep by running:
+
+	```bash
+	rg -F 'map[BirthDay][]string'
+	```
 
 !!! info
-    If you want to see where this is populated from, take a look at the `data/people.csv` file. This CSV file is bundled into the executable and loaded in when the server starts up.
+    If you want to see where this is populated from, take a look at the `data/people.csv` and `data/data.go` files. This CSV file is bundled into the executable and loaded in when the server starts up using the `go embed` feature introduced in Golang v1.16.
+
+	!!! example "`data/data.go`"
+		```go linenums="1" hl_lines="5-6"
+		package data
+
+		import _ "embed"
+
+		//go:embed people.csv
+		var PeopleCSV string
+		```
 
     Obviously, in a real world application we would want our people and birthdays to exist in a database instead of being statically bundled with the API executable, but this goes to show how easy it is in Go to bundle stuff into the final executable without needing to rely on any files at run-time!
 
-Okay, so let's add another endpoint for our date-based happy birthday wishes:
+Okay, now that we've found our mapping, let's add another endpoint for our date-based happy birthday wishes. Add to the file `handlers/birthday.go` the highlighted lines:
 
 !!! example "`handlers/birthday.go`"
-    ```go linenums="1" hl_lines="6-7 20 40-60"
+    ```go linenums="1" hl_lines="6-7 21 41-67"
     package handlers
 
     import (
@@ -127,6 +133,7 @@ Okay, so let's add another endpoint for our date-based happy birthday wishes:
     	"time"
 
     	"github.com/labstack/echo/v4"
+
     	"hartree.stfc.ac.uk/hbaas-server/context"
     )
 
@@ -157,44 +164,62 @@ Okay, so let's add another endpoint for our date-based happy birthday wishes:
     	)
     }
 
-    func (h BirthdayHandler) sayHappyBirthdayByDate(c echo.Context) error {
-    	date := c.Param("date")
+	func (h BirthdayHandler) sayHappyBirthdayByDate(c echo.Context) error {
+		date := c.Param("date")
 
-    	dateTime, err := time.Parse("2-January", date)
-    	if err != nil {
-    		return echo.ErrBadRequest
-    	}
+		dateTime, err := time.Parse("2-January", date)
+		if err != nil {
+			return echo.ErrBadRequest
+		}
 
-    	message := "It doesn't look like I know of anyone with that birthday!"
+		message := "It doesn't look like I know of anyone with that birthday!"
 
-    	birthDay := context.NewBirthDay(dateTime)
-    	peopleWithBirthday, exists := h.Context.PeopleByBirthday[birthDay]
-    	if exists {
-    		message = fmt.Sprintf(
-    			"Happy birthday to %s!",
-    			strings.Join(peopleWithBirthday, ", "),
-    		)
-    	}
+		birthDay := context.NewBirthDay(dateTime)
+		names, exists := h.Context.PeopleByBirthday[birthDay]
+		if exists {
+			names[len(names)-2] = fmt.Sprintf(
+				"%s and %s",
+				names[len(names)-2],
+				names[len(names)-1],
+			)
+			names = names[0 : len(names)-1]
+			message = fmt.Sprintf(
+				"Happy birthday to %s!",
+				strings.Join(names, ", "),
+			)
+		}
 
-    	return c.JSON(http.StatusOK, NewAPIMessage(message))
-    }
+		return c.JSON(http.StatusOK, NewAPIMessage(message))
+	}
     ```
 
-The specifics of this code isn't enormously important, other than that this is a function on the `BirthdayHandler` type that takes the data loaded into the application context in `h.Context.PeopleByBirthday` and uses that to look up people who have the birthday specified by the request parameter.
+!!! tip
+	The VM comes with Vim, Emacs and nano installed - you can use your editor of preference to modify the file, or install a new one! VS Code also has good support for [remote development using SSH](https://code.visualstudio.com/docs/remote/ssh).
+
+The specifics of this code isn't important for this particular workshop, other than that we're adding an endpoint at `/:date` (where `:date` represents a variable passed through in the endpoint path) and that this endpoint uses our `h.Context.PeopleByBirthday` mapping to look up people who have the birthday specified by the path parameter.
 
 Now that we've got that endpoint added, we can recompile our server and try it out!
 
 ```bash
-make build
+task
 ./hbaas-server
+```
 
-# In another terminal
-curl localhost:8000/date/2-November
-> {"message":"Happy birthday to David Schwimmer!"}
+In another terminal tab:
+
+```bash
+curl -s localhost:8000/date/5-November
+```
+```json
+{
+  "message": "Happy birthday to Leonardo DiCaprio, Demi Moore and Stanley Tucci!"
+}
 ```
 
 !!! tip
     If you're getting "Bad Request" messages back, make sure you're putting the birth dates in the format `{day as number}-{month as full name}`, e.g. for the 2nd May you would do `2-May` and for the 27th February you would do `27-February`.
+
+Try it out with a few more dates - there's almost 300 people listed in there!
 
 Now that this feature is implemented and working, we're ready to merge it back into the `dev` branch:
 
@@ -211,7 +236,10 @@ git commit -m "Add endpoint for wishing people happy birthday by date."
 git push --set-upstream origin feature/add-happy-birthday-by-date
 ```
 
-If you now go to your repository in GitLab, you should create a merge request from this new feature branch to the dev branch. (If you set the default branch to be dev as per instructions in previous section, then dev should be the default target of your merge requests).
+If you now go to your repository in GitLab, you should create a merge request from this new feature branch to the `dev` branch.
+
+!!! tip
+	Make sure that your merge request is pointed at the `dev` branch of your forked repository, not the upstream repository that we originally forked from.
 
 At this point, if you're working in a wider team, you'll want to assign a designated teammate to review the code and approve it. Once it's been approved, you can merge in the changes.
 
@@ -220,3 +248,5 @@ At this point, if you're working in a wider team, you'll want to assign a design
 
 !!! success
     Congratulations, you've completed your first feature branch! :tada:
+
+	Next we're going to be containerising our API so that we can deploy it to AWS.

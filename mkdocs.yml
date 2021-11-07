@@ -1,9 +1,8 @@
 site_name: Go With The Flow
-# - An Introduction to Git Flow, Continuous Delivery and Containers
 site_author: Drew Silcock, STFC Hartree Centre
-copyright: Copyright &copy; 2020 - STFC Hartee Centre
-site_url: https://go-with-the-flow.netlify.app
-repo_name: drewsilcock/go-with-the-flow-code
+copyright: Copyright &copy; 2021 - STFC Hartee Centre
+site_url: https://go-with-the-flow.training.hartree.dev
+repo_name: go-with-the-flow-code
 repo_url: https://gitlab.com/drewsilcock/go-with-the-flow-code
 edit_uri: ""
 
