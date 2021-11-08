@@ -6,7 +6,7 @@ title: 4. Setting up continuous integration
 
 Next, we're going to leverage the power of continuous integration to take a bunch of work off our hands and generally make our lives easier.
 
-## What's continuous integration all about?
+## Recap: what's continuous integration all about?
 
 In short, continuous integration (or CI) just means setting up a computer to run automatic checks over your code every time you upload a commit to your repository.
 
@@ -16,33 +16,35 @@ This is a super simple idea but can bring a lot of power and versatility to your
 
 There are a bunch of different CI tools out there. Here's a quick overview of the most popular:
 
-### GitLab CI
+### GitLab CI/CD
 
-![GitLab CI / CD](/images/continuous-integration/gitlab-ci-cd.png){: style="height: 200px; float: right;"}
+![GitLab CI/CD](/images/continuous-integration/gitlab-ci-cd.png){: style="height: 200px; float: right;"}
 
-GitLab CI is what we're going to be using for this demo for a few reasons:
+GitLab CI/CD is what we're going to be using for this demo for a few reasons:
 
 - GitLab is an incredibly popular tool for companies hosting their own version control system. This makes it prevelant in business which don't want their IP-sensitive company code on a publicly hosted systems.
-- GitLab CI comes built into GitLab - all you need to do to set up a Runner (i.e. computer which runs our pipelines) is run a simple script.
-- GitLab CI is free to use on the publicly hosted [gitlab.com](https://gitlab.com){target="_blank" rel="noopener noreferrer"} GitLab instance and works out of the box without needing to install, setup or enable anything whatsoever. This means that it's both free and easy to use for this tutorial.
+- GitLab CI/CD comes built into GitLab - all you need to do to set up a Runner (i.e. computer which runs our pipelines) is run a simple script.
+- GitLab CI/CD is free to use on the publicly hosted [gitlab.com](https://gitlab.com){target="_blank" rel="noopener noreferrer"} GitLab instance and works out of the box without needing to install, setup or enable anything whatsoever. This means that it's both free and easy to use for this tutorial.
 
-Overall, GitLab CI is a very sophisticated, well designed and battle-hardened CI solution.
+Overall, GitLab CI/CD is a very sophisticated, well designed and battle-hardened CI solution.
 
 ### GitHub Actions
 
 ![GitHub Actions](/images/continuous-integration/github-actions.jpg){: style="height: 200px; float: right; margin: 0 0 15px 15px;"}
 
-GitHub Actions is the new kid on the block here - it started its public beta a few months ago and it now available for widespread use.
+GitHub Actions is the new kid on the block here - it started its public beta not too long ago but has since become a popular CI solution, particularly since TravisCI changed their pricing model.
 
-Admittedly, it's become fairly popular in the few months that it's been around, but it's still in it's early stages[^1]. It's being used in production by big companies already, but it's not as well established as the big players like GitLab CI, CircleCI and TravisCI.
+It's being used in production by big companies already, and if you're developing on GitHub, it'd be my primary recommendation for a CI solution, even if it's still not as well established as the big players like GitLab CI, CircleCI and TravisCI.
 
 One of the big advantages of GitHub Actions is that because it's built into GitHub, you can fork a repository and have the CI _just work_ on your fork (excluding any secret variables). This is actually pretty powerful! This same advantage also applied to GitLab, but GitHub remains the go-to solution for open source code and many proprietary codebases.
 
-[^1]: A case in point here is that GitHub Actions configuration files changed entirely from using a domain-specific language (DSL) to using YAML (like all the other CI solutions), which means searching around for documentation still brings up the old DSL solution instead of the new YAML solution.
+[^1]: A case in point here is that GitHub Actions configuration files changed entirely from using a domain-specific language (DSL) to using YAML (like all the other CI solutions), which means searching around for documentation still brings up the old DSL solution instead of the new YAML solution. This isn't such a bug issue anymore as online memory of the old DSL fades, but it still pops up now and then.
 
 Something that sets GitHub Actions apart from all the competitors is it's support for code annotations that will label issues with your code directly in the pull request, which is a pretty useful feature.
 
 This and the ability to leverage pipelines other people have written (via the [GitHub Marketplace](https://github.com/marketplace?type=actions){target="_blank" rel="noopener noreferrer"}) to made your CI configuration easier means that Actions will likely be used more and more over the next few years, especially for open source projects.
+
+All the skills you learn from using GitLab CI/CD here should equally well transfer over to GitHub Actions - they're both YAML-based CI solutions, the main difference is just that in GitLab CI/CD you use Docker images to run your CI, whereas on GitHub Actions you get a more barebones environment and are responsible for things like checking out the code and installing anything you need yourself (although there's usually an existing Action on the GitHub Marketplace you can utilise).
 
 ### Jenkins
 
@@ -54,7 +56,7 @@ It's a large, lumbering project which predates many things like containers and i
 
 For this reason, it's largely lagged behind in terms of functionality, but makes up for it by having an enormous ecosystem of plugins. Because Jenkins has been around for so long and has been used by so many people, there's a plugin for pretty much anything you might want to do.
 
-This does mean that it doesn't provide out-of-the-box support for many things, and in my experience it's a lot more effort to maintain and configure, but it's certainly stable product with many years of battle experience under it's belt.
+This does mean that it doesn't provide out-of-the-box support for many things, and in my experience it's a lot more effort to maintain and configure, but it's certainly stable product with many years of battle experience under its belt.
 
 ### TravisCI
 
@@ -75,7 +77,7 @@ CircleCI is similar to TravisCI is many ways, with two important differences:
 
 Other than that, there's not much more to say! The configuration is slightly different to TravisCI (but still YAML) and it doesn't have the same build matrix options that TravisCI has.
 
-Regardless, CircleCI remains a very popular choice for it's relative cheapness, easy of use and ability to move onto self-hosted servers now or at a later date without any frictions or conversion required.
+Regardless, CircleCI remains a very popular choice for its relative cheapness, easy of use and ability to move onto self-hosted servers now or at a later date without any frictions or conversion required.
 
 ### DroneCI
 
@@ -93,7 +95,50 @@ The first thing we're going to want to do in our continuous integration is _lint
 
 In Go, the most popular tool for CI linting is [golangci-lint](https://golangci-lint.run){target="_blank" rel="noopener noreferrer"} - this combines a bunch of different checkers into one single tool which is easy to install in CI pipelines. It'll check for common programming mistakes, style inconsistencies and it'll verify whether we've remember to run `go fmt` to automatically format our code.
 
-To get started with our CI, we first have to make our `.gitlab-ci.yml` file:
+Let's add another task to our trusty `Taskfile.yml` to lint and auto-format our code.
+
+!!! example "`Taskfile.yml`"
+    ```yaml linenums="73" hl_lines="11-27"
+      cmds:
+        - echo Uploading Docker image...
+        - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
+        - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}
+        - >-
+          aws ecr get-login-password |
+          docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
+        - docker push {{.CONTAINER_URI}}:latest
+        - docker push {{.CONTAINER_URI}}:{{.VERSION}}
+
+    lint:
+      desc: Run linter over codebase to check for style and formatting errors.
+      cmds:
+        - >-
+          CGO_ENABLED=0 golangci-lint run
+          --enable gofmt --enable goimports
+          --config .golangci.yml --timeout 10m
+
+    format:
+      desc: Run linter over codebase to format code.
+      cmds:
+        - >-
+          CGO_ENABLED=0 golangci-lint run
+          --enable gofmt --enable goimports
+          --config .golangci.yml --timeout 10m
+          --fix
+
+    clean:
+      desc: Clean up all files generated and output by build process.
+      cmds:
+        - echo Cleaning build files...
+        - go clean
+        - "rm {{.PROJECT_NAME}} 2> /dev/null; true"
+    ```
+
+We can then run `task lint` to check for style and formatting errors. Give it a try now!
+
+Next, we're going to create a GitLab CI/CD pipeline that runs this lint task. Every time we push a new commit up to our GitLab repository, it'll run this linter and tell us if we've made a mistake.
+
+GitLab CI/CD (much like most of the other CI solutions) uses YAML configuration files to define the pipelines. Let's add a file called `.gitlab-ci.yml` to our repository with our linting pipeline:
 
 !!! example "`.gitlab-ci.yml`"
     ```yaml linenums="1"
@@ -237,7 +282,7 @@ This is _super_ useful for regressing bugs because you can run the application a
 
 Now if you go to the "CI / CD" > "Pipelines" page, you should have a dropdown allowing you to download your built application executable as a file called `artifacts.zip` - decompress this and you'll get your `hbaas-server` exe for that commit.
 
-## Let's build, tag and upload our images automatically!
+## Let's build, tag and upload our images automatically
 
 Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/containerise-it/).
 

@@ -37,15 +37,15 @@ Containers are fundamentally a Linux technology! [^2]
 
 [^2]: In fact, if you're running Docker on either macOS or Windows, you'll be running a Linux virtual machine under the hood - all of the container cleverness happens inside the virtual machine's Linux kernel.
 
-In fact, containers are really a collection of features of the Linux kernel that enable you to namespace things like filesystems, processes, networks and memory. What this means is that a container can have it's own processes that run *completely isolated* from the rest of your system, and this separation is enforced at the kernel level.
+In fact, containers are really a collection of features of the Linux kernel that enable you to namespace things like filesystems, processes, networks and memory. What this means is that a container can have its own processes that run *completely isolated* from the rest of your system, and this separation is enforced at the kernel level.
 
 There's no way that another container or process outside of the container runtime can access anything inside your image because the kernel enforces the isolation. This is a really simple concept (the specifics of the implementation are not so simple) but the power and versability that you can get out of this simple idea are pretty extraordinary!
 
 As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be just a few kilobytes instead of gigabytes. As a rule of thumb, there's not generally any significant CPU overhead for running inside a container, but there is some overhead associated with the network stack. You can read some numbers for container performance characterisation [here](https://www.nginx.com/blog/comparing-nginx-performance-bare-metal-and-virtual-environments/){target="_blank" rel="noopener noreferrer"}.
 
-![Virtual machines vs. containers. From: https://blog.netapp.com/blogs/containers-vs-vms/](/images/containerise-it/vm-vs-container.png)
+![Virtual machines vs. containers](/images/containerise-it/vm-vs-container.png)
 
-From: https://blog.netapp.com/blogs/containers-vs-vms/
+**From:** https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
 
 If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/){target="_blank" rel="noopener noreferrer"} and [zines](https://wizardzines.com/zines/containers/){target="_blank" rel="noopener noreferrer"} by [Julia Evans](https://twitter.com/b0rk){target="_blank" rel="noopener noreferrer"}.
@@ -212,9 +212,9 @@ docker build --tag hbaas-server .
 If all goes well, you should now be able to run your image:
 
 ```bash
-# The `--rm` flag will clear up the container after it's run and the `--publish`
-# flag enables us to connect to the container on port 8000 using port 8000 on
-# our host machine.
+# The `--rm` flag will clear up the container after it has run and the
+# `--publish` flag enables us to connect to the container on port 8000
+# using port 8000 on our host machine.
 docker run --rm --publish 8000:8000 hbaas-server
 ```
 
@@ -369,7 +369,7 @@ hbaas-server       latest              edbb955e4319   41 seconds ago   21.8MB
 ```
 
 !!! note
-    We're using the [Alpine](https://alpinelinux.org/){target="_blank" rel="noopener noreferrer"} image here which is basically a super-lightweight Linux distro which is really popular for making Docker images because of it's tiny size. We can see here that it's adding around 10 MB on top of our executable. Not bad!
+    We're using the [Alpine](https://alpinelinux.org/){target="_blank" rel="noopener noreferrer"} image here which is basically a super-lightweight Linux distro which is really popular for making Docker images because of its tiny size. We can see here that it's adding around 10 MB on top of our executable. Not bad!
 
     In fact, technically we don't even need Alpine! We could equally have done `FROM scratch` instead which would contain literally no other files! The only reason we're not doing this is that cloud providers often require basic utilities like Bash installed to work properly, and we need to install the `ca-certificates` package in order for our API to support TLS (i.e. to be able to access our API using `https://` instead of `http://`).
 
@@ -450,21 +450,6 @@ Let's commit our progress again before moving on:
 git add .
 git commit -m "Add task to `Taskfile.yml` to build Docker image with version."
 ```
-
-## Finishing up
-
-Now that we can build and run our API as a Docker image, let's push our feature branch up to GitLab and merge it in.
-
-```bash
-git push --set-upstream origin feature/containerise-api
-```
-
-Now you can merge the feature branch into `dev` either using git locally or on GitLab - just remember to disable fast-forwarding if you do it in GitLab.
-
-!!! success
-    Great work! Now you've containerised your API.
-
-    Now you're ready to start automating tasks using continuous integration.
 
 ## Let's create our private repository
 
@@ -625,3 +610,25 @@ aws ecr describe-images --repository-name go-with-the-flow/hbaas-server-<your-na
     ]
 }
 ```
+
+Good job! Let's commit our progress again:
+
+```bash
+git add .
+git commit -m "Add task to upload image to AWS ECR."
+```
+
+## Finishing up
+
+Now that we can build, run and publish our API as a Docker image, let's push our feature branch up to GitLab and merge it in.
+
+```bash
+git push --set-upstream origin feature/containerise-api
+```
+
+Now you can merge the feature branch into `dev` either using git locally or on GitLab - just remember to disable fast-forwarding if you do it in GitLab.
+
+!!! success
+    Great work! Now you've containerised your API.
+
+    Now you're ready to start automating tasks using continuous integration.

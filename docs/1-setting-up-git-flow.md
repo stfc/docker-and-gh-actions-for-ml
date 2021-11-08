@@ -10,6 +10,9 @@ Like we discussed in the presentation, we'll be using the **git-flow** branching
 
 ![git-flow branching model](/images/setting-up-git-flow/git-flow.png)
 
+**From:** http://nvie.com/archives/323 ([CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/))
+{: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
+
 Now, there's a lot going on in this diagram so don't panic if this still doesn't make much sense to you - we're going to be going through it in practice step-by-step.
 
 !!! note
@@ -30,7 +33,7 @@ As we explained in the presentation, SemVer consists of 3 numbers, separated by 
 
 ![SemVer Demo](/images/setting-up-git-flow/semver.png)
 
-From: https://forums.ubports.com/topic/1822/semantic-versioning-for-ut
+**From:** https://forums.ubports.com/topic/1822/semantic-versioning-for-ut ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/))
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
 
 There's a few important things to understand about how SemVer works with git-flow. Let's say we're working on a library that tells you whether a particular day is a bank holiday or not. This imaginary library is currently on version `3.6.1`.
