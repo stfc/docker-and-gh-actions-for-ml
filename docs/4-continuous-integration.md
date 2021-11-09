@@ -142,12 +142,13 @@ GitLab CI/CD (much like most of the other CI solutions) uses YAML configuration 
 
 !!! example "`.gitlab-ci.yml`"
     ```yaml linenums="1"
-    image: golang
+    # Default image for all jobs.
+    image: golang:1.17
 
+    # Cache go packages to speed up future builds.
     cache:
       key: ${CI_COMMIT_REF_SLUG}
       paths:
-        - .go-bin
         - .go-pkg
 
     # Each stage runs consecutively, one after the other. Each stage can have multiple
@@ -159,42 +160,36 @@ GitLab CI/CD (much like most of the other CI solutions) uses YAML configuration 
     lint:
       stage: lint
       before_script:
-        - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /go/bin v1.27.0
-        # We need to run the code-gen scripts for the linting to work.
-        - make code-gen
+        - apk add curl
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        - task --version
+        - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - golangci-lint run --enable gofmt --enable goimports
+        - task lint
     ```
 
 !!! tip
-    Notice how we're specifying a cache in this YAML file - this ensures that the Go dependencies are all cached in between each CI run, which will massively speed up how long it takes to complete your CI pipelines.
+    Notice how we're specifying a `GOPATH` in the lint job `before_script` and caching that folder with the `cache` section - this ensures that the Go dependencies are all cached in between each CI run, which will massively speed up how long it takes to complete your CI pipelines.
 
-If you commit this file and push it up to your GitLab repo, and go to "CI / CD" > "Pipelines" in the bar along the left, you should see our CI pipeline running for the first time!
+Let's commit this change and push it up to our repository.
+
+```bash
+# Make sure we're on the up to date dev branch.
+git checkout dev
+git pull
+git checkout -b feature/add-lint-pipeline
+
+git add .
+git commit -m "Add GitLab CI pipeline to lint code using golangci-lint."
+git push --set-upstream feature/add-lint-pipeline
+```
+
+If you go to "CI/CD" > "Pipelines" in your GitLab project, you should now see your pipeline running for the first time.
 
 ![lint pipeline list](/images/continuous-integration/lint-pipeline-list.png)
 
-If you click on the individual pipeline that just ran, you can see a visualisation of our pipeline, along with the output of all the commands.
-
-But alas, our pipeline has an error in it! If you go into the the output of the lint job you should be able to see what the error is:
-
-![lint pipeline error](/images/continuous-integration/lint-pipeline-error.png)
-
-Based on this, we can see that we have a string that is inside a call to `fmt.Sprintf()`, but which doesn't have any formatting applied to it. A silly mistake which can be easily remedied:
-
-!!! example "`handlers/birthday.go`"
-    ```go linenums="21" hl_lines="4"
-    }
-
-    func (h BirthdayHandler) sayHello(c echo.Context) error {
-    	message := "Welcome! Try sending a request to '/{some-name}' to get started!"
-    	return c.JSON(
-    		http.StatusOK,
-    		NewAPIMessage(message),
-    ```
-
-If you commit this fix and push your change, you should get that lovely nice green tick:
-
-![line pipeline fix](/images/continuous-integration/lint-pipeline-fix.png)
+Once that's passed let's merge that feature branch into `dev` and move on.
 
 ## Let's make sure our code builds
 
@@ -205,33 +200,55 @@ But we can do better.
 Let's start by adding another stage to our pipeline to build our code. This'll happen just after our 'lint' stage:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="11 22-26"
-    image: golang
+    ```yaml linenums="1" hl_lines="14 28-35"
+    # Default image for all jobs.
+    image: golang:1.17
 
+    # Cache go packages to speed up future builds.
     cache:
       key: ${CI_COMMIT_REF_SLUG}
       paths:
-        - .go-bin
         - .go-pkg
 
+    # Each stage runs consecutively, one after the other. Each stage can have multiple
+    # jobs running in it.
     stages:
       - lint
       - build
 
+    # This is a single job, called 'lint', running in the 'lint' stage.
     lint:
       stage: lint
       before_script:
-        - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /go/bin v1.27.0
-        # We need to run the code-gen scripts for the linting to work.
-        - make code-gen
+        - apk add curl
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        - task --version
+        - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - golangci-lint run --enable gofmt --enable goimports
+        - task lint
 
     build:
       stage: build
+      before_script:
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - make build
+        - task build
     ```
+
+Let's commit and push this up to another feature branch:
+
+```bash
+git checkout dev
+git pull
+git checkout -b feature/add-build-job-to-ci-pipeline
+
+git add .
+git commit -m "Add build job to CI pipeline."
+git push --set-upstream feature/add-build-job-to-ci-pipeline
+```
 
 Now we can see our CI pipeline has an extra stage in it for our build, which as expected is succeeding:
 
@@ -239,35 +256,47 @@ Now we can see our CI pipeline has an extra stage in it for our build, which as 
 
 We can do better than this though - we can 'artifact' the output of the build so that we have a downloadable history of the state of the built application after every single commit.
 
-This is _super_ useful for regressing bugs because you can run the application after every single commit and find which commit introduced the bug. Here's how we do it:
+This is _super_ useful for regressing bugs because you can run the application after every single commit and find which commit introduced the bug.
+
+First, remember to merge your Merge Request in GitLab (or using command line). Then, here's how we artifact our built application:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="26-30"
-    image: golang
+    ```yaml linenums="1" hl_lines="36-40"
+    # Default image for all jobs.
+    image: golang:1.17
 
+    # Cache go packages to speed up future builds.
     cache:
       key: ${CI_COMMIT_REF_SLUG}
       paths:
-        - .go-bin
         - .go-pkg
 
+    # Each stage runs consecutively, one after the other. Each stage can have multiple
+    # jobs running in it.
     stages:
       - lint
       - build
 
+    # This is a single job, called 'lint', running in the 'lint' stage.
     lint:
       stage: lint
       before_script:
-        - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /go/bin v1.27.0
-        # We need to run the code-gen scripts for the linting to work.
-        - make code-gen
+        - apk add curl
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        - task --version
+        - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - golangci-lint run --enable gofmt --enable goimports
+        - task lint
 
     build:
       stage: build
+      before_script:
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - make build
+        - task build
       artifacts:
         paths:
           - hbaas-server
@@ -280,134 +309,113 @@ This is _super_ useful for regressing bugs because you can run the application a
 
     These unit tests will also be shown in merge requests so that you can check over them before merging feature or fixes into your dev branch.
 
-Now if you go to the "CI / CD" > "Pipelines" page, you should have a dropdown allowing you to download your built application executable as a file called `artifacts.zip` - decompress this and you'll get your `hbaas-server` exe for that commit.
+Now if you commit and push this up:
+
+```bash
+git checkout dev
+git pull
+git checkout -b feature/artifact-built-ci-executables
+
+git add .
+git commit -m "Add artifacting of built executables to CI build job."
+git push --set-upstream feature/artifact-built-ci-executables
+```
+
+Now if you go to the "CI / CD" > "Pipelines" page, you should have a dropdown allowing you to download your built application executable as a file called `artifacts.zip` - decompress this and you'll get your `hbaas-server` exe for that commit. Go ahead and merge that feature branch once it passes.
 
 ## Let's build, tag and upload our images automatically
 
 Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/containerise-it/).
 
-As we need to have access to our private repository, we need to get an API key from IBM Cloud and put it into the "secrets" in GitLab. This means that when we do `ibmcloud login`, the IBM Cloud CLI takes our API key from the runner environment and uses it to authenticate against the IBM Cloud so that it can upload our image. Neat!
+As we need to have access to our private ECR repository, we need to put our AWS access key and secret key into GitLab's project CI settings. This allows us to retrieve these values from a CI job so that we can login to the Docker repository and push the our image.
 
-First things first, let's get our API key from IBM Cloud.
+We need to copy these values and our region into the "Variables" section under "Settings" > "CI / CD". The variables we need to add are:
 
-You can do this [using the IBM Cloud website](https://cloud.ibm.com/docs/iam?topic=iam-userapikey#create_user_key), but we're going to use the CLI because it's easier and faster:
-
-```bash
-ibmcloud iam api-key-create GitLabCIKey -d "API key for GitLab CI / CD." --file gitlab_ci_key.json
-```
-
-If you look in the output `gitlab_ci_key.json` file, you should see something like this:
-
-!!! example "`gitlab_ci_key.json`"
-    ```json linenums="1"
-    {
-        "id": "ApiKey-01234567-89ab-cdef-0123-456789abcdef",
-        "crn": "crn:v1:bluemix:public:iam-identity::a/0123456789abcdef0123456789abcdefA-1234567A::apikey:ApiKey-01234567-89ab-cdef-0123-456789abcdef",
-        "iam_id": "IBMid-0123456789",
-        "account_id": "0123456789abcdef0123456789abcdef",
-        "name": "GitLabCIKey",
-        "description": "API key for GitLab CI / CD.",
-        "apikey": "abcdefghijk-lmnopq_rstuvwxy-zABCDEFGH_IJKLMN",
-        "locked": false,
-        "entity_tag": "1-0123456789abcdef0123456789abcdef",
-        "created_at": "2020-06-02T10:37+0000",
-        "created_by": "IBMid-0123456789",
-        "modified_at": "2020-06-02T10:37+0000"
-    }
-    ```
-
-The important thing here is the `apikey` field - this is what we want! The rest is just bits of metadata.
-
-We need to copy this `apikey` value and put it into the "Variables" section under "Settings" > "CI / CD", like so:
+* `AWS_ACCESS_KEY_ID` - the access key for your AWS account
+* `AWS_SECRET_ACCESS_KEY` - the secret key for your AWS account
+* `AWS_DEFAULT_REGION` - the region that we're using (i.e. `eu-west-2`)
 
 ![GitLab CI secrets](/images/continuous-integration/gitlab-ci-secrets.png)
 
 !!! note
     If you're using an older hosted version of GitLab, this UI will look slightly different, and the section will be called "Secrets" instead of "Variables" - the outcome is the same, though!
 
-It's important that you call the key `IBMCLOUD_API_KEY` precisely, otherwise the IBM Cloud CLI will not pick it up. For the value, simply paste in the `apikey` from above.
+!!! warning
+    Make sure you untick the "Protect variable" checkbox for all of these variables - on the publicly hosted GitLab this is enabled by default by this means we'd have to protect our `main`, `dev` and version tag branches. If you don't, our CI pipelines won't be able to access the variables and so won't be able to authenticate against our ECR repository.
 
-!!! tip
-    If you're not seeing the environment variable show up in your CI pipeline, check whether the "Protected" flag is set in the CI settings. If this is set, the variable is only available to branches which are "protected".
+    In general this is a really good idea to do because it protects your AWS credentials and also prevents accidental git history rewrites, but we're trying to keep it simple here.
 
-    By default, only `master` is protected, which means you have to either protect the `dev` branch in "Settings" > "Repository" or untick the "Protected" box on the variables settings page.
+!!! info
+    In a production environment, you'd want to use Amazon IAM to create a set of credentials specifically to put into GitLab CI. You can then restrict the permissions granted to these credentials to only push to ECR. That way, if your AWS credentials are ever leaked from GitLab, any malicious people won't be able to mess up your AWS infrastructure.
 
-    In general, it's a good idea to keep your `master` and `dev` branches protected because it prevents rewriting history, but this is up to your individual use-case.
-
-Once you've done this, we can update our GitLab CI YAML to add an extra stage for our Docker stuff and add a job that will upload a Docker image every time a commit is pushed to the `dev` or `master` branches:
+Once you've done this, we can update our GitLab CI YAML to add an extra stage for our Docker deployment and add a job that will upload a Docker image every time a commit is pushed to the `dev` branch or when a tag is created:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="3-23 34 54-70"
-    image: golang
+    ```yaml linenums="1" hl_lines="3-9 19 44-64"
+    image: golang:1.17
 
     variables:
-      # When using dind service we need to instruct docker, to talk with the
-      # daemon started inside of the service. The daemon is available with
-      # a network connection instead of the default /var/run/docker.sock socket.
-      #
-      # The 'docker' hostname is the alias of the service container as described at
-      # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
-      #
-      # Note that if you're using the Kubernetes executor, the variable should be set to
-      # tcp://localhost:2375 because of how the Kubernetes executor connects services
-      # to the job container
-      # DOCKER_HOST: tcp://localhost:2375
-      #
-      # For non-Kubernetes executors, we use tcp://docker:2375
-      # DOCKER_HOST: tcp://docker:2375
-      #
-      # This will instruct Docker not to start over TLS.
+      # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
+      DOCKER_HOST: tcp://docker:2376
       DOCKER_TLS_CERTDIR: "/certs"
 
     services:
-      - name: docker:19.03.1-dind
+      - name: docker:19.03.12-dind
 
     cache:
       key: ${CI_COMMIT_REF_SLUG}
       paths:
-        - .go-bin
         - .go-pkg
 
     stages:
       - lint
       - build
-      - docker
+      - publish
 
     lint:
       stage: lint
       before_script:
-        - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /go/bin v1.27.0
-        # We need to run the code-gen scripts for the linting to work.
-        - make code-gen
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.43.0
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - golangci-lint run --enable gofmt --enable goimports
+        - task lint
 
     build:
       stage: build
+      before_script:
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - make build
+        - task build
       artifacts:
         paths:
           - hbaas-server
         expire_in: 30 days
 
     upload-image:
-      stage: docker
-      image: docker:19.03.1
+      stage: publish
+      image: docker:19.03.12
       before_script:
-        - apk add --update alpine-sdk bash
-        - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-        - ibmcloud plugin install container-registry -r 'IBM Cloud'
-        # Latest CF is not compatible with IBM Cloud (seemingly) because the IBM Cloud CF
-        # instance doesn't have log cache installed on it.
-        - ibmcloud cf install --version 6.49.0 --force
-        - ibmcloud login --no-region
-        - ibmcloud cr region-set uk-south
+        - docker info
+        - apk add curl git
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - >-
+          export AWS_ECR_PASSWORD=$(
+          docker run --rm
+          --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+          --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+          amazon/aws-cli
+          ecr --region $AWS_DEFAULT_REGION get-login-password
+          )
       script:
-        - make upload-image
+        - task upload-image
       only:
         - dev
-        - master
+        - tags
     ```
 
 !!! note
@@ -415,34 +423,72 @@ Once you've done this, we can update our GitLab CI YAML to add an extra stage fo
 
     This is because the job is running inside a Docker image, which means we need to allow the Docker in the job inside the container to contact the Docker daemon running outside the container. This is known as d-in-d or Docker-in-Docker.
 
-Commit and push this change to your GitLab repo and you should see your images built, tagged and uploaded to your private repository.
+Let's go ahead and commit this:
+
+```bash
+git checkout dev
+git pull
+git checkout -b feature/add-docker-image-publishing-to-ci
+
+git add .
+git commit -m "Add CI job to upload Docker image to ECR."
+git push --set-upstream feature/add-docker-image-publishing-to-ci
+```
+
+You'll need to merge this one before you can see the publish job running. Once you do, it should look like this:
 
 ![upload image CI pipeline](/images/continuous-integration/upload-image-ci-pipeline.png)
 
-This'll work regardless of whether it's running on `dev` or `master` - you don't want this running on other branches, otherwise you'll end up with images in your private repository from your feature and bugfix branches cluttering up your private registry.
+This upload job will run either on the `dev` branch or on any tags that are created, which in our workflow correspond to version releases.
 
 !!! note
-    Building images for your feature and bug fix branches can be a really powerful and useful tool to use in combination with continuous deployment for allowing you to automatically host test environments for new features.
+    Building images for your feature and bug fix branches can be a really powerful and useful tool to use in combination with continuous deployment for allowing you to automatically host test environments for new features so that QA engineers can verify that they're working correctly.
 
     This would be part of a much more complex and sophisticated CI / CD setup, so isn't in scope of this tutorial.
-
-!!! tip
-    Making the CI play nicely with the IBM Cloud private repository can be fernickity so please do reach out if you encounter any problems here!
 
 If you check your "upload-image" job in GitLab, you should see an output that looks something like this:
 
 ![image upload job output](/images/continuous-integration/image-upload-job-output.png)
 
-You can check to make sure that your images have uploaded properly by checking the GitLab CI job logs and by running:
+You can check to make sure that your images have uploaded properly by running:
 
 ```bash
-ibmcloud cr images
-> Listing images...
->
-> Repository                                     Tag                                Digest         Namespace               Created          Size     Security status
-> uk.icr.io/my-org/hbaas-server                  latest                             135777eaee3a   my-org                  12 minutes ago   13 MB    No Issues
-> uk.icr.io/my-org/hbaas-server                  v1.0.0-16-g232c588                 a4ba15b7e419   my-org                  2 days ago       13 MB    No Issues
+aws ecr describe-images --repository-name go-with-the-flow/hbaas-server-<your-name> | jq
 ```
+```json
+{
+    "imageDetails": [
+        {
+            "registryId": "049839538904",
+            "repositoryName": "go-with-the-flow/hbaas-server-drewsilcock",
+            "imageDigest": "sha256:3a788d1cdaf64346d6d94f7a3519b38bd7a44399d727726b4330c5d421f1a480",
+            "imageTags": [
+              "latest",
+              "v1.0.0-160786e"
+            ],
+            "imageSizeInBytes": 12110909,
+            "imagePushedAt": "2021-11-09T09:41:35+00:00",
+            "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+        },
+        {
+            "registryId": "049839538904",
+            "repositoryName": "go-with-the-flow/hbaas-server-<your-name>",
+            "imageDigest": "sha256:c29a539f33ac40ac65a053d75c1f6ae6e75440c14c4f8e2a0d231f612b1b5166",
+            "imageTags": [
+                "v1.0.0-af6f40d"
+            ],
+            "imageSizeInBytes": 12110280,
+            "imagePushedAt": "2021-11-07T20:32:42+00:00",
+            "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+        }
+    ]
+}
+```
+
+!!! note
+    You'll notice that your new uploaded image has the `latest` tag and the image you uplaoded manually in the last section no longer does. When you upload a new image with a particular tag, e.g. `latest`, it will take the place of any existing image with that tag. This means that you always get the most up to date image when you pull the `latest` tag.
 
 !!! success
     With this completed, you've now got your continuous integration pipeline set up! Congratulations!
