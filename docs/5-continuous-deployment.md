@@ -539,7 +539,7 @@ curl -s localhost/status | jq
 
 ```bash
 # Just for fun - output will depend on when you run it!
-curl localhost/date/$(date +"%d-%B")
+curl -s localhost/date/$(date +"%d-%B") | jq
 ```
 ```json
 {

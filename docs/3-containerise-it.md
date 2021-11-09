@@ -540,17 +540,44 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
     Complete this task to upload the image to our AWS container registry:
 
     !!! example "`Taskfile.yml`"
-        ```yaml linenums="1" hl_lines="13-15"
+        ```yaml linenums="58" hl_lines="15-29"
+                GOOS: linux
+                GOARCH: amd64
+      
+        build-image:
+          desc: Build Docker image for API.
+          cmds:
+            - echo Building Docker image...
+            - >-
+              docker build
+              --build-arg version={{.VERSION}}
+              --tag {{.PROJECT_NAME}}:latest
+              --tag {{.PROJECT_NAME}}:{{.VERSION}}
+              .
+      
         upload-image:
-          desc: Upload Docker image to AWS container registry.
+          desc: Upload Docker image for API to AWS ECR.
+          deps:
+            - build-image
           cmds:
             - echo Uploading Docker image...
             - >-
-              aws ecr get-login-password |
+              echo $AWS_ECR_PASSWORD |
               docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - echo TODO: Upload 'latest' image to AWS ECR.
             - echo TODO: Upload current version tagged image to AWS ECR.
             - echo TODO: Upload image tagged with current branch to AWS ECR.
+          env:
+            AWS_ECR_PASSWORD:
+              sh: which aws && aws ecr get-login-password || true
+      
+        lint:
+          desc: Run linter over codebase to check for style and formatting errors. This requires that you've already installed `golangci-lint`.
+          cmds:
+            - CGO_ENABLED=0 golangci-lint run --enable gofmt --enable goimports --config .golangci.yml --timeout 10m
+      
+        format:
+          desc: Run linter over codebase to format code. This requires that you've already installed `golangci-lint`.
         ```
 
     You can access the relevant variables using the `{{.VARIABLE_NAME}}` syntax. For instance:
@@ -592,6 +619,9 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
             - docker push {{.CONTAINER_URI}}:latest
             - docker push {{.CONTAINER_URI}}:{{.VERSION}}
             - "[ -z \"{{.GIT_BRANCH}}\" ] && docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
+          env:
+            AWS_ECR_PASSWORD:
+              sh: which aws && aws ecr get-login-password || true
 
         clean:
           desc: Clean up all files generated and output by build process.
