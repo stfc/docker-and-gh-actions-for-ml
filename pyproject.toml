@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "ida-cloud-training-docs"
+name = "go-with-the-flow-docs"
 version = "0.1.0"
-description = "Documentation for IDA Cloud Training day practical sessions."
+description = "Documentation for Go With the Flow workshop."
 authors = ["Drew Silcock <drew.silcock@stfc.ac.uk>"]
 license = "MIT"
 

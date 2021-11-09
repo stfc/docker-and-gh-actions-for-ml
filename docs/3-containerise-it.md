@@ -169,10 +169,12 @@ What this Dockerfile will do is take the Go Docker image from [Docker Hub](https
 
         # Now that we've got our Docker image, we can specify what command to run
         # when running our image.
-        CMD ["./hbaas-server"]
+        CMD ["/app/hbaas-server"]
         ```
 
-    There is a subtle difference between `CMD ["./hbaas-server"]` and `CMD ./hbaas-server`. The former is called the "exec" form and the latter is called the "shell" form. The exec form is the preferred form for a variety of reasons (see e.g. [this article](https://hynek.me/articles/docker-signals/){target="_blank" rel="noopener noreferrer"}).
+    There is a subtle difference between `CMD ["/app/hbaas-server"]` and `CMD /app/hbaas-server`. The former is called the "exec" form and the latter is called the "shell" form. The exec form is the preferred form for a variety of reasons (see e.g. [this article](https://hynek.me/articles/docker-signals/){target="_blank" rel="noopener noreferrer"}).
+
+    You could also use `CMD ["./hbaas-server"]` instead of specifying the full path to the executable, but it's best practice to specify the full path because modifying our `Dockerfile` later on might involve changing the working directory which will cause the CMD command to fail.
 
 We're also going to add a [`.dockerignore` file](https://docs.docker.com/engine/reference/builder/#dockerignore-file){target="_blank" rel="noopener noreferrer"} - this is exactly like a `.gitignore` but tells Docker that, even if we say `COPY . .`, we don't need to worry about certain files. Let's create one and put a few standards things in (this'll speed up the image build time and often reduces the output image size too[^5]):
 
@@ -287,7 +289,7 @@ So let's look at making our Docker cache usage more efficient by updating our Do
     
     # Now that we've got our Docker image, we can specify what command to run
     # when running our image.
-    CMD ["./hbaas-server"]
+    CMD ["/app/hbaas-server"]
     ```
 
 What this means is that we can download all of our dependencies before we do the important `COPY . /app` command. This way, is we change any of our source files and re-run the `docker build` command, our Docker build will skip straight past downloading the dependencies.
@@ -358,7 +360,7 @@ We'll need to make some changes to our `Dockerfile`:
 
     # Now that we've got our Docker image, we can specify what command to run
     # when running our image.
-    CMD ["./hbaas-server"]
+    CMD ["/app/hbaas-server"]
     ```
 
 Now if we rebuild our image and check our sizes now with our fancy new multi-stage build, we can see a _significant_ improvement:
@@ -507,7 +509,7 @@ Now we're going to upload our image into the registry. We're going to use the `T
 Firstly, we need to add a few variables at the beginning of the file:
 
 !!! example "`Taskfile.yml`"
-    ```yaml linenums="1" hl_lines="8-12"
+    ```yaml linenums="1" hl_lines="14-20"
     version: "3"
     
     silent: true
@@ -515,16 +517,19 @@ Firstly, we need to add a few variables at the beginning of the file:
     vars:
       PROJECT_NAME: hbaas-server
     
-      CONTAINER_REGISTRY: 049839538904.dkr.ecr.eu-west-2.amazonaws.com
-      CONTAINER_NAMESPACE: go-with-the-flow
-      CONTAINER_REPO: {{.PROJECT_NAME}}-<your-name>
-      CONTAINER_URI: {{.CONTAINER_REGISTRY}}/{{.CONTAINER_NAMESPACE}}/{{.CONTAINER_REPO}}
-    
       VERSION:
         sh: echo "${VERSION:-$(git describe --tags --always 2> /dev/null)}"
     
       BUILD_TIME:
         sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
+
+      CONTAINER_REGISTRY: 049839538904.dkr.ecr.eu-west-2.amazonaws.com
+      CONTAINER_NAMESPACE: go-with-the-flow
+      CONTAINER_REPO: {{.PROJECT_NAME}}-<your-name>
+      CONTAINER_URI: {{.CONTAINER_REGISTRY}}/{{.CONTAINER_NAMESPACE}}/{{.CONTAINER_REPO}}
+    
+      GIT_BRANCH:
+        sh: git branch --show-current
     ```
 
 Where you replace `<your-name>` with the personal identifier (e.g. name with hyphens instead of spaces) from the previous section.
@@ -545,12 +550,14 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
               docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - echo TODO: Upload 'latest' image to AWS ECR.
             - echo TODO: Upload current version tagged image to AWS ECR.
+            - echo TODO: Upload image tagged with current branch to AWS ECR.
         ```
 
     You can access the relevant variables using the `{{.VARIABLE_NAME}}` syntax. For instance:
 
     * Full URI to container image: `{{.CONTAINER_URI}}`
     * Current version: `{{.VERSION}}`
+    * Current branch: `{{.GIT_BRANCH}}`
 
     You might need to refer back to the `build-image` task we added before to make sure you know what the image tags are.
 
@@ -566,7 +573,7 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
     There are four commands required to complete this task:
 
     !!! example "`Taskfile.yml`"
-        ```yaml linenums="1" hl_lines="13-16"
+        ```yaml linenums="66" hl_lines="13-18"
               --tag {{.PROJECT_NAME}}:{{.VERSION}}
               .
 
@@ -581,14 +588,18 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
               docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
             - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}
+            - "[ -z \"{{.GIT_BRANCH}}\" ] && docker tag {{.PROJECT_NAME}}:{{.BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
             - docker push {{.CONTAINER_URI}}:latest
             - docker push {{.CONTAINER_URI}}:{{.VERSION}}
+            - "[ -z \"{{.GIT_BRANCH}}\" ] && docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
 
         clean:
           desc: Clean up all files generated and output by build process.
         ```
 
-    The first two tag the images with the full URI of the container image including tag. This tells Docker that it is this image that should be uploaded when we run the final two commands.
+    The first three tag the images with the full URI of the container image including tag. This tells Docker that it is this image that should be uploaded when we run the final two commands.
+
+    You'll notice the branch tagging and pushing have a weird bit of bash at the beginning - we might not always be on a branch, so this simply checks whether `GIT_BRANCH` is empty - if it is, it doesn't try to tag and push the branch image. Don't worry too much if you didn't include this in your solution, it's just to prevent errors in case you're running e.g. on a tag instead of a branch.
 
 If all goes well, you should now be able to see your images in the AWS ECR repository:
 

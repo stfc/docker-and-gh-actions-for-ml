@@ -8,7 +8,7 @@ We've done some really cool things with our git-flow, semantic versioning and co
 
 Well, fear not, because this last section is going to talk you through extending our existing CI pipeline to add continuous deployment!
 
-## Why continuously deploy?
+## Recap: why continuously deploy?
 
 There's a bunch of major advantages to continuous deploying your software:
 
@@ -17,267 +17,120 @@ There's a bunch of major advantages to continuous deploying your software:
 3. You can extend your pipeline to automate more advanced workflows, like deploying a whole new version of your cloud environment for a release candidate, or for new features.
 4. It's repeatable and less error-prone - by taking away the human element in the deployment process, you ensure that every deployment runs exactly the same. There's no possibility of accidentally deploying to the wrong instance or running commands in the wrong order or any of that. If your deployment works the 1st time, it should be the 1000th time.
 
-## Creating our app manifests
+## Let's publish our images automatically
 
-Different cloud providers have different techniques for deploying apps. We're going to be using IBM Cloud's CloudFoundry to deploy ours, which means that we need to add a YAML manifest file for the API.
+Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/containerise-it/).
 
-We're going to have two separate deployments:
+As we need to have access to our private ECR repository, we need to put our AWS access key and secret key into GitLab's project CI settings. This allows us to retrieve these values from a CI job so that we can login to the Docker repository and push the our image.
 
-- one `hbaas-dev` service for testing purposes, deployed from the `dev` branch, and
-- one `hbaas-prod` service as the production instance, deployed from the `master` branch.
+We need to copy these values and our region into the "Variables" section under "Settings" > "CI / CD". The variables we need to add are:
 
-Let's see what this looks like in code:
+* `AWS_ACCESS_KEY_ID` - the access key for your AWS account
+* `AWS_SECRET_ACCESS_KEY` - the secret key for your AWS account
+* `AWS_DEFAULT_REGION` - the region that we're using (i.e. `eu-west-2`)
 
-!!! example "`manifest.yaml`"
-    ```yaml linenums="1"
-    ---
-    applications:
-      - name: hbaas-server-dev
-        instances: 1
-        memory: 1GB
-        routes:
-          - route: myorg-hbaas-dev.eu-gb.cf.appdomain.cloud
-        # You can specify any environment variables to pass through to the application
-        # here. The only one we need right now is the API environment, but if we were
-        # connecting to external services like databases, we would want to include the
-        # environment variables for these credentials here. Just be careful what you
-        # commit to the repository and who can access that! Depending on your
-        # requirements, it may be more appropriate to keep secret credentials in the CI
-        # runner secrets and inject them from the CI pipeline.
-        env:
-          HBAAS_ENV: dev
+![GitLab CI secrets](/images/continuous-deployment/gitlab-ci-secrets.png)
 
-      - name: hbaas-server-prod
-        # If your app requires more resources, you can increase the n# instances &
-        # available memory here to match your requirements.
-        instances: 1
-        memory: 1GB
-        routes:
-          - route: myorg-hbaas-prod.eu-gb.cf.appdomain.cloud
-        env:
-          HBAAS_ENV: prod
-    ```
+!!! note
+    If you're using an older hosted version of GitLab, this UI will look slightly different, and the section will be called "Secrets" instead of "Variables" - the outcome is the same, though!
 
 !!! warning
-    The route here must be globally unique, which means if everyone uses the same one, the deployment will fail. Make sure you use a unique route to avoid encountering this difficulty!
+    Make sure you untick the "Protect variable" checkbox for all of these variables - on the publicly hosted GitLab this is enabled by default by this means we'd have to protect our `main`, `dev` and version tag branches. If you don't, our CI pipelines won't be able to access the variables and so won't be able to authenticate against our ECR repository.
 
-Normally, this configuration would include either a "buildpack" or the path to a Docker image to specify the actual application that's going to be run.
+    In general this is a really good idea to do because it protects your AWS credentials and also prevents accidental git history rewrites, but we're trying to keep it simple here.
 
-Instead, we're going to leave this blank in the `manifest.yaml` because we're going to be specifying the path to the Docker image dynamically. I'll explain why this is when we get there.
+!!! info
+    In a production environment, you'd want to use Amazon IAM to create a set of credentials specifically to put into GitLab CI. You can then restrict the permissions granted to these credentials to only push to ECR. That way, if your AWS credentials are ever leaked from GitLab, any malicious people won't be able to mess up your AWS infrastructure.
 
-Let's update our `Makefile` to allow us to easily deploy our dev and prod APIs:
-
-!!! example "`Makefile`"
-    At the top of the file:
-
-    ```Makefile linenums="3" hl_lines="4-6"
-    PROJECTNAME := hbaas-server
-    DOCKERREGISTRY := uk.icr.io/my-org
-
-    # Change these as you require, based on your IBM Cloud account setup.
-    CFREGION := eu-gb
-    CFSPACE := my-cloud-foundry-space
-
-    # Go related variables.
-    GOBASE := $(shell pwd)
-    ```
-
-    Towards the bottom of the file:
-
-    ```Makefile linenums="111" hl_lines="5-24"
-    	    $(call log-error,Unable to deploy Docker image to repository.) \
-    	    && false \
-    	)
-
-    ## deploy-dev: Build and deploy Cloud Foundry development app instance.
-    deploy-dev:
-    	APPTODEPLOY=$(PROJECTNAME)-dev make deploy-app
-
-    ## deploy-prod: Build and deploy Cloud Foundry production app instance.
-    deploy-prod:
-    	APPTODEPLOY=$(PROJECTNAME)-prod make deploy-app
-
-    deploy-app: upload-image
-    	@$(call log,Deploying app $(APPTODEPLOY) $(VERSION) to Cloud Foundry...)
-    	ibmcloud target --cf -s $(CFSPACE) -r $(CFREGION)
-    	ibmcloud cr login
-    	CF_DOCKER_PASSWORD=${IBMCLOUD_API_KEY} ibmcloud	push \
-    	    -f manifest.yaml $(APPTODEPLOY) \
-    	    --docker-image $(DOCKERREGISTRY)/$(PROJECTNAME):$(VERSION) \
-    	    --docker-username iamapikey || \
-    	(\
-    	    $(call log-error,Unable to deploy Cloud Foundry app.) \
-    	    && false \
-    	)
-
-    ## clean: Clean build files. Runs `go clean` internally.
-    clean:
-    	@-rm $(OUTBINDIR)/$(PROJECTNAME) 2> /dev/null
-    ```
-
-Importantly, in order to deploy our app to CloudFoundry from our private registry, we need our IBM Cloud API key from [Section 4](/4-continuous-integration) in our environment. This is because CloudFoundry needs the key to get access to your private repository to pull our application image.
-
-We also need to specify the space and region that we're targeting for CloudFoundry - the region will likely be `eu-gb` and the space will be specified when your IBM Cloud is set up - if you're not sure what to put for the space, get in contact with us and we can sort you out.
-
-Let's give it a whirl!
-
-```bash
-export IBMCLOUD_API_KEY={you value from last section}
-# As before, you'll need to re-run `ibmcloud login` if you haven't run it in while.
-make deploy-dev
-```
-
-If all is successful, you should see some output indicating that your app has been successfully deployed, like so:
-
-![dev app deployed output](/images/continuous-deployment/dev-app-deployed-output.png)
-
-!!! tip
-    Notice how we're pinning the app - even the dev instance! - to a specific version of the image. This is because we don't want our app updating without our knowing because we updated the `:latest` image.
-
-    By pinning to a specific version, that ensures that this particular app deployment is reproducible, i.e. it's always going to give you the same results. If you do use the `:latest` tag instead of a pinned version, you're app is liable to change when it's re-staged, whether you wanted it to or not.
-
-Let's give our newly deployed app a go:
-
-```bash
-# You'll need to change this URL depending on what you put as your route in the
-# `manifest.yaml`.
-curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/version
-> {"build_time":"2020-06-03T10:28:28Z","version":"v1.0.0-16-g232c588"}
-```
-
-## Continuously deploying our dev instance
-
-Now that we've got our deployment working, let's extend our GitLab CI pipeline to enable us to re-deploy our dev CloudFoundry app instance:
+Once you've done this, we can update our GitLab CI YAML to add an extra stage for our Docker deployment and add a job that will upload a Docker image every time a commit is pushed to the `dev` branch or when a tag is created:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="13 47-69"
-    image: golang
+    ```yaml linenums="1" hl_lines="3-9 19 44-77"
+    image: golang:1.17
+
+    variables:
+      # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_TLS_CERTDIR: "/certs"
+
+    services:
+      - name: docker:19.03.12-dind
 
     cache:
       key: ${CI_COMMIT_REF_SLUG}
       paths:
-        - .go-bin
         - .go-pkg
 
     stages:
       - lint
       - build
-      - docker
       - deploy
 
     lint:
       stage: lint
       before_script:
-        - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /go/bin v1.27.0
-        # We need to run the code-gen scripts for the linting to work.
-        - make code-gen
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.43.0
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - golangci-lint run --enable gofmt --enable goimports
+        - task lint
 
     build:
       stage: build
+      before_script:
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - export GOPATH="${PWD}/.go-pkg"
       script:
-        - make build
+        - task build
       artifacts:
         paths:
           - hbaas-server
         expire_in: 30 days
 
-    upload-image:
-      stage: docker
-      before_script:
-        - apk add --update alpine-sdk bash
-        - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-        - ibmcloud plugin install container-registry -r 'IBM Cloud'
-        # Latest CF is not compatible with IBM Cloud (seemingly) because the IBM Cloud CF
-        # instance doesn't have log cache installed on it.
-        - ibmcloud cf install --version 6.49.0 --force
-        - ibmcloud login --no-region
-        - ibmcloud cr region-set uk-south
-      script:
-        - make upload-image
-
-    .deploy-template: &deploy-template
+    # If you put a dot in front of the job name, GitLab takes it as a job template rather
+    # than a job.
+    .publish-image:
       stage: deploy
-      image: docker:19.03.1
+      image: docker:19.03.12
       before_script:
-        - apk add --update alpine-sdk bash
-        - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-        - ibmcloud plugin install container-registry -r 'IBM Cloud'
-        # Latest CF is not compatible with IBM Cloud (seemingly) because the IBM Cloud CF
-        # instance doesn't have log cache installed on it.
-        - ibmcloud cf install --version 6.49.0 --force
-        - ibmcloud login --no-region
-        - ibmcloud cr region-set uk-south
-
-    deploy-dev:
-      <<: *deploy-template
-      environment:
-        name: HBaaS Dev
-        # Change this depending on your route.
-        url: https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud
+        - docker info
+        - apk add curl git
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        - task --version
+        - >-
+          export AWS_ECR_PASSWORD=$(
+          docker run --rm
+          --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+          --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+          amazon/aws-cli
+          ecr --region $AWS_DEFAULT_REGION get-login-password
+          )
       script:
-        - make deploy-dev
+        - task upload-image
+    
+    publish-image-dev:
+      extends: .publish-image
+      environment:
+        GIT_BRANCH: dev
       only:
         - dev
-    ```
-
-!!! info
-    We're using a YAML anchor here to implement a template for the deployment that we can use later for our prod deployment.
-
-    If you're using a newer version of GitLab, you can use the [GitLab CI-specific template syntax](https://docs.gitlab.com/ee/ci/yaml/#extends), which is generally nicer.
-
-Commit and push this up and you should see the extra stage added to your CI pipeline:
-
-![CI pipeline deploy dev](/images/continuous-deployment/ci-pipeline-deploy-dev.png)
-
-Examining the job output for our new "deploy-dev" should show a successful dev deployment:
-
-![CI pipeline successful dev deploy](/images/continuous-deployment/ci-pipeline-successful-dev-deploy.png)
-
-## Continuously deploying our prod instance
-
-Now that we've got our dev instance continuously deploying from our GitLab, the only thing left to do is add another job to the CD pipeline within the deploy stage to deploy our production instance whenever we tag a new release:
-
-!!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="46" hl_lines="25-34"
-    .deploy-template: &deploy-template
-      stage: deploy
-      image: docker:19.03.1
-      before_script:
-        - apk add --update alpine-sdk bash
-        - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-        - ibmcloud plugin install container-registry -r 'IBM Cloud'
-        # Latest CF is not compatible with IBM Cloud (seemingly) because the IBM Cloud CF
-        # instance doesn't have log cache installed on it.
-        - ibmcloud cf install --version 6.49.0 --force
-        - ibmcloud login --no-region
-        - ibmcloud cr region-set uk-south
-
-    deploy-dev:
-      <<: *deploy-template
+    
+    publish-image-prod:
+      extends: .publish-image
       environment:
-        name: HBaaS Dev
-        # Change this depending on your route.
-        url: https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud
-      script:
-        - make deploy-dev
-      only:
-        - dev
-
-    deploy-prod:
-      <<: *deploy-template
-      environment:
-        name: HBaaS Prod
-        # Change this depending on your route.
-        url: https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud
-      script:
-        - make deploy-prod
+        GIT_BRANCH: prod
       only:
         - tags
     ```
 
-!!! warning
+!!! note
+    You might notice that we had to use the `docker:19.03.12` image for the upload job, and `docker:19.03.12-dind` and add a few global variables to the pipeline.
+
+    This is because we need to be able to use Docker from inside the job, which is itself running in a Docker image. We need to allow the Docker in the job inside the container to contact the Docker daemon running outside the container. This is known as dind or Docker-in-Docker.
+
+!!! info
     This setup will run the production deployment whenever a tag is uploaded. This means that you can only use tags for version releases.
 
     Sometimes you might need to use tags for other purposes as well - this is fine! You just need to modify the `only` block to do one or multiple of the following:
@@ -308,10 +161,239 @@ Now that we've got our dev instance continuously deploying from our GitLab, the 
 
     This is discussed more on the [GitLab issue for this topic](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27818){target="_blank" rel="noopener noreferrer"}.
 
-!!! note
-    Notice how we specify an "environment" for each deployment - we'll take a look at what this can do later.
+Let's go ahead and commit this:
 
-Go ahead and commit and push this up - we're going to test it out in the next section.
+```bash
+git checkout dev
+git pull
+git checkout -b feature/add-docker-image-publishing-to-ci
+
+git add .
+git commit -m "Add CI job to upload Docker image to ECR."
+git push --set-upstream feature/add-docker-image-publishing-to-ci
+```
+
+You'll need to merge this one before you can see the publish job running. Once you do, it should look like this:
+ 
+![upload image CI pipeline](/images/continuous-deployment/upload-image-ci-pipeline.png)
+
+This upload job will run either on the `dev` branch or on any tags that are created, which in our workflow correspond to version releases.
+
+!!! note
+    Building images for your feature and bug fix branches can be a really powerful and useful tool to use in combination with continuous deployment for allowing you to automatically host test environments for new features so that QA engineers can verify that they're working correctly.
+
+    This would be part of a much more complex and sophisticated CI / CD setup, so isn't in scope of this tutorial.
+
+If you check your "publish-image-dev" job in GitLab, you should see an output that looks something like this:
+
+![image upload job output](/images/continuous-deployment/image-upload-job-output.png)
+
+You can check to make sure that your images have uploaded properly by running:
+
+```bash
+aws ecr describe-images --repository-name go-with-the-flow/hbaas-server-<your-name> | jq
+```
+```json
+{
+    "imageDetails": [
+        {
+            "registryId": "049839538904",
+            "repositoryName": "go-with-the-flow/hbaas-server-drewsilcock",
+            "imageDigest": "sha256:3a788d1cdaf64346d6d94f7a3519b38bd7a44399d727726b4330c5d421f1a480",
+            "imageTags": [
+              "latest",
+              "dev",
+              "v1.0.0-160786e"
+            ],
+            "imageSizeInBytes": 12110909,
+            "imagePushedAt": "2021-11-09T09:41:35+00:00",
+            "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+        },
+        {
+            "registryId": "049839538904",
+            "repositoryName": "go-with-the-flow/hbaas-server-<your-name>",
+            "imageDigest": "sha256:c29a539f33ac40ac65a053d75c1f6ae6e75440c14c4f8e2a0d231f612b1b5166",
+            "imageTags": [
+                "v1.0.0-af6f40d"
+            ],
+            "imageSizeInBytes": 12110280,
+            "imagePushedAt": "2021-11-07T20:32:42+00:00",
+            "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+        }
+    ]
+}
+```
+
+!!! note
+    You'll notice that your new uploaded image has the `latest` tag and the image you uplaoded manually in the last section no longer does. When you upload a new image with a particular tag, e.g. `latest`, it will take the place of any existing image with that tag. This means that you always get the most up to date image when you pull the `latest` tag.
+
+## Hosting our API with Docker Compose
+
+If you were creating a full production cloud architecture, you'd probably want to take our image that we're automatically building and publishing and run it using one of Amazon's many services for such things, such as Amazon ECS (Elastic Container Service) or Amazon EKS (Elastic Kubernetes Service). As these are very complicated tools that require significant AWS expertise and engineering to set up correctly, that's outside of the scope of this time-limited tutorial.
+
+Instead, we're going to set up a simple, single-machine hosting setup using Docker Compose.
+
+If you haven't used it before, Docker Compose is a simple tool for running multiple Docker containers together - they can communicate with each other, share volumes and have ports exposed as external services - all configured through simple YAML files. (Yes more YAML! Just be glad we're not touching Kubernetes, or we'd be drowning in YAML.)
+
+Let's go ahead and create our `docker-compose.yaml` and add our development and production images to it:
+
+!!! example "`docker-compose.yaml`"
+    ```yaml linenums="1"
+    version: "3"
+
+    services:
+      hbaas-dev:
+        container_name: hbaas-server-dev
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:dev
+        ports:
+          - "8000:8000"
+        restart: on-failure
+
+      hbaas-prod:
+        container_name: hbaas-server-prod
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:prod
+        ports:
+          - "80:8000"
+        restart: on-failure
+    ```
+
+Now if we run `docker-compose up` we'll see both our dev and prod versions of the API spin up simultaneously. To spin the services up in the background, we can use the `-d` flag:
+
+```bash
+docker-compose up -d
+```
+
+We can still check out the logs by running `docker-compose logs -f`, but now we can get on with doing other things in our shell.
+
+Notice how we added `restart: on-failure` to the containers - this means that if any errors occur with our API, Docker Compose will automatically restart them for us. This ensures availability and reliability of our API.
+
+We've made the prod version of our API available on port 80 (the standard HTTP port) while the dev version is available on port 8000 - this way we can access both deployment environments while still hosting on our single VM.
+
+Let's branch commit our progress before continuing:
+
+```bash
+git checkout dev
+git pull
+git checkout -b feature/add-docker-compose-deployment
+
+git add docker-compose.yaml
+git commit -m "Add Docker Compose deployment YAML file for dev and prod API."
+```
+
+## Setting up automatic re-deployment
+
+So we've got our Docker images being continuously published up to ECR and we've got dev and prod APIs running through Docker Compose, but if we update our API images, our deployments currently don't update.
+
+There's a couple of different ways to fix this:
+
+* Add SSH keys to the GitLab CI/CD pipeline and manually update the tags on the `docker-compose.yaml` over SSH inside the GitLab CI/CD pipeline.
+* Set up a "watcher" on the Docker Compose side that polls ECR for updates to the tags, then pulls them in and restarts the APIs when it finds updates to the images.
+
+We're going to set up the latter because it's simpler and more reliable, plus you don't need to worry about having your private SSH keys leaked via GitLab.
+
+There's a tool we can use for this called [Watchtower](https://containrrr.dev/watchtower/) - this will handle all of the polling, image version checking and restarting for us.
+
+In order to get Watchtower to play nicely with ECR, we need to do a couple of extra steps. We're going to use the [amazon-ecr-credential-helper](https://github.com/awslabs/amazon-ecr-credential-helper) tool to allow Watchtower to pull the images from our private ECR repository. First things first, we need to create a `Dockerfile` for this credential helper. Let's create a file called `AWSECRCredHelper-Dockerfile`:
+
+!!! example "`AWSECRCredHelper-Dockerfile`"
+    ```Dockerfile linenums="1"
+    FROM golang:1.13
+
+    ENV CGO_ENABLED 0
+    ENV REPO github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login
+
+    RUN go get -u $REPO
+
+    RUN rm /go/bin/docker-credential-ecr-login
+
+    RUN go build \
+     -o /go/bin/docker-credential-ecr-login \
+     /go/src/$REPO
+
+    WORKDIR /go/bin/
+    ```
+
+This is adapted from a guide on the [Watchtower documentation](https://containrrr.dev/watchtower/private-registries/#credential_helpers).
+
+What we want to do here is build the `docker-credential-ecr-login` binary from this `AWSECRCredHelper-Dockerfile` and make it available to the Watchtower container from our Docker Compose via a volume. To do this, we need to create the volume and build the binary:
+
+```bash
+docker volume create helper
+docker build -t aws-ecr-dock-cred-helper -f AWSECRCredHelper-Dockerfile .
+docker run -d --rm --name aws-cred-helper \
+  --volume helper:/go/bin aws-ecr-dock-cred-helper
+```
+
+If this all goes well, we should now have a volume called `helper` which contains the ECR credential helper built binary.
+
+In order to tell Docker that we want to authenticate against our ECR using this credential helper tool, we need to modify our `~/.docker/config.json` file (or add it if it's not there) to tell Docker:
+
+!!! example "`~/.docker/config.json`"
+    ```json linenums="1"
+    {
+        "credsStore": "ecr-login"
+    }
+    ```
+
+If you correctly set up your AWS CLI in [Section 0](/0-setup/) then you should already have a folder called `~/.aws` with your AWS credentials in it. All we need to do is mount that inside our Watchtower container along with the helper volume we created and the Docker socket for Docker-in-Docker to work, like so:
+
+!!! example "`docker-compose.yaml`"
+    ```yaml linenums="1" hl_lines="18-35"
+    version: "3"
+
+    services:
+      hbaas-dev:
+        container_name: hbaas-server-dev
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:latest
+        ports:
+          - "8000:8000"
+        restart: on-failure
+
+      hbaas-prod:
+        container_name: hbaas-server-prod
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:prod
+        ports:
+          - "80:8000"
+        restart: on-failure
+
+      watchtower:
+        image: containrrr/watchtower
+        container_name: watchtower
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - $HOME/.docker/config.json:/config.json
+          - $HOME/.aws:/.aws
+          - helper:/go/bin
+        environment:
+          - HOME=/
+          - PATH=$PATH:/go/bin
+          - AWS_REGION=eu-west-2
+        command: --interval 30
+        restart: on-failure
+
+    volumes:
+      helper:
+        external: true
+    ```
+
+This will tell Watchtower to poll the Docker socket for updates every 30 seconds and restart the containers when it finds new images.
+
+Give it a go by running `docker-compose up -d` again - don't worry about if haven't brought the services from before down, Docker Compose will handle all that for you.
+
+Let's go ahead and finish up this feature branch:
+
+```bash
+git add docker-compose.yaml AWSECRCredHelper-Dockerfile
+git commit -m "Add AWS cred helper Dockerfile and Docker Compose config for Watchtower."
+
+git push --set-upstream origin feature/add-docker-compose-deployment
+```
+
+If you merge this into the `dev` branch the usual way (GitLab UI or git CLI), you should be able to sit and watch the CI build and deploy you dev image, then have Watchtower poll ECR and pick it up. Watchtower will then automatically restarts your dev service - neat!
+
+![Watchtower service automatic restart](/images/continuous-deployment/watchtower-restart.png)
 
 ## Triggering our deployments
 
@@ -320,7 +402,7 @@ Now that we've got our dev and prod API instances continuous deploying, let's tr
 Firsly, let's add another endoint that'll work as a health check for our API:
 
 !!! example "`handlers/maintenance.go`"
-    ```go linenums="1" hl_lines="16 29-39"
+    ```go linenums="1" hl_lines="17 30-40"
     package handlers
 
     import (
@@ -329,6 +411,7 @@ Firsly, let's add another endoint that'll work as a health check for our API:
     	"time"
 
     	"github.com/labstack/echo/v4"
+
     	"hartree.stfc.ac.uk/hbaas-server/version"
     )
 
@@ -362,37 +445,42 @@ Firsly, let's add another endoint that'll work as a health check for our API:
     }
     ```
 
-Great, now let's do another feature branch for this:
+!!! question "Exercise 5.1"
+    Great, now your final exercise is to create a new branch from the `dev` branch called `feature/add-status-endpoint`. Commit your changes and push your feature branch up to GitLab to a branch of the same name. Once you've done that, merge the feature branch into the `dev` branch.
 
-```bash
-git checkout dev
-git checkout -b feature/add-status-endpoint
-git add handlers/maintenance.go
-git commit -m "Add status endpoint that acts as health check."
-git push --set-upstream origin feature/add-status-endpoint
-```
+!!! answers "Answers 5.1"
+    As per usual, all you need to do is run:
 
-Now if you go to your GitLab repository and check out the merge request you just opened, you should see a nice green tick show up indicating the MR passed the CI checks:
+    ```bash
+    git checkout dev
+    git checkout -b feature/add-status-endpoint
+    git add handlers/maintenance.go
+    git commit -m "Add status endpoint that acts as health check."
+    git push --set-upstream origin feature/add-status-endpoint
+    ```
 
-![MR CI checks passing](/images/continuous-deployment/mr-ci-checks-passing.png)
-
-Now if you merge this in using the GitLab UI (or alternatively merge it in using the local command-line), you should see your dev deployment trigger:
-
-![dev CD running](images/continuous-deployment/dev-deployment-running.png)
+    And merge using the GitLab UI (or git CLI).
 
 Once that's done, we can check that it's properly deployed the dev app by hitting our new status endpoint:
 
 ```bash
 # Remember to change this endpoint depending on your route in your `manifest.yaml`.
-curl https://myorg-hbaas-dev.eu-gb.cf.appdomain.cloud/status
-> {"message":"The time is 41 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."}
+curl -s localhost:8000/status | jq
+```
+```json
+{
+  "message": "The time is 41 minutes past the 11 hour on the Tuesday 9 November 2021 and all is well."
+}
 ```
 
-Great! Now let's do a release onto master so that our prod instance updates. If you're working on a major update, it's a good idea to create a dedicated branch for the release candidate, but as we're only adding a small new feature, we can just merge straight from dev to master.
+Great! Now let's do a release onto `main` so that our prod instance updates. If you're working on a major update, it's a good idea to create a dedicated branch for the release candidate, but as we're only adding a small new feature, we can just merge straight from `dev` to `main`.
 
-To do this, let's create another merge request, this time from dev to master:
+To do this, let's create another merge request, this time from `dev` to `main`, and call is "Release v1.1.0":
 
-![dev to master MR](/images/continuous-deployment/dev-to-master-mr.png)
+![dev to main MR](/images/continuous-deployment/dev-to-main-mr.png)
+
+!!! note
+    As we've containerised our app and added a new endpoint, we've made backwards-compatible but significant modification of the API, hence we do a the minor version bump.
 
 Once that's created, make sure the CI tests pass and then merge it in!
 
@@ -401,14 +489,14 @@ Once that's created, make sure the CI tests pass and then merge it in!
 
 ### Creating releases
 
-Once that's done, all we need to do is create our new version tag on master and push it up and that'll trigger our prod deployment. Note that as we're adding a new non-breaking feature, this would correspond to a minor version update.
+Once that's done, all we need to do is create our new version tag on master and push it up and that'll trigger our prod deployment.
 
 There are two ways to do this. There's the good ol' fashioned command-line way and the fancy GitLab UI way.
 
 #### The good ol' fashioned command-line way
 
 ```bash
-git checkout master
+git checkout main
 git pull
 git tag -a "v1.1.0" -m "Release v1.1.0: add status endpoint"
 git push --tags
@@ -420,46 +508,43 @@ Simple and easy.
 
 There's another option though - GitLab provides a nice UI for creating new tags which allows you to add "Release notes" which appear under "Releases" in the project overview in GitLab.
 
-Go to "Repository" > "Tags" in your GitLab project and click "New Tag". Here's the equivalent as above using the fancy GitLab UI:
+Go to "Deployments" > "Releases" in your GitLab project and click "New release". Here's the equivalent as above using the fancy GitLab UI:
 
-![creating the GitLab tag](/images/continuous-deployment/gitlab-creating-tag.png)
+We can add a small changelog as our release notes in the GitLab UI here which is super useful for looking back at what features were implemented when.
 
-To see your fancy new release, go to "Project overview" > "Releases":
-
-![GitLab show releases](/images/continuous-deployment/gitlab-show-release.png)
-
-Now sit back and watch as your CD pipeline automatically deploys our updated API:
-
-![CI pipeline with deploy prod](/images/continuous-deployment/ci-pipeline-with-deploy-prod.png)
-
-![CI pipeline successful prod deploy](/images/continuous-deployment/ci-pipeline-successful-prod-deploy.png)
-
-### Understanding GitLab environments
-
-We saw earlier that we could specify an "environment" for each of our deployments. What this does is allow us to go into GitLab and see when each environment has been deployed, easily open the URL for the environment and to easily re-run deployments on a per-environment basis:
-
-![GitLab environments](/images/continuous-deployment/gitlab-environments.png)
-
-!!! info
-    If you're using a more advanced deployment system utilising Kubernetes, GitLab will integrate these environments with your Kubernetes instance.
-
-    For more info on this, check out [the GitLab docs on Kubernetes integration](https://docs.gitlab.com/ee/user/project/clusters/index.html){target="_blank" rel="noopener noreferrer"}.
+Now sit back and watch as your CD pipeline automatically deploys our updated prod API.
 
 ## Let's give it a whirl!
 
 Once that's done, let's try it out!
 
 ```bash
-# Remember to change this endpoint depending on your route in your `manifest.yaml`.
-curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/version
-> {"build_time":"2020-06-03T10:40:59Z","version":"v1.1.0"}
+curl -s localhost/version | jq
+```
+```json
+{
+    "build_time": "2020-06-03T10:40:59Z",
+    "version": "v1.1.0"
+}
+```
 
-curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/status
-> {"message":"The time is 59 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."}
+```bash
+```
+curl -s localhost/status | jq
+```json
+{
+    "message": "The time is 59 minutes past the 11 hour on the Wednesday 3 June 2020 and all is well."
+}
+```
 
+```bash
 # Just for fun - output will depend on when you run it!
-curl https://myorg-hbaas-prod.eu-gb.cf.appdomain.cloud/date/$(date +"%d-%B")
-> {"message":"Happy birthday to Clint Eastwood!"}
+curl localhost/date/$(date +"%d-%B")
+```
+```json
+{
+  "message": "Happy birthday to Clint Eastwood!"
+}
 ```
 
 !!! success
