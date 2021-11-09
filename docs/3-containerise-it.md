@@ -117,6 +117,8 @@ Our API is written in Go, and there's already a Docker image for building Go cod
     # for what that means).
     FROM golang:latest
 
+    RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
     # Copy all of the code in repository into this image so that we can build it.
     COPY . /app
     WORKDIR /app
@@ -125,6 +127,8 @@ Our API is written in Go, and there's already a Docker image for building Go cod
     # sure we're compiling the executable for Linux to be able to run inside the
     # container.
     RUN task build-linux --force
+
+    EXPOSE 8000
 
     # Now that we've got our Docker image, we can specify what command to run
     # when running our image.
