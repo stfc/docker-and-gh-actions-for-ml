@@ -243,9 +243,9 @@ GitLab CI/CD (much like most of the other CI solutions) uses YAML configuration 
     lint:
       stage: lint
       before_script:
-        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
         - task --version
-        - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.43.0
         - export GOPATH="${PWD}/.go-pkg"
       script:
         - task lint
@@ -302,9 +302,9 @@ Let's start by adding another stage to our pipeline to build our code. This'll h
     lint:
       stage: lint
       before_script:
-        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
         - task --version
-        - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.43.0
         - export GOPATH="${PWD}/.go-pkg"
       script:
         - task lint
@@ -362,9 +362,9 @@ First, remember to merge your Merge Request in GitLab (or using command line). T
     lint:
       stage: lint
       before_script:
-        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
         - task --version
-        - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
+        - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.43.0
         - export GOPATH="${PWD}/.go-pkg"
       script:
         - task lint
