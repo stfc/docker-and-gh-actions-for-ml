@@ -149,7 +149,7 @@ sudo gitlab-runner register \
   --name="aws-vm" \
   --tag-list="docker" \
   --run-untagged="true" \
-  --docker-priviledged \
+  --docker-privileged \
   --docker-volumes="/cache" \
   --docker-volumes="/certs/clients" \
   --executor="docker" \
