@@ -563,15 +563,9 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
             - build-image
           cmds:
             - echo Uploading Docker image...
-            - >-
-              echo $AWS_ECR_PASSWORD |
-              docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - echo TODO: Upload 'latest' image to AWS ECR.
             - echo TODO: Upload current version tagged image to AWS ECR.
             - echo TODO: Upload image tagged with current branch to AWS ECR.
-          env:
-            AWS_ECR_PASSWORD:
-              sh: which aws && aws ecr get-login-password || true
       
         lint:
           desc: Run linter over codebase to check for style and formatting errors. This requires that you've already installed `golangci-lint`.
@@ -633,7 +627,23 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
 
     You'll notice the branch tagging and pushing have a weird bit of bash at the beginning - we might not always be on a branch, so this simply checks whether `GIT_BRANCH` is empty - if it is, it doesn't try to tag and push the branch image. Don't worry too much if you didn't include this in your solution, it's just to prevent errors in case you're running e.g. on a tag instead of a branch.
 
-Once you've finished that exercise, go ahead and run it:
+Now, one thing we haven't sorted out yet is the authentication with the private ECR repository. There's a tool made by Amazon called [amazon-ecr-credential-helper](https://github.com/awslabs/amazon-ecr-credential-helper){target="_blank" rel="noopener noreferrer"} that conveniently handles all this for us by reading `~/.aws/credentials`, where the AWS CLi stores its configuration, but we need to install it first:
+
+```bash
+sudo apt update
+sudo apt install amazon-ecr-credential-helper
+```
+
+Now we need to tell Docker that we're using this credential helper by creating the directory `~/.docker` (e.g. using `mkdir -p ~/.docker`) and adding a file called `config.json` with the following contents:
+
+!!! example "`config.json`"
+    ```json
+    {
+        "credsStore": "ecr-login"
+    }
+    ```
+
+Once you've done that, go ahead and run our image upload task:
 
 ```bash
 task upload-image
