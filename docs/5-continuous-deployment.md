@@ -45,13 +45,15 @@ We need to copy these values and our region into the "Variables" section under "
 Once you've done this, we can update our GitLab CI YAML to add an extra stage for our Docker deployment and add a job that will upload a Docker image every time a commit is pushed to the `dev` branch or when a tag is created:
 
 !!! example "`.gitlab-ci.yml`"
-    ```yaml linenums="1" hl_lines="3-9 19 44-77"
+    ```yaml linenums="1" hl_lines="3-11 21 46-79"
     image: golang:1.17
 
     variables:
       # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
       DOCKER_HOST: tcp://docker:2376
       DOCKER_TLS_CERTDIR: "/certs"
+
+      CONTAINER_REGISTRY: "049839538904.dkr.ecr.eu-west-2.amazonaws.com"
 
     services:
       - name: docker:19.03.12-dind
@@ -100,13 +102,12 @@ Once you've done this, we can update our GitLab CI YAML to add an extra stage fo
         - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
         - task --version
         - >-
-          export AWS_ECR_PASSWORD=$(
           docker run --rm
           --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
           --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
           amazon/aws-cli
           ecr --region $AWS_DEFAULT_REGION get-login-password
-          )
+          | docker login --username AWS --password-stdin $CONTAINER_REGISTRY
       script:
         - task upload-image
     
