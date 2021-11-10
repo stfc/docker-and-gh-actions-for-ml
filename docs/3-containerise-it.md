@@ -115,7 +115,7 @@ Our API is written in Go, and there's already a Docker image for building Go cod
     ```dockerfile linenums="1"
     # We use the standard Golang image as our "base image" (see terminology section
     # for what that means).
-    FROM golang:latest
+    FROM golang:1.17
 
     RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 
@@ -154,7 +154,7 @@ What this Dockerfile will do is take the Go Docker image from [Docker Hub](https
         ```dockerfile linenums="1" hl_lines="15"
         # We use the standard Golang image as our "base image" (see terminology section
         # for what that means).
-        FROM golang:latest
+        FROM golang:1.17
 
         RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 
