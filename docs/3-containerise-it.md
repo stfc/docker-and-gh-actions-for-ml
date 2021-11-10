@@ -644,10 +644,10 @@ sudo apt update
 sudo apt install amazon-ecr-credential-helper
 ```
 
-Now we need to tell Docker that we're using this credential helper by creating the directory `~/.docker` (e.g. using `mkdir -p ~/.docker`) and adding a file called `config.json` with the following contents:
+Now we need to tell Docker that we're using this credential helper by creating the directory `~/.docker` (e.g. using `mkdir -p ~/.docker`) and adding a file called `~/.docker/config.json` with the following contents:
 
-!!! example "`config.json`"
-    ```json
+!!! example "`~/.docker/config.json`"
+    ```json linenums="1"
     {
         "credsStore": "ecr-login"
     }

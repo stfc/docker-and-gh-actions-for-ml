@@ -19,7 +19,7 @@ There's a bunch of major advantages to continuous deploying your software:
 
 ## Let's publish our images automatically
 
-Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/containerise-it/).
+Now that we've got lint and build stages set up, we can build and upload our image to the private repository we created in [Section 3](/3-containerise-it/).
 
 As we need to have access to our private ECR repository, we need to put our AWS access key and secret key into GitLab's project CI settings. This allows us to retrieve these values from a CI job so that we can login to the Docker repository and push the our image.
 
@@ -268,7 +268,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 ```
 
 !!! note
-    You may need to re-login to the ECR if it's been a while since you did the `docker push` from [Section 3](/containerise-it/):
+    You may need to re-login to the ECR if it's been a while since you did the `docker push` from [Section 3](/3-containerise-it/):
 
     ```bash
     aws ecr get-login-password | docker login --username AWS --password-stdin 049839538904.dkr.ecr.eu-west-2.amazonaws.com
@@ -345,14 +345,7 @@ docker run -d --rm --name aws-cred-helper \
 
 If this all goes well, we should now have a volume called `helper` which contains the ECR credential helper built binary.
 
-In order to tell Docker that we want to authenticate against our ECR using this credential helper tool, we need to modify our `~/.docker/config.json` file (or add it if it's not there) to tell Docker:
-
-!!! example "`~/.docker/config.json`"
-    ```json linenums="1"
-    {
-        "credsStore": "ecr-login"
-    }
-    ```
+We're going to use the Amazon ECR credential helper tool that we did before, but this time in a containerised way. Make sure you've got your JSON config file set up at `~/.docker/config.json` as per [Section 3](/3-containerise-it/).
 
 If you correctly set up your AWS CLI in [Section 0](/0-setup/) then you should already have a folder called `~/.aws` with your AWS credentials in it. All we need to do is mount that inside our Watchtower container along with the helper volume we created and the Docker socket for Docker-in-Docker to work, like so:
 
