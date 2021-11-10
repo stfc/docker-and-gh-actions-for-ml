@@ -251,13 +251,6 @@ Let's go ahead and create our `docker-compose.yaml` and add our development and 
         ports:
           - "8000:8000"
         restart: on-failure
-
-      hbaas-prod:
-        container_name: hbaas-server-prod
-        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:prod
-        ports:
-          - "80:8000"
-        restart: on-failure
     ```
 
 We do need to install the `docker-compose` command line tool which is just two commands:
@@ -274,7 +267,7 @@ sudo chmod +x /usr/local/bin/docker-compose
     aws ecr get-login-password | docker login --username AWS --password-stdin 049839538904.dkr.ecr.eu-west-2.amazonaws.com
     ```
 
-Now if we run `docker-compose up` we'll see both our dev and prod versions of the API spin up simultaneously. To spin the services up in the background, we can use the `-d` flag:
+Now if we run `docker-compose up` we'll see the dev version of the API spin up. To spin the service up in the background, we can use the `-d` flag:
 
 ```bash
 docker-compose up -d
@@ -283,8 +276,6 @@ docker-compose up -d
 We can still check out the logs by running `docker-compose logs -f`, but now we can get on with doing other things in our shell.
 
 Notice how we added `restart: on-failure` to the containers - this means that if any errors occur with our API, Docker Compose will automatically restart them for us. This ensures availability and reliability of our API.
-
-We've made the prod version of our API available on port 80 (the standard HTTP port) while the dev version is available on port 8000 - this way we can access both deployment environments while still hosting on our single VM.
 
 Let's branch commit our progress before continuing:
 
@@ -350,22 +341,15 @@ We're going to use the Amazon ECR credential helper tool that we did before, but
 If you correctly set up your AWS CLI in [Section 0](/0-setup/) then you should already have a folder called `~/.aws` with your AWS credentials in it. All we need to do is mount that inside our Watchtower container along with the helper volume we created and the Docker socket for Docker-in-Docker to work, like so:
 
 !!! example "`docker-compose.yaml`"
-    ```yaml linenums="1" hl_lines="18-35"
+    ```yaml linenums="1" hl_lines="11-28"
     version: "3"
 
     services:
       hbaas-dev:
         container_name: hbaas-server-dev
-        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:latest
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:dev
         ports:
           - "8000:8000"
-        restart: on-failure
-
-      hbaas-prod:
-        container_name: hbaas-server-prod
-        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:prod
-        ports:
-          - "80:8000"
         restart: on-failure
 
       watchtower:
@@ -407,7 +391,7 @@ If you merge this into the `dev` branch the usual way (GitLab UI or git CLI), yo
 
 ## Triggering our deployments
 
-Now that we've got our dev and prod API instances continuous deploying, let's try out adding a new feature so that we can do a version bump and see our CD pipeline in action!
+Now that we've got dev API instance continuously deploying, let's try out adding a new feature so that we can do a version bump and see our CD pipeline in action!
 
 Firsly, let's add another endoint that'll work as a health check for our API:
 
@@ -523,6 +507,68 @@ Go to "Deployments" > "Releases" in your GitLab project and click "New release".
 We can add a small changelog as our release notes in the GitLab UI here which is super useful for looking back at what features were implemented when.
 
 Now sit back and watch as your CD pipeline automatically deploys our updated prod API.
+
+### Adding prod to Docker Compose
+
+Once that prod release CD pipeline has finished running, we'll have our prod image up in ECR. That means we can add our prod container to our Docker Compose:
+
+!!! example "`docker-compose.yaml`"
+    ```yaml linenums="1" hl_lines="11-16"
+    version: "3"
+
+    services:
+      hbaas-dev:
+        container_name: hbaas-server-dev
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:dev
+        ports:
+          - "8000:8000"
+        restart: on-failure
+
+      hbaas-prod:
+        container_name: hbaas-server-prod
+        image: 049839538904.dkr.ecr.eu-west-2.amazonaws.com/go-with-the-flow/hbaas-server-drewsilcock:prod
+        ports:
+          - "80:8000"
+        restart: on-failure
+
+      watchtower:
+        image: containrrr/watchtower
+        container_name: watchtower
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - $HOME/.docker/config.json:/config.json
+          - $HOME/.aws:/.aws
+          - helper:/go/bin
+        environment:
+          - HOME=/
+          - PATH=$PATH:/go/bin
+          - AWS_REGION=eu-west-2
+        command: --interval 30
+        restart: on-failure
+
+    volumes:
+      helper:
+        external: true
+    ```
+
+We've made the prod version of our API available on port 80 (the standard HTTP port) while the dev version is available on port 8000 - this way we can access both deployment environments while still hosting on our single VM.
+
+We may as well push this up to out GitLab repo as well:
+
+```bash
+git checkout dev
+git pull --rebase
+git checkout -b feature/add-hbaas-prod-to-docker-compose
+git add docker-compose.yaml
+git commit -m "Add HBaaS prod container to Docker Compose."
+git push --set-upstream origin feature/add-hbaas-prod-to-docker-compose
+```
+
+Go ahead and merge that and we're ready to spin the prod version up!
+
+```bash
+docker-compose up -d
+```
 
 ## Let's give it a whirl!
 
