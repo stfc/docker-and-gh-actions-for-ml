@@ -165,7 +165,7 @@ Let's go ahead and commit this:
 
 ```bash
 git checkout dev
-git pull
+git pull --rebase
 git checkout -b feature/add-docker-image-publishing-to-ci
 
 git add .
@@ -275,7 +275,7 @@ Let's branch commit our progress before continuing:
 
 ```bash
 git checkout dev
-git pull
+git pull --rebase
 git checkout -b feature/add-docker-compose-deployment
 
 git add docker-compose.yaml
@@ -497,7 +497,7 @@ There are two ways to do this. There's the good ol' fashioned command-line way a
 
 ```bash
 git checkout main
-git pull
+git pull --rebase
 git tag -a "v1.1.0" -m "Release v1.1.0: add status endpoint"
 git push --tags
 ```

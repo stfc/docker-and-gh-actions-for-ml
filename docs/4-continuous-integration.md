@@ -143,17 +143,17 @@ It's a simple command to register the runner:
 export token="<your GitLab runner registration token>"
 
 sudo gitlab-runner register \
-  --non-interactive
-  --url "https://gitlab.com" \
-  --registration-token "$token" \
-  --name "aws-vm" \
-  --tag-list "docker" \
-  --run-untagged "true" \
+  --non-interactive \
+  --url="https://gitlab.com" \
+  --registration-token="$token" \
+  --name="aws-vm" \
+  --tag-list="docker" \
+  --run-untagged="true" \
   --docker-priviledged \
-  --docker-volumes "/cache" \
-  --docker-volumes "/certs/clients" \
-  --executor "docker" \
-  --docker-image "docker:19.03.12"
+  --docker-volumes="/cache" \
+  --docker-volumes="/certs/clients" \
+  --executor="docker" \
+  --docker-image="docker:19.03.12"
 ```
 
 You can check whether that's worked by running:
@@ -260,7 +260,7 @@ Let's commit this change and push it up to our repository.
 ```bash
 # Make sure we're on the up to date dev branch.
 git checkout dev
-git pull
+git pull --rebase
 git checkout -b feature/add-lint-pipeline
 
 git add .
@@ -325,7 +325,7 @@ Let's commit and push this up to another feature branch:
 
 ```bash
 git checkout dev
-git pull
+git pull --rebase
 git checkout -b feature/add-build-job-to-ci-pipeline
 
 git add .
@@ -396,7 +396,7 @@ Now if you commit and push this up:
 
 ```bash
 git checkout dev
-git pull
+git pull --rebase
 git checkout -b feature/artifact-built-ci-executables
 
 git add .
