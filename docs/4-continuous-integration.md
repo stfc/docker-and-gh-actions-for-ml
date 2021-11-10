@@ -89,6 +89,89 @@ Like almost all the others (looking at you Jenkins), it uses a simple YAML forma
 
 DroneCI is a very simple and slick solution that's good if you want to be able to quickly set up a CI server and forget about it from then on. There's basically zero required (or even possible) system configuration, which makes it excellent for simple tasks, but lacking flexibility for complex custom workflows. Then again, there's always an API for you to use if you want to build out your own custom CI code around the DroneCI API...
 
+## Important - new GitLab users need to read this
+
+On May 17th 2021, [GitLab changed their policy](https://about.gitlab.com/blog/2021/05/17/prevent-crypto-mining-abuse/){target="_blank" rel="noopener noreferrer"} on usage of shared runners to prevent misuse. A GitLab "Runner" is the machine that runs your CI/CD pipelines for you.
+
+What this means is that if you created your GitLab account since then, you'll need to either:
+
+* Add a credit or debit card to your account (it won't be charged anything and can be removed after the workshop)
+* Disable shared runners on your account and register your own runner own your AWS VM.
+
+If you created your GitLab account before May 17th or you're willing to add a card to your account, you're in the clear and can move onto the [next section](#time-to-clear-out-the-lint). If not, here are some instructions to follow to workaround this:
+
+### Disabling shared runners
+
+Firstly, you'll need to go to your project in GitLab and click on "Settings" > "CI/CD" on the left bar. Uncheck the switch called "Enable shared runners for this project", like so:
+
+![disable shared runners](/images/continuous-integration/disabling-shared-runners.png)
+
+### Registering your own runner
+
+Next, we'll install and register our GitLab runner on our AWS VM.
+
+To do this, simply run:
+
+```bash
+curl -LJO "https://gitlab-runner-downloads.s3.amazonaws.com/latest/deb/gitlab-runner_amd64.deb"
+sudo dpkg -i gitlab-runner_amd64.deb
+
+# Check that gitlab-runner is indeed running.
+sudo gitlab-runner status
+```
+
+You should see something like:
+
+```
+Runtime platform                                    arch=amd64 os=linux pid=5530 revision=4b9e985a version=14.4.0
+gitlab-runner: Service is running
+```
+
+Now our runner is up and running, we need to register it with our repository. To do this, go back to the "Settings" > "CI/CD" page and go to "Runners" - make a note of the registration token under "Specific runners".
+
+!!! info
+    "Specific runner" is just what GitLab calls a runner set up for a specific project, instead of the shared runners which are generally available for GitLab users and the group runners which are available for all projects under a group.
+
+From the screenshot above, you can see that the registration token is `w4xYV_NZnUMEG166GtHx`.
+
+!!! warning
+    You shouldn't share this registration token with anyone else as it gives others the ability to access your project's CI/CD pipeline, including access your code. Don't worry, I reset my token after taking the screenshot :slightly_smiling_face:
+
+It's a simple command to register the runner:
+
+```bash
+export token="<your GitLab runner registration token>"
+
+sudo gitlab-runner register \
+  --non-interactive
+  --url "https://gitlab.com" \
+  --registration-token "$token" \
+  --name "aws-vm" \
+  --tag-list "docker" \
+  --run-untagged "true" \
+  --docker-priviledged \
+  --docker-volumes "/cache" \
+  --docker-volumes "/certs/clients" \
+  --executor "docker" \
+  --docker-image "docker:19.03.12"
+```
+
+You can check whether that's worked by running:
+
+```bash
+sudo gitlab-runner verify
+sudo gitlab-runner list
+```
+
+You should see your newly registered runner listed in the output here and also on the GitLab CI/CD page under "Runners", underneath where we got the registration token from earlier. Hopefully, it'll even have a nice green circle next to it, like this:
+
+![registered runner](/images/continuous-integration/registered-runner.png)
+
+Hooray! You should now be ready to continue onto the next section.
+
+!!! info
+    If you do encounter an issue when running a pipeline where GitLab says the pipeline is "stalled", it means that for whatever reason GitLab can't or doesn't want to run your pipeline on your registered runner. If this happens, go ahead and let us know and we'll figure out what's going wrong. (It's usually just a simple configuration error.)
+
 ## Time to clear out the lint
 
 The first thing we're going to want to do in our continuous integration is _lint_ our code. This means automatically checking to make sure it is correctly formatted and doesn't fall victim to common programming mistakes.
