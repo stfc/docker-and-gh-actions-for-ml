@@ -611,7 +611,7 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
           cmds:
             - echo Uploading Docker image...
             - >-
-              aws ecr get-login-password |
+              echo $AWS_ECR_PASSWORD |
               docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
             - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}

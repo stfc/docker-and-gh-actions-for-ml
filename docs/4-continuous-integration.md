@@ -151,7 +151,7 @@ sudo gitlab-runner register \
   --run-untagged="true" \
   --docker-privileged \
   --docker-volumes="/cache" \
-  --docker-volumes="/certs/clients" \
+  --docker-volumes="/certs/client" \
   --executor="docker" \
   --docker-image="docker:19.03.12"
 ```
