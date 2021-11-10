@@ -243,7 +243,6 @@ GitLab CI/CD (much like most of the other CI solutions) uses YAML configuration 
     lint:
       stage: lint
       before_script:
-        - apk add curl
         - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
         - task --version
         - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
@@ -303,7 +302,6 @@ Let's start by adding another stage to our pipeline to build our code. This'll h
     lint:
       stage: lint
       before_script:
-        - apk add curl
         - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
         - task --version
         - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
@@ -364,7 +362,6 @@ First, remember to merge your Merge Request in GitLab (or using command line). T
     lint:
       stage: lint
       before_script:
-        - apk add curl
         - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
         - task --version
         - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.43.0
