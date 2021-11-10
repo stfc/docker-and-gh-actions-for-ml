@@ -56,7 +56,7 @@ It's sometimes tempting to use commit messages like "updated /hello endpoint" or
 Here are a few tips on creating the most useful commit messages you can:
 
 - **Be specific** - If someone reads a commit that says "changes to backend", the first thing we want to know is: what changes did you make! By being as specific as possible, it makes it massively easier to trace back through a commit history and find where a particular feature was added (or conversely where it was broken!). For an example of this, think about "Add date filtering to /hello endpoint". Now someone who's wondering why the date filtering isn't working can look through the history and immediately pick out the commit that they need!
-- **Explain intent** - We can see into the commit and look at what files you changed and how - the important thing to get across in your commit message is _why_ you made the changes that you did. For instance, instead of saying "Changes to backend"
+- **Explain intent** - We can see into the commit and look at what files you changed and how - the important thing to get across in your commit message is _why_ you made the changes that you did. For instance, instead of saying "Changes to backend", you could say "Increase backend timeout to prevent ephemeral issues".
 - **Be consistent** - It's not particularly important which specific format you use for your commits. whether you choose to phrase your commits like "Add x to y" or "Added x to y" (although there are endless debates online) doesn't really make any change anything about anything! As with the code itself, the important thing is to be consistent - choose an approach and stick to it (and make sure that other people stick to it as well).
 - **When appropriate, include extra detail** - There's a standard format for git commits. They look like this:
 
@@ -114,6 +114,8 @@ As we're using git-flow, we don't want to use the default git behaviour of "fast
 git config --global merge.ff no
 ```
 
+This won't return anything indicating success, but you can check that it's set correctly by running `git config --global merge.ff`, which should give you `no`.
+
 ## Setting up our branches
 
 We only have the `workshop-start` branch right now - not even a `main` branch! That's the first thing we'll need to create.
@@ -134,7 +136,7 @@ git push --tags
 The important thing here is the name we're giving our tag with the `-a` flag - `v1.0.0`. This is the SemVer version of our API that we'll be developing. As we're on version `v1.0.0`, we'll be expected by our imaginary API customers to follow SemVer best practices for major, minor & patch version updates.
 
 !!! info "Code signing tags"
-    In generic, I would very much recommend creating a GPG key and signing your commits and tags using that key. You can then upload your public GPG key to GitLab to show whether your commits and tags are verified.
+    In general, I would very much recommend creating a GPG key and signing your commits and tags using that key. You can then upload your public GPG key to GitLab to show whether your commits and tags are verified.
 
     Having an expectation of signing your git activity is a really good position to be in from a security perspective.
 

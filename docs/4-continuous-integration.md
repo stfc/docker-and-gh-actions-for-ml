@@ -189,10 +189,10 @@ Let's add another task to our trusty `Taskfile.yml` to lint and auto-format our 
           docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
         - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
         - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}
-        - "[ -z \"{{.GIT_BRANCH}}\" ] && docker tag {{.PROJECT_NAME}}:{{.BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
+        - "[ -z \"{{.GIT_BRANCH}}\" ] || docker tag {{.PROJECT_NAME}}:{{.GIT_BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
         - docker push {{.CONTAINER_URI}}:latest
         - docker push {{.CONTAINER_URI}}:{{.VERSION}}
-        - "[ -z \"{{.GIT_BRANCH}}\" ] && docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
+        - "[ -z \"{{.GIT_BRANCH}}\" ] || docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
       env:
         AWS_ECR_PASSWORD:
           sh: which aws && aws ecr get-login-password || true
@@ -221,6 +221,12 @@ Let's add another task to our trusty `Taskfile.yml` to lint and auto-format our 
         - go clean
         - "rm {{.PROJECT_NAME}} 2> /dev/null; true"
     ```
+
+Before running it, we need to quickly install the golangci-lint tool:
+
+```bash
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin v1.43.0
+```
 
 We can then run `task lint` to check for style and formatting errors. Give it a try now!
 
@@ -269,7 +275,7 @@ git checkout -b feature/add-lint-pipeline
 
 git add .
 git commit -m "Add GitLab CI pipeline to lint code using golangci-lint."
-git push --set-upstream feature/add-lint-pipeline
+git push --set-upstream origin feature/add-lint-pipeline
 ```
 
 If you go to "CI/CD" > "Pipelines" in your GitLab project, you should now see your pipeline running for the first time.
@@ -333,7 +339,7 @@ git checkout -b feature/add-build-job-to-ci-pipeline
 
 git add .
 git commit -m "Add build job to CI pipeline."
-git push --set-upstream feature/add-build-job-to-ci-pipeline
+git push --set-upstream origin feature/add-build-job-to-ci-pipeline
 ```
 
 Now we can see our CI pipeline has an extra stage in it for our build, which as expected is succeeding:
@@ -403,10 +409,10 @@ git checkout -b feature/artifact-built-ci-executables
 
 git add .
 git commit -m "Add artifacting of built executables to CI build job."
-git push --set-upstream feature/artifact-built-ci-executables
+git push --set-upstream origin feature/artifact-built-ci-executables
 ```
 
-Now if you go to the "CI / CD" > "Pipelines" page, you should have a dropdown allowing you to download your built application executable as a file called `artifacts.zip` - decompress this and you'll get your `hbaas-server` exe for that commit. Go ahead and merge that feature branch once it passes.
+Now if you go to the "CI / CD" > "Pipelines" page, you should have a dropdown allowing you to download your built application executable as a file called `artifacts.zip` - decompress this and you'll get your `hbaas-server` exe for that commit (it's a Linux ELF binary, so it will only run on Linux systems). Go ahead and merge that feature branch once it passes.
 
 !!! success
     With this completed, you've now got your continuous integration pipeline set up! Congratulations!

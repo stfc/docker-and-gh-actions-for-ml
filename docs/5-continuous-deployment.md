@@ -170,7 +170,7 @@ git checkout -b feature/add-docker-image-publishing-to-ci
 
 git add .
 git commit -m "Add CI job to upload Docker image to ECR."
-git push --set-upstream feature/add-docker-image-publishing-to-ci
+git push --set-upstream origin feature/add-docker-image-publishing-to-ci
 ```
 
 You'll need to merge this one before you can see the publish job running. Once you do, it should look like this:
@@ -294,6 +294,8 @@ git checkout -b feature/add-docker-compose-deployment
 
 git add docker-compose.yaml
 git commit -m "Add Docker Compose deployment YAML file for dev and prod API."
+# We're going to do a bit more work on this Docker Compose file so we'll push it up to
+# GitLab in a bit.
 ```
 
 ## Setting up automatic re-deployment

@@ -208,7 +208,7 @@ task
 In another terminal tab:
 
 ```bash
-curl -s localhost:8000/date/5-November
+curl -s localhost:8000/date/11-November
 ```
 ```json
 {

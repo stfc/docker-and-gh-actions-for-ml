@@ -72,7 +72,7 @@ While Docker is still the main tool, as all of the underlying technologies ([con
 
 Even though it dominates the market, Docker isn't the only container runtime around with a logo of a happy cute sea animal!
 
-Enter [Podman](https://podman.io/){: style="height: 100px; float: right;"}.
+Enter [Podman](https://podman.io/){target="_blank" rel="noopener noreferrer"}.
 
 The main differentiator between Docker and Podman is that Podman doesn't need a daemon running as root in the background[^3]. This makes it popular for security-conscious users or where root access to the underlying machine is not available (e.g. in HPC environments).
 
@@ -155,6 +155,8 @@ What this Dockerfile will do is take the Go Docker image from [Docker Hub](https
         # We use the standard Golang image as our "base image" (see terminology section
         # for what that means).
         FROM golang:latest
+
+        RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 
         COPY . /app
         WORKDIR /app
@@ -523,10 +525,10 @@ Firstly, we need to add a few variables at the beginning of the file:
       BUILD_TIME:
         sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
 
-      CONTAINER_REGISTRY: 049839538904.dkr.ecr.eu-west-2.amazonaws.com
-      CONTAINER_NAMESPACE: go-with-the-flow
-      CONTAINER_REPO: {{.PROJECT_NAME}}-<your-name>
-      CONTAINER_URI: {{.CONTAINER_REGISTRY}}/{{.CONTAINER_NAMESPACE}}/{{.CONTAINER_REPO}}
+      CONTAINER_REGISTRY: "049839538904.dkr.ecr.eu-west-2.amazonaws.com"
+      CONTAINER_NAMESPACE: "go-with-the-flow"
+      CONTAINER_REPO: "{{.PROJECT_NAME}}-<your-name>"
+      CONTAINER_URI: "{{.CONTAINER_REGISTRY}}/{{.CONTAINER_NAMESPACE}}/{{.CONTAINER_REPO}}"
     
       GIT_BRANCH:
         sh: git branch --show-current
@@ -615,10 +617,10 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
               docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
             - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}
-            - "[ -z \"{{.GIT_BRANCH}}\" ] && docker tag {{.PROJECT_NAME}}:{{.BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
+            - "[ -z \"{{.GIT_BRANCH}}\" ] || docker tag {{.PROJECT_NAME}}:{{.GIT_BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
             - docker push {{.CONTAINER_URI}}:latest
             - docker push {{.CONTAINER_URI}}:{{.VERSION}}
-            - "[ -z \"{{.GIT_BRANCH}}\" ] && docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
+            - "[ -z \"{{.GIT_BRANCH}}\" ] || docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
           env:
             AWS_ECR_PASSWORD:
               sh: which aws && aws ecr get-login-password || true
@@ -630,6 +632,12 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
     The first three tag the images with the full URI of the container image including tag. This tells Docker that it is this image that should be uploaded when we run the final two commands.
 
     You'll notice the branch tagging and pushing have a weird bit of bash at the beginning - we might not always be on a branch, so this simply checks whether `GIT_BRANCH` is empty - if it is, it doesn't try to tag and push the branch image. Don't worry too much if you didn't include this in your solution, it's just to prevent errors in case you're running e.g. on a tag instead of a branch.
+
+Once you've finished that exercise, go ahead and run it:
+
+```bash
+task upload-image
+```
 
 If all goes well, you should now be able to see your images in the AWS ECR repository:
 
