@@ -441,6 +441,7 @@ Next let's take our `Taskfile.yml` file which defines our tasks and add another 
             --tag {{.PROJECT_NAME}}:latest
             --tag {{.PROJECT_NAME}}:{{.VERSION}}
             .
+          - "[ -z \"{{.GIT_BRANCH}}\" ] || docker tag {{.PROJECT_NAME}}:latest {{.PROJECT_NAME}}:{{.GIT_BRANCH}}"
 
       clean:
         desc: Clean up all files generated and output by build process.
@@ -511,17 +512,17 @@ Now we're going to upload our image into the registry. We're going to use the `T
 Firstly, we need to add a few variables at the beginning of the file:
 
 !!! example "`Taskfile.yml`"
-    ```yaml linenums="1" hl_lines="14-20"
+    ```yaml linenums="1" hl_lines="14-17 26-28"
     version: "3"
-    
+
     silent: true
-    
+
     vars:
       PROJECT_NAME: hbaas-server
-    
+
       VERSION:
         sh: echo "${VERSION:-$(git describe --tags --always 2> /dev/null)}"
-    
+
       BUILD_TIME:
         sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
 
@@ -529,9 +530,22 @@ Firstly, we need to add a few variables at the beginning of the file:
       CONTAINER_NAMESPACE: "go-with-the-flow"
       CONTAINER_REPO: "{{.PROJECT_NAME}}-<your-name>"
       CONTAINER_URI: "{{.CONTAINER_REGISTRY}}/{{.CONTAINER_NAMESPACE}}/{{.CONTAINER_REPO}}"
-    
+
+      PACKAGENAME:
+        sh: go list 2> /dev/null || true
+
+      LD_FLAGS: >
+        -ldflags "-X '{{.PACKAGENAME}}/version.Version={{.VERSION}}'
+        -X '{{.PACKAGENAME}}/version.BuildTime={{.BUILD_TIME}}'"
+
+    env:
       GIT_BRANCH:
         sh: git branch --show-current
+
+    tasks:
+      default:
+        cmds:
+          - task: build
     ```
 
 Where you replace `<your-name>` with the personal identifier (e.g. name with hyphens instead of spaces) from the previous section.
@@ -542,7 +556,7 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
     Complete this task to upload the image to our AWS container registry:
 
     !!! example "`Taskfile.yml`"
-        ```yaml linenums="58" hl_lines="15-29"
+        ```yaml linenums="58" hl_lines="16-24"
                 GOOS: linux
                 GOARCH: amd64
       
@@ -556,6 +570,7 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
               --tag {{.PROJECT_NAME}}:latest
               --tag {{.PROJECT_NAME}}:{{.VERSION}}
               .
+            - "[ -z \"{{.GIT_BRANCH}}\" ] || docker tag {{.PROJECT_NAME}}:latest {{.PROJECT_NAME}}:{{.GIT_BRANCH}}"
       
         upload-image:
           desc: Upload Docker image for API to AWS ECR.
@@ -596,9 +611,10 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
     There are four commands required to complete this task:
 
     !!! example "`Taskfile.yml`"
-        ```yaml linenums="66" hl_lines="13-18"
+        ```yaml linenums="69" hl_lines="11-16"
               --tag {{.PROJECT_NAME}}:{{.VERSION}}
               .
+            - "[ -z \"{{.GIT_BRANCH}}\" ] || docker tag {{.PROJECT_NAME}}:latest {{.PROJECT_NAME}}:{{.GIT_BRANCH}}"
 
         upload-image:
           desc: Upload Docker image for API to AWS ECR.
@@ -606,18 +622,12 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
             - build-image
           cmds:
             - echo Uploading Docker image...
-            - >-
-              echo $AWS_ECR_PASSWORD |
-              docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
             - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
             - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}
             - "[ -z \"{{.GIT_BRANCH}}\" ] || docker tag {{.PROJECT_NAME}}:{{.GIT_BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
             - docker push {{.CONTAINER_URI}}:latest
             - docker push {{.CONTAINER_URI}}:{{.VERSION}}
             - "[ -z \"{{.GIT_BRANCH}}\" ] || docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
-          env:
-            AWS_ECR_PASSWORD:
-              sh: which aws && aws ecr get-login-password || true
 
         clean:
           desc: Clean up all files generated and output by build process.
