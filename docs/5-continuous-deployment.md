@@ -266,6 +266,13 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
+!!! note
+    You may need to re-login to the ECR if it's been a while since you did the `docker push` from [Section 3](/containerise-it/):
+
+    ```bash
+    aws ecr get-login-password | docker login --username AWS --password-stdin 049839538904.dkr.ecr.eu-west-2.amazonaws.com
+    ```
+
 Now if we run `docker-compose up` we'll see both our dev and prod versions of the API spin up simultaneously. To spin the services up in the background, we can use the `-d` flag:
 
 ```bash

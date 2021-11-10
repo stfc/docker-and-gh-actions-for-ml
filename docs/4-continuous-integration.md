@@ -181,16 +181,21 @@ In Go, the most popular tool for CI linting is [golangci-lint](https://golangci-
 Let's add another task to our trusty `Taskfile.yml` to lint and auto-format our code.
 
 !!! example "`Taskfile.yml`"
-    ```yaml linenums="73" hl_lines="11-27"
+    ```yaml linenums="76" hl_lines="16-31"
       cmds:
         - echo Uploading Docker image...
+        - >-
+          echo $AWS_ECR_PASSWORD |
+          docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
         - docker tag {{.PROJECT_NAME}}:latest {{.CONTAINER_URI}}:latest
         - docker tag {{.PROJECT_NAME}}:{{.VERSION}} {{.CONTAINER_URI}}:{{.VERSION}}
-        - >-
-          aws ecr get-login-password |
-          docker login --username AWS --password-stdin {{.CONTAINER_REGISTRY}}
+        - "[ -z \"{{.GIT_BRANCH}}\" ] && docker tag {{.PROJECT_NAME}}:{{.BRANCH}} {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
         - docker push {{.CONTAINER_URI}}:latest
         - docker push {{.CONTAINER_URI}}:{{.VERSION}}
+        - "[ -z \"{{.GIT_BRANCH}}\" ] && docker push {{.CONTAINER_URI}}:{{.GIT_BRANCH}}"
+      env:
+        AWS_ECR_PASSWORD:
+          sh: which aws && aws ecr get-login-password || true
 
     lint:
       desc: Run linter over codebase to check for style and formatting errors.
