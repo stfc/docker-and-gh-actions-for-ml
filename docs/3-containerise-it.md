@@ -144,10 +144,10 @@ What this Dockerfile will do is take the Go Docker image from [Docker Hub](https
 
     You should use the Dockerfile reference to help you: https://docs.docker.com/engine/reference/builder/.
 
-??? hint "Hint 3.1"
+??? hint "Hint 3.1 - click to reveal"
     The `RUN` instruction is used to run a command while building the image and the `CMD` instruction is used to specify the command that will be run when the image is run. Check out [CMD in the Dockerfile reference](https://docs.docker.com/engine/reference/builder/#cmd) for details on how the syntax works.
 
-??? answers "Answers 3.1"
+??? answers "Answers 3.1 - click to reveal"
     Our built executable is simply called `hbaas-server` and the instruction to specify the runtime command of the image is `CMD`, so we want to add:
 
     !!! example "`Dockerfile`"
@@ -588,7 +588,7 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
 
     You might need to refer back to the `build-image` task we added before to make sure you know what the image tags are.
 
-??? hint "Hint 3.2"
+??? hint "Hint 3.2 - click to reveal"
     There are two parts to this task:
 
     * Tagging the images with the full URI of the container image, including the container registry, namespace, repository and tag.
@@ -596,7 +596,7 @@ Next, we want to add a task called `upload-image` to our `Taskfile.yml`.
 
     For the former, you'll need to add an extra tag to the image generated from the `build-image` task. For the latter, you just need to use `docker push` to upload the image to the repository.
 
-??? answers "Answers 3.2"
+??? answers "Answers 3.2 - click to reveal"
     There are four commands required to complete this task:
 
     !!! example "`Taskfile.yml`"

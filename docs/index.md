@@ -31,3 +31,16 @@ The next port of call is to message or chat to us in the Zoom call - we can talk
 You can also comment on any of these tutorial sections[^disqus] using Disqus - any and all feedback, corrections or questions are very welcome!
 
 [^disqus]: Apart from this intro page :slightly_smiling_face:
+
+## :question: Exercises, hints and answers
+
+Sprinkled among the workshop are a few small exercises for the reader. The hint and answer are hidden by default - you need to click on the coloured bar to show the contents. They look like this:
+
+!!! question "Exercise 5.2"
+    Complete this very important file.
+
+??? hint "Hint 5.2 - click to show"
+    This is a very important hint about how to complete the very important file.
+
+??? answers "Answers 5.2 - click to show"
+    Alright, here's the completed very important file.

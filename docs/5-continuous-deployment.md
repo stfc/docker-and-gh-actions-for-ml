@@ -112,14 +112,14 @@ Once you've done this, we can update our GitLab CI YAML to add an extra stage fo
     
     publish-image-dev:
       extends: .publish-image
-      environment:
+      variables:
         GIT_BRANCH: dev
       only:
         - dev
     
     publish-image-prod:
       extends: .publish-image
-      environment:
+      variables:
         GIT_BRANCH: prod
       only:
         - tags
@@ -448,7 +448,7 @@ Firsly, let's add another endoint that'll work as a health check for our API:
 !!! question "Exercise 5.1"
     Great, now your final exercise is to create a new branch from the `dev` branch called `feature/add-status-endpoint`. Commit your changes and push your feature branch up to GitLab to a branch of the same name. Once you've done that, merge the feature branch into the `dev` branch.
 
-!!! answers "Answers 5.1"
+!!! answers "Answers 5.1 - click to reveal"
     As per usual, all you need to do is run:
 
     ```bash
