@@ -220,7 +220,7 @@ If this works, you should see something like this:
 
     We want to query the API using curl to get the API version. Have a go at it!
 
-!!! tip "Hint 1.1 - click to reveal"
+??? tip "Hint 1.1 - click to reveal"
     If you're running the API in one terminal tab, you'll need to get another tab up and SSH into the VM to run the curl command at the same time as the API command.
 
     Alternatively, you can fork the API command using `/hbaas-server &`, but then you'll need to remember to kill the server when you want to re-build the API, or the port will be in use and you won't be able to run the API.
