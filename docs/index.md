@@ -39,8 +39,8 @@ Sprinkled among the workshop are a few small exercises for the reader. The hint 
 !!! question "Exercise 5.2"
     Complete this very important file.
 
-??? hint "Hint 5.2 - click to show"
+??? hint "Hint 5.2 - click to reveal"
     This is a very important hint about how to complete the very important file.
 
-??? answers "Answers 5.2 - click to show"
+??? answers "Answers 5.2 - click to reveal"
     Alright, here's the completed very important file.
