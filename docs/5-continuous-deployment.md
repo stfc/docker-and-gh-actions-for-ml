@@ -259,6 +259,13 @@ Let's go ahead and create our `docker-compose.yaml` and add our development and 
         restart: on-failure
     ```
 
+We do need to install the `docker-compose` command line tool which is just two commands:
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
 Now if we run `docker-compose up` we'll see both our dev and prod versions of the API spin up simultaneously. To spin the services up in the background, we can use the `-d` flag:
 
 ```bash
