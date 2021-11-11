@@ -208,9 +208,6 @@ We're also going to add a [`.dockerignore` file](https://docs.docker.com/engine/
 
 As this has the same syntax as `.gitignore`, you can use the https://gitignore.io tool to generate your `.dockerignore` file based on the tools you're using.
 
-!!! note
-    We're not ignoring the `.git` folder from our image - this is because we want to be able to use the git tagging and branching information to get our version.
-
 Now, let's give it a build:
 
 ```bash
