@@ -87,6 +87,9 @@ Once we've forked the repo into our own account space, we can clone our forked r
 
 ```bash
 git clone https://gitlab.com/{my-username}/go-with-the-flow-code.git
+
+# Then change into the directory that the cloned code is in.
+cd go-with-the-flow-code
 ```
 
 where `{my-username}` is your GitLab username.
