@@ -22,7 +22,7 @@ There are a bunch of different CI tools out there. Here's a quick overview of th
 
 GitLab CI/CD is what we're going to be using for this demo for a few reasons:
 
-- GitLab is an incredibly popular tool for companies hosting their own version control system. This makes it prevelant in business which don't want their IP-sensitive company code on a publicly hosted systems.
+- GitLab is an incredibly popular tool for companies hosting their own version control system. This makes it prevalant in business which don't want their IP-sensitive company code on a publicly hosted systems.
 - GitLab CI/CD comes built into GitLab - all you need to do to set up a Runner (i.e. computer which runs our pipelines) is run a simple script.
 - GitLab CI/CD is free to use on the publicly hosted [gitlab.com](https://gitlab.com){target="_blank" rel="noopener noreferrer"} GitLab instance and works out of the box without needing to install, setup or enable anything whatsoever. This means that it's both free and easy to use for this tutorial.
 
