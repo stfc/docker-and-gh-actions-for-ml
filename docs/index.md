@@ -8,7 +8,7 @@ In this workshop, we will be expanding on the skills we learnt in the previous 1
 
 We've got a variety of people from different backgrounds with different experience levels attending this course so it's designed to be taken at your own pace - if you get stuck at any time, we'll be available on the Zoom call to help you out. Just let us know and we'll break out into a separate room to chat.
 
-You can get to the starting code for a particular section by checking out the branch `tutorial/section-X` where `X` is the section number that you want to get working on. The final code that you should end up with after the tutorial can be found in the `tutorial/completed` branch.
+The default branch for the repo is `workshop-start` (instructions on cloning the repo are in the relevant section). There's also a branch called `workshop-completed` which has all the answers in. If you really do get stuck, you can always refer to this for answers (although I'd encourage you to ask in the Zoom first!).
 
 !!! info
     Tempting as it might be, you'll get a lot more out of this tutorial if you go through all the commands and code modifications yourself, rather than just skipping ahead. :slightly_smiling_face:
@@ -18,15 +18,11 @@ You can get to the starting code for a particular section by checking out the br
     1. Better process what you're typing
     2. Probably make typos - this is great! Making mistakes and fixing them is the best way to learn.
 
-You should understand from the presentation what git is and how it works, including what branches and tags are and how they're used to manage your codebase. If any of these aren't clear, please do speak up in the Zoom call and we can explain it in more detail.
-
 Any experience using Go, GitLab CI and AWS would be helpful, but you should be able to going without any prior experience using these.
 
 ## :speech_balloon: Giving feedback and getting help
 
-If you get stuck or encounter a problem, the first thing to do is quickly check out the [Troubleshooting](/troubleshooting) page - you might find that someone else has already encountered your problem and this page contains some of the errors that people have encountered along with their solutions.
-
-The next port of call is to message or chat to us in the Zoom call - we can talk through your problem and see what's going on.
+If you get stuck or encounter a problem, the first port of call is to message or chat to us in the Zoom call - we can talk through your problem and see what's going on.
 
 You can also comment on any of these tutorial sections[^disqus] using Disqus - any and all feedback, corrections or questions are very welcome!
 
