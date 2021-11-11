@@ -537,7 +537,7 @@ Firstly, we need to add a few variables at the beginning of the file:
 
     env:
       GIT_BRANCH:
-        sh: git branch --show-current
+        sh: git branch --show-current 2> /dev/null || true
 
     tasks:
       default:
