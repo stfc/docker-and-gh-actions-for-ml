@@ -91,10 +91,6 @@ git clone https://gitlab.com/{my-username}/go-with-the-flow-code.git
 
 where `{my-username}` is your GitLab username.
 
-If you run `git branch --all`, you should see something like this:
-
-![TODO]()
-
 This tells you that:
 
 * You're currently on the `workshop-start` branch.
