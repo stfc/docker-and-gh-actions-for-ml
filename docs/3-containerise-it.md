@@ -650,9 +650,23 @@ Now we need to tell Docker that we're using this credential helper by creating t
     }
     ```
 
+Let's commit our progress again:
+
+```bash
+git add .
+git commit -m "Add task to upload image to AWS ECR."
+
+# Let's save our progress now.
+git push --set-upstream origin feature/containerise-api
+```
+
+Now you can merge the feature branch into `dev` either using git locally or on GitLab - just remember to disable fast-forwarding if you do it in GitLab.
+
 Once you've done that, go ahead and run our image upload task:
 
 ```bash
+git checkout dev
+git pull --rebase
 task upload-image
 ```
 
@@ -680,23 +694,6 @@ aws ecr describe-images --repository-name go-with-the-flow/hbaas-server-<your-na
     ]
 }
 ```
-
-Good job! Let's commit our progress again:
-
-```bash
-git add .
-git commit -m "Add task to upload image to AWS ECR."
-```
-
-## Finishing up
-
-Now that we can build, run and publish our API as a Docker image, let's push our feature branch up to GitLab and merge it in.
-
-```bash
-git push --set-upstream origin feature/containerise-api
-```
-
-Now you can merge the feature branch into `dev` either using git locally or on GitLab - just remember to disable fast-forwarding if you do it in GitLab.
 
 !!! success
     Great work! Now you've containerised your API.
