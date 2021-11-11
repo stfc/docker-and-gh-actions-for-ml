@@ -91,12 +91,6 @@ git clone https://gitlab.com/{my-username}/go-with-the-flow-code.git
 
 where `{my-username}` is your GitLab username.
 
-This tells you that:
-
-* You're currently on the `workshop-start` branch.
-* There's a branch on the origin called `workshop-completed`.
-* The origin `HEAD` points to the `workshop-start` branch - this means that this is the default branch, which is why you were dropped into it when you cloned the repo.
-
 !!! note
     The `workshop-completed` branch contains the code with all the answers to the exercises - these are here in case you get really stuck and just need to see what's going on, but it's highly encouraged if you get stuck to either persist and figure it out or let us know and we can work through it together.
 
