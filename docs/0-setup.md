@@ -6,21 +6,28 @@ title: 0. Setup
 
 ## Pre-requisites
 
-As with the previous course, we'll be using the VM (Virtual Machine) on EC2 for our development. The connection details for this should be exactly the same as the previous course - if you don't have these details anymore or you can't access the VM for whatever reason, drop up a line and we'll sort it out.
+We'll be using the VM (Virtual Machine) on EC2 for our development.
 
-We recommend a terminal emulator to run SSH through, although you can also access the VM through the EC2 console using your provided login details. Our recommended terminal emulators are:
+You have all been set up an account with a VM - the connection details will be sent out to you individually via Zoom. If you haven't got them or can't find them, just let us know and we'll send them again.
 
-- macOS - [iTerm2](https://www.iterm2.com/){target="_blank" rel="noopener noreferrer"}
-- Windows - [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab){target="_blank" rel="noopener noreferrer"} or [WSL (Windows Subsystem for Linux)](https://docs.microsoft.com/en-us/windows/wsl/install){target="_blank" rel="noopener noreferrer"} for Windows 10, [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html){target="_blank" rel="noopener noreferrer"} for Windows 8 and below.
-- Linux - if you're using Linux, you're probably already familiar with your terminal of preference - they all come with one pre-installed anyway, so you can just search for "Terminal" in your apps and it should be there.
+There are two options for accessing the VM:
+
+- Using SSH (Secure Shell) command line tool from your favourite terminal emulator, such as Windows Terminal, iTerm2 or GNOME Terminal. If you're familiar and comfortable in the terminal, we'd recommend this.
+- Using the AWS web console. If your corporate firewall prevents SSH connections or you're not familiar with the command-line environment, you can access the VM straight from your web browser.
 
 ## Connecting to VM using SSH
+
+First, make sure you've got a terminal emulator installed. Some options are:
+
+- macOS - [iTerm2](https://www.iterm2.com/){target="_blank" rel="noopener noreferrer"}
+- Windows - [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab){target="_blank" rel="noopener noreferrer"} or [WSL (Windows Subsystem for Linux)](https://docs.microsoft.com/en-us/windows/wsl/install){target="_blank" rel="noopener noreferrer"} (Windows 10 and up), [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html){target="_blank" rel="noopener noreferrer"} (Windows 8 and below).
+- Linux - if you're using Linux, you're probably already familiar with your terminal of preference - they all come with one pre-installed anyway, so you can just search for "Terminal" in your apps and it should be there.
 
 For those new to the terminal, SSH is a program that allows you to securely connect to another machine and run commands on that machine - it's a simple and ubiquitous tool.
 
 You should have been sent the details of the VM created for you for this workshop along with the private key needed to connect to it, alongside your AWS account details. If you don't have any of this information, please do let us know and we'll sort it out for you.
 
-To connect to the VM, simply run:
+To connect to the VM, run:
 
 ```bash
 # Needed for Linux, macOS & WSL, otherwise SSH server will
@@ -30,7 +37,7 @@ chmod 600 <path to private key file>
 ssh -i <path to private key file> ubuntu@<hostname of your VM>
 ```
 
-If you're on Linux, macOS or WSL, to make it easy to connect to the VM you can also add an alias in your SSH config:
+If you're on Linux, macOS or WSL, to make it easy to connect to the VM you can also optionally add an alias in your SSH config:
 
 ```bash
 echo "Host explain-vm
@@ -48,8 +55,10 @@ echo "Host explain-vm
 ssh explain-vm
 ```
 
+If this SSH config doesn't work or seems too complicated - don't worry about it, using the full command each time works just fine.
+
 !!! info
-    Your VM hostname should look something like `ec2-52-56-111-13.eu-west-2.compute.amazonaws.com` where `52-56-111-13` will be replaced with the external IP of your particular VM.
+    Your VM hostname should look something like `ec2-52-56-111-13.eu-west-2.compute.amazonaws.com` where `52-56-111-13` will be replaced with the external IP of your particular VM but with hyphens instead of fullstops.
 
 !!! warning
     If you see an error like this:
@@ -63,6 +72,42 @@ ssh explain-vm
     ```bash
     chmod 600 <path to private key file>
     ```
+
+## Connecting to VM using the AWS web console
+
+Firstly, open your web browser of choice and go to https://signin.aws.amazon.com/console.
+
+You should be presented with a login screen like this one:
+
+![AWS login screen showing account ID, IAM user name and password fields](/images/setup/aws-login.png)
+
+Enter the account ID, username and password we sent you.
+
+You'll probably have to do one of those annoying captcha things too - if you realise at this point that you're actually a robot, I'm afraid this is where we part ways.
+
+Next you'll be presented with the AWS console home page - if you're familiar with AWS, you may already know and love this page. Either way, we can to access our VM in EC2, so click on the search bar at the top of the page and type "EC2". Click on the "EC2" service as shown below and this'll take you to the EC2 console.
+
+![AWS console search bar showing EC2 service](/images/setup/aws-search-bar.png)
+
+Once you're in the EC2 console, you should see something like this:
+
+![AWS EC2 console](/images/setup/aws-ec2-dashboard.png)
+
+At this point you want to go to "Instances" on the left sidebar under "Instances" and you should be shown a list of VMs. You want to click on the search bar under "Instances" and above the table of VMs and type in the VM name that we sent you in the connection details pack.
+
+![AWS EC2 instance search page](/images/setup/aws-ec2-instance-search.png)
+
+Once you've found your VM instance, click on the "Instance ID" link and you should be shown the details of the VM.
+
+![AWS EC2 instance details, including "Connect" button](/images/setup/aws-ec2-instance-details.png)
+
+Now all you need to do is click on the "Connect" button, type in "ubuntu" as the user on the "Connect" page that shows up and click on the big orange "Connect" button and you're off!
+
+![AWS EC2 instance connect page, with user "ubuntu" and "Connect" button](/images/setup/aws-ec2-instance-connect.png)
+
+Now you should have a shell open on the VM ready to continue with the workshop.
+
+![AWS EC2 instance remote terminal](/images/setup/aws-ec2-instance-terminal.png)
 
 ## Setting up AWS CLI
 

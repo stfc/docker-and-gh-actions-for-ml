@@ -1,12 +1,12 @@
-# Intro
+# Introduction
 
 ## :wave: Welcome
 
-Welcome to the "Go With The Flow" workshop, part of the "Testing and Building Apps for the Cloud" course within STFC Hartree Centre's [HNCDI Explain programme](https://www.hartree.stfc.ac.uk/Pages/Explain.aspx){target="_blank" rel="noopener noreferrer"}.
+Welcome to the "Go With The Flow" workshop, part of the "Supercharge Your Cloud Development Workflow" course within STFC Hartree Centre's [HNCDI Explain programme](https://www.hartree.stfc.ac.uk/Pages/Explain.aspx){target="_blank" rel="noopener noreferrer"}.
 
-In this workshop, we will be expanding on the skills we learnt in the previous 12-factor app workshop by setting up a git workflow, containerising a small API then using GitLab CI/CD to automatically build and deploy our API to the cloud.
+In this workshop, we will be exploring the skills we discussed in the presentation by setting up a git workflow, containerising a small API then using GitLab CI/CD to automatically build and deploy our API to the cloud.
 
-We've got a variety of people from different backgrounds with different experience levels attending this course so it's designed to be taken at your own pace - if you get stuck at any time, we'll be available on the Zoom call to help you out. Just let us know and we'll break out into a separate room to chat.
+We've got a variety of people from different backgrounds with different experience levels attending this course so it's designed to be taken at your own pace - if you get stuck at any time, we'll be available on the Zoom call to help you out. Just let us know and we can break out into a separate room to chat or discuss it in the main Zoom.
 
 The default branch for the repo is `workshop-start` (instructions on cloning the repo are in the relevant section). There's also a branch called `workshop-completed` which has all the answers in. If you really do get stuck, you can always refer to this for answers (although I'd encourage you to ask in the Zoom first!).
 

@@ -8,6 +8,8 @@ This is an extra bonus chapter if you've whizzed through the other chapters with
 
 If you're not interested in this, you can go ahead and move on the [final page](/next-steps) where you get the big stamp of success.
 
+It's got some pretty neat stuff in so if you've always been scared and/or intimidated by git and felt like you didn't really understand what is going on under the hood when you run your git commands, you should find this stuff pretty interesting.
+
 ## :sparkles: Git isn't magic
 
 If you're still here, this most likely means you're one of the more experienced attendees, I thought it would be interested to dig a bit further into how git works under the hood. A lot of the time I see people think of git as some kind of magical tool that either works perfectly or becomes uncomprehensibly complicated. I'd like to show how it isn't really magic and it's actually not as complicated as people make out to be.
