@@ -177,12 +177,14 @@ Okay, now that we've found our mapping, let's add another endpoint for our date-
 		birthDay := context.NewBirthDay(dateTime)
 		names, exists := h.Context.PeopleByBirthday[birthDay]
 		if exists {
-			names[len(names)-2] = fmt.Sprintf(
-				"%s and %s",
-				names[len(names)-2],
-				names[len(names)-1],
-			)
-			names = names[0 : len(names)-1]
+			if len(names) > 1 {
+				names[len(names)-2] = fmt.Sprintf(
+					"%s and %s",
+					names[len(names)-2],
+					names[len(names)-1],
+				)
+				names = names[0 : len(names)-1]
+			}
 			message = fmt.Sprintf(
 				"Happy birthday to %s!",
 				strings.Join(names, ", "),
