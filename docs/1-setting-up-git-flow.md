@@ -250,5 +250,34 @@ If this works, you should see something like this:
 
     Setting this up is outside the scope of this tutorial, but if this is something you need to think about, there's [plenty](https://stackoverflow.com/questions/389169/best-practices-for-api-versioning){target="_blank" rel="noopener noreferrer"} of [resources](https://www.xmatters.com/blog/devops/blog-four-rest-api-versioning-strategies/){target="_blank" rel="noopener noreferrer"} [online](https://restfulapi.net/versioning/){target="_blank" rel="noopener noreferrer"} talking about it and arguing about which one is the One Right Way^®^.
 
+## Troubleshooting
+
+If you see an error like this:
+
+```
+Building executable...
+# golang.org/x/sys/unix
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/syscall_darwin.1_13.go:25:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.1_13.go:27:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.1_13.go:40:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:28:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:43:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:59:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:75:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:90:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:105:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:121:3: //go:linkname must refer to declared function or variable
+../../../go/pkg/mod/golang.org/x/sys@v0.0.0-20191228213918-04cbcbbfeed8/unix/zsyscall_darwin_arm64.go:121:3: too many errors
+task: Failed to run task "default": task: Failed to run task "build": exit status 2
+```
+
+This means you've got an oudated version of the `golang.org/x/sys` package and so need to update it:
+
+```bash
+go get -u golang.org/x/sys
+```
+
+Once you've done this, your build should work.
+
 !!! success
     With this out the way, we've got our repo in a good starting state to use git-flow to complete our first feature!
