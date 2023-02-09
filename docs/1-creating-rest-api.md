@@ -1,10 +1,10 @@
 ---
-title: 1. Setting up git-flow
+title: 1. Creating our model API
 ---
 
-# 1. :twisted_rightwards_arrows: Setting up git-flow
+# 1. :twisted_rightwards_arrows: Creating our model API
 
-## Git-flow
+## FastAPI
 
 Like we discussed in the presentation, we'll be using the **git-flow** branching model. Here's what that looks like:
 

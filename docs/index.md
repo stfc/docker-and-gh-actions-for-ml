@@ -2,13 +2,19 @@
 
 ## :wave: Welcome
 
-Welcome to the "Go With The Flow" workshop, part of the "Supercharge Your Cloud Development Workflow" course within STFC Hartree Centre's [HNCDI Explain programme](https://www.hartree.stfc.ac.uk/Pages/Explain.aspx){target="_blank" rel="noopener noreferrer"}.
+Welcome to the "Introduction to Docker and GitHub Actions for ML apps" workshop, part of the "Supercharge Your Cloud Development Workflow" course within STFC Hartree Centre's [HNCDI Explain programme](https://www.hartree.stfc.ac.uk/digital-innovation/hartree-national-centre-for-digital-innovation/explain/){target="_blank" rel="noopener noreferrer"}.
 
-In this workshop, we will be exploring the skills we discussed in the presentation by setting up a git workflow, containerising a small API then using GitLab CI/CD to automatically build and deploy our API to the cloud.
+In this workshop, we will be trying out the stuff we discussed in our introductory presentation by:
+
+* Wrapping up an open source ML language model as a (very simple) REST API using FastAPI
+* Containerising it using Docker
+* Deploying it to Azure as a cloud-native source using Azure App Service
+* Setting up a Continuous Deployment (CD) pipeline using GitHub Actions
 
 We've got a variety of people from different backgrounds with different experience levels attending this course so it's designed to be taken at your own pace - if you get stuck at any time, we'll be available on the Zoom call to help you out. Just let us know and we can break out into a separate room to chat or discuss it in the main Zoom.
 
-The default branch for the repo is `workshop-start` (instructions on cloning the repo are in the relevant section). There's also a branch called `workshop-completed` which has all the answers in. If you really do get stuck, you can always refer to this for answers (although I'd encourage you to ask in the Zoom first!).
+!!! warning "Todo: Should this be here?"
+    The default branch for the repo is `workshop-start` (instructions on cloning the repo are in the relevant section). There's also a branch called `workshop-completed` which has all the answers in. If you really do get stuck, you can always refer to this for answers (although I'd encourage you to ask in the Zoom first!).
 
 !!! info
     Tempting as it might be, you'll get a lot more out of this tutorial if you go through all the commands and code modifications yourself, rather than just skipping ahead. :slightly_smiling_face:
@@ -18,15 +24,11 @@ The default branch for the repo is `workshop-start` (instructions on cloning the
     1. Better process what you're typing
     2. Probably make typos - this is great! Making mistakes and fixing them is the best way to learn.
 
-Any experience using Go, GitLab CI and AWS would be helpful, but you should be able to going without any prior experience using these.
-
 ## :speech_balloon: Giving feedback and getting help
 
 If you get stuck or encounter a problem, the first port of call is to message or chat to us in the Zoom call - we can talk through your problem and see what's going on.
 
-You can also comment on any of these tutorial sections[^disqus] using Disqus - any and all feedback, corrections or questions are very welcome!
-
-[^disqus]: Apart from this intro page :slightly_smiling_face:
+You can also comment on any of these tutorial sections using Disqus - any and all feedback, corrections or questions are very welcome!
 
 ## :question: Exercises, hints and answers
 

@@ -1,8 +1,8 @@
 ---
-title: 3. Containerise it
+title: 2. Containerising it
 ---
 
-# 3. :package: Containerise it
+# 3. :package: Containerising it
 
 Our next step is going to be to take our API and containerise it - in other words, we're going to build a Docker image to bundle up our server so that we can run it anywhere!
 

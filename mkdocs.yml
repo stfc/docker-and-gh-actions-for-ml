@@ -1,9 +1,9 @@
-site_name: Go With The Flow
+site_name: Introduction to Docker and GitHub Actions for ML apps
 site_author: Drew Silcock, STFC Hartree Centre
-copyright: Copyright &copy; 2022 - STFC Hartee Centre
-site_url: https://go-with-the-flow.training.hartree.dev
-repo_name: go-with-the-flow-code
-repo_url: https://gitlab.com/drewsilcock/go-with-the-flow-code
+copyright: Copyright &copy; 2023 - STFC Hartee Centre
+site_url: https://docker-and-gh-actions-for-ml.training.hartree.dev
+repo_name: docker-and-gh-actions-for-ml
+repo_url: https://github.com/drewsilcock/docker-and-gh-actions-for-ml
 edit_uri: ""
 
 theme:
@@ -14,7 +14,7 @@ theme:
     primary: "#1e5df8"
     accent: "#ff5a5a"
   logo: images/ukri.svg
-  favicon: images/favicon.ico
+  favicon: images/stfc.png
 
 markdown_extensions:
   - toc:
@@ -55,7 +55,7 @@ extra_css:
   - styles.css
 
 extra:
-  disqus: go-with-the-flow
+  disqus: docker-and-gh-actions-for-ml
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/drewsilcock

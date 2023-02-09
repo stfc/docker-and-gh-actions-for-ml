@@ -1,6 +1,6 @@
-# Go With The Flow Docs
+# Introduction to Docker and GitHub Actions for ML apps - workshop site
 
-This repository contains the documentation files used to generate the "Go With The Flow" workshop online tutorial website.
+This repository contains the docs used to generate the "Introduction to Docker and GitHub Actions for ML apps" workshop online tutorial site.
 
 ## Getting started
 
@@ -19,4 +19,4 @@ Then go to http://localhost:8000
 
 ## Deploying
 
-To deploy updates, simply push to the `main` branch - the deployment will automatically be handled by Netlify.
+To deploy updates, simply push to the `site` branch - the deployment will automatically be handled by Netlify.
