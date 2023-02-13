@@ -4,7 +4,7 @@ This repository contains the docs used to generate the "Introduction to Docker a
 
 ## Getting started
 
-- Install Python 3.10 using e.g. pyenv
+- Install Python 3.x using e.g. pyenv (Netlify uses 3.8 but anything 3.8+ should work).
 - Install Poetry
 
 ```bash

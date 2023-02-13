@@ -12,7 +12,7 @@ mkdocs-git-revision-date-localized-plugin = "^1.0.1"
 mkdocs-material = "^8.3.8"
 mkdocs-minify-plugin = "^0.5.0"
 pymdown-extensions = "^9.5"
-python = "^3.10"
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 
