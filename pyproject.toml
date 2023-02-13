@@ -1,0 +1,84 @@
+[tool.poetry]
+authors = ["Drew Silcock <drew.silcock@stfc.ac.uk>"]
+description = "Text generation with DistilGPT2 as a REST API."
+license = "MIT"
+name = "distilgpt2-api"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+fastapi = "^0.85.1"
+python = "~3.10"
+transformers = "^4.23.1"
+uvicorn = {extras = ["standard"], version = "^0.19.0"}
+
+[[tool.poetry.dependencies.torch]]
+markers = "sys_platform == 'linux'"
+url = "https://download.pytorch.org/whl/cpu/torch-1.13.0%2Bcpu-cp310-cp310-linux_x86_64.whl"
+
+[[tool.poetry.dependencies.torch]]
+markers = "sys_platform == 'win32'"
+url = "https://download.pytorch.org/whl/cpu/torch-1.13.0%2Bcpu-cp310-cp310-win_amd64.whl"
+
+[[tool.poetry.dependencies.torch]]
+markers = "sys_platform == 'darwin' and platform_machine == 'x86_64'"
+url = "https://download.pytorch.org/whl/cpu/torch-1.13.0-cp310-none-macosx_10_9_x86_64.whl"
+
+[[tool.poetry.dependencies.torch]]
+markers = "sys_platform == 'darwin' and platform_machine == 'arm64'"
+url = "https://download.pytorch.org/whl/cpu/torch-1.13.0-cp310-none-macosx_11_0_arm64.whl"
+
+[tool.poetry.dev-dependencies]
+black = "^22.10.0"
+# Stuck on 4.x until prospector updates mccabe & pycodestyle
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "^0.982"
+prospector = "^1.7.7"
+pytest = "^7.2.0"
+taskipy = "^1.10.3"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool.isort]
+extend_skip = [".python_packages"]
+profile = "black"
+
+[tool.pylint.messages_control]
+disable = [
+  "bad-continuation",
+  "bad-whitespace",
+  "too-many-arguments",
+  "too-many-statements",
+  "too-many-locals",
+]
+
+[tool.pylint.format]
+max-line-length = 160
+
+[tool.mypy]
+exclude = ['\.venv']
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [ "transformers" ]
+
+[tool.taskipy.tasks]
+lint = """\
+    black --check . \
+    && flake8 . \
+    && isort --check . \
+    && mypy . \
+    && prospector
+"""
+
+format = """\
+    black . \
+    && isort .
+"""
+
+test = "pytest --verbose"
