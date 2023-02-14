@@ -22,7 +22,15 @@ First things first, head over to https://github.com/stfc/docker-and-gh-actions-f
 
 Go ahead and click on "Fork" and then "Create fork" to create your own version of the repository within your own account - this is essential for some of the future steps we'll be working on.
 
-(TODO: Screenshot of the fork button / page)
+![screenshot of fork button](images/0-setup/repo-fork-1.png)
+
+**Forking the repository, step 1.**
+{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
+
+![screenshot of fork page](images/0-setup/repo-fork-2.png)
+
+**Forking the repository, step 2.**
+{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
 
 !!! important
     We recommend you fork the repository as a public repository on your own account. This is because GitHub places limits on free use of certain resources like Actions and Packages on private repositories.
@@ -31,6 +39,9 @@ Go ahead and click on "Fork" and then "Create fork" to create your own version o
 
 Once you've forked the repostory, you can create your codespace to get started editing the code. To do this, just click on the "Code" button to the left of the "About" section, click on the "Codespaces" tab and then click on "Create codespace on main" - this should automatically create your codespace and open it up in a new tab.
 
-(TODO: Screenshot of the create codespace button / page)
+![screenshot of create codespace page](images/0-setup/create-codespace.png)
+
+**Creating the GitHub Codespace.**
+{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
 
 You might need to wait a couple of minutes for your codespace to initialise, but it shouldn't take too long. Once that's up and running, you're ready to get started! 🎊
