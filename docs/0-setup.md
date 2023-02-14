@@ -4,7 +4,7 @@ title: 0. Setup
 
 # 0. :desktop: Setup
 
-Throughout this tutorial we will be using [GitHub Codespaces](https://github.com/features/codespaces) to develop our code. This is basically VS Code in a browser - it's pretty cool!
+Throughout this tutorial we will be using [GitHub Codespaces](https://github.com/features/codespaces){target="_blank" rel="noopener noreferrer"} to develop our code. This is basically VS Code in a browser - it's pretty cool!
 
 ![screenshot of a GitHub Codespace](images/0-setup/codespaces.webp)
 
