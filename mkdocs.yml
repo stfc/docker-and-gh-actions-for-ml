@@ -3,7 +3,7 @@ site_author: Drew Silcock, STFC Hartree Centre
 copyright: Copyright &copy; 2023 - STFC Hartee Centre
 site_url: https://docker-and-gh-actions-for-ml.training.hartree.dev
 repo_name: docker-and-gh-actions-for-ml
-repo_url: https://github.com/drewsilcock/docker-and-gh-actions-for-ml
+repo_url: https://github.com/stfc/docker-and-gh-actions-for-ml
 edit_uri: ""
 
 theme:
