@@ -19,4 +19,4 @@ jobs:
         with:
           context: .
           push: true
-          tag: distilgpt2-api:latest
+          tags: ghcr.io/${{ github.actor }}/distilgpt2-api:latest
