@@ -1,5 +1,4 @@
 from os import PathLike
-from pathlib import Path
 from typing import TypedDict, cast
 
 from transformers import (
