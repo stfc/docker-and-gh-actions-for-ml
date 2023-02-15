@@ -43,7 +43,7 @@ Containers are fundamentally a Linux technology! [^2]
 
 In fact, containers are really a collection of features of the Linux kernel that enable you to namespace things like filesystems, processes, networks and memory. What this means is that a container can have its own processes that run *completely isolated* from the rest of your system, and this separation is enforced at the kernel level.
 
-There's no way that another container or process outside of the container runtime can access anything inside your image because the kernel enforces the isolation. This is a really simple concept (the specifics of the implementation are not so simple) but the power and versability that you can get out of this simple idea are pretty extraordinary!
+There's no way that another container or process outside of the container runtime can access anything inside your image because the kernel enforces the isolation. This is a really simple concept (the specifics of the implementation are not so simple) but the power and versatility that you can get out of this simple idea are pretty extraordinary!
 
 As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be just a few kilobytes instead of gigabytes. (As a rule of thumb, there's not generally any significant CPU overhead for running inside a container, but there is some overhead associated with the network stack. You can read some numbers for container performance characterisation [here](https://www.nginx.com/blog/comparing-nginx-performance-bare-metal-and-virtual-environments/){target="_blank" rel="noopener noreferrer"}.)
 
@@ -113,6 +113,8 @@ We're going to start off by specifying a base image - this comes with Python bui
 
     COPY . .
 
+    EXPOSE 8000
+
     CMD [ \
         "gunicorn", \
         "distilgpt2_api.api:app", \
@@ -126,12 +128,14 @@ This is pretty much as simple you can can get. It starts off with the official P
 
 Next, it copies all of our code from our repository into the image.
 
+The `EXPOSE` command doesn't do anything functional - it's purely documenting that the application listens on port 8000. We'll need that later because that's exactly how Azure App Service determines which port it should forward when it runs our Docker image in the cloud.
+
 Then, it specifies what command should be run when a container using this image is run.
 
 !!! note "Choosing a Python base image"
-    There are loads of different base images you could use for Python, from "slim" to "bullseye" to "alpine" and plenty more if you're looking outside the offical python images.
+    There are loads of different base images you could use for Python, from "slim" to "bullseye" to "alpine" and plenty more if you're looking outside the official python images.
 
-    In general there's no right choice about which image you should use, other than to avoid the temptation to use "alpine" even though it's much smaller than the Debian-based images. The [PythonSpeed articles](https://pythonspeed.com/articles/base-image-python-docker-images/) on the topic go into loads of detail about the tradeoffs of the various options.
+    In general there's no right choice about which image you should use, other than to avoid the temptation to use "alpine" even though it's much smaller than the Debian-based images. The [PythonSpeed articles](https://pythonspeed.com/articles/base-image-python-docker-images/) on the topic go into loads of detail about the trade-offs of the various options.
 
 We're using Gunicorn here on top of Uvicorn here - Gunicorn provides an extra layer of production-ready application serving to handle things like multiple worker, address binding, etc. In this case we're only using one worker to reduce memory usage, but it's considered best practice to use Gunicorn + Uvicorn when deploying a FastAPI application.
 
@@ -140,30 +144,24 @@ Now, we can build this image and run it right now if we want to, but we're not g
 Next, we're going to update our `Dockerfile` to install Poetry, the tool we're using for managing our Python dependencies.
 
 !!! example "`Dockerfile`"
-    ```dockerfile linenums="1" hl_lines="3-21"
+    ```dockerfile linenums="1" hl_lines="3-13"
     FROM python:3.10-slim
-
-    RUN \
-        apt-get update --yes --quiet && \
-        apt-get install --yes --quiet --no-install-recommends curl && \
-        apt-get clean --yes --quiet
 
     ENV \
         POETRY_VERSION="1.3.2" \
-        POETRY_HOME="/opt/poetry" \
         POETRY_VIRTUALENVS_IN_PROJECT=true \
         POETRY_NO_INTERACTION=1 \
         VENV_PATH="/app/.venv"
 
-    ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
-
+    ENV PATH="$VENV_PATH/bin:/root/.local/bin:$PATH"
     RUN mkdir -p "$VENV_PATH"
     WORKDIR "/app"
 
-    # Respects `POETRY_VERSION` and `POETRY_HOME` environment variables.
-    RUN curl -sSL https://install.python-poetry.org | python3 -
+    RUN pip install pipx && pipx install poetry==$POETRY_VERSION
 
     COPY . .
+
+    EXPOSE 8000
 
     CMD [ \
         "gunicorn", \
@@ -179,31 +177,25 @@ There's quite a lot going on here, but the important bit is really line 21. That
 Now that we've got Poetry installed, we're ready to install all of our application dependencies:
 
 !!! example "`Dockerfile`"
-    ```dockerfile linenums="1" hl_lines="24"
+    ```dockerfile linenums="1" hl_lines="16"
     FROM python:3.10-slim
-
-    RUN \
-        apt-get update --yes --quiet && \
-        apt-get install --yes --quiet --no-install-recommends curl && \
-        apt-get clean --yes --quiet
 
     ENV \
         POETRY_VERSION="1.3.2" \
-        POETRY_HOME="/opt/poetry" \
         POETRY_VIRTUALENVS_IN_PROJECT=true \
         POETRY_NO_INTERACTION=1 \
         VENV_PATH="/app/.venv"
 
-    ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
-
+    ENV PATH="$VENV_PATH/bin:/root/.local/bin:$PATH"
     RUN mkdir -p "$VENV_PATH"
     WORKDIR "/app"
 
-    # Respects `POETRY_VERSION` and `POETRY_HOME` environment variables.
-    RUN curl -sSL https://install.python-poetry.org | python3 -
+    RUN pip install pipx && pipx install poetry==$POETRY_VERSION
 
     COPY . .
     RUN poetry install --no-dev
+
+    EXPOSE 8000
 
     CMD [ \
         "gunicorn", \
@@ -266,28 +258,20 @@ There's a few extra things you can ignore from Docker that you can't from git - 
 Next, let's update our Dockerfile so that we add and install all of our dependencies before adding our actual application code. What this means is that if we are only updating our application code but not updating any dependencies, when we re-build our Docker image, we don't need to re-install the dependencies in the build process - Docker will use the build cache that it maintains to speed up the build process massively.
 
 !!! example "`Dockerfile`"
-    ```dockerfile linenums="1" hl_lines="23-28"
+    ```dockerfile linenums="1" hl_lines="15-20"
     FROM python:3.10-slim
-
-    RUN \
-        apt-get update --yes --quiet && \
-        apt-get install --yes --quiet --no-install-recommends curl && \
-        apt-get clean --yes --quiet
 
     ENV \
         POETRY_VERSION="1.3.2" \
-        POETRY_HOME="/opt/poetry" \
         POETRY_VIRTUALENVS_IN_PROJECT=true \
         POETRY_NO_INTERACTION=1 \
         VENV_PATH="/app/.venv"
 
-    ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
-
+    ENV PATH="$VENV_PATH/bin:/root/.local/bin:$PATH"
     RUN mkdir -p "$VENV_PATH"
     WORKDIR "/app"
 
-    # Respects `POETRY_VERSION` and `POETRY_HOME` environment variables.
-    RUN curl -sSL https://install.python-poetry.org | python3 -
+    RUN pip install pipx && pipx install poetry==$POETRY_VERSION
 
     COPY ./pyproject.toml ./poetry.lock ./
     RUN poetry install --no-dev --no-root
@@ -296,6 +280,7 @@ Next, let's update our Dockerfile so that we add and install all of our dependen
     COPY src ./src
     RUN poetry install --no-dev
 
+    EXPOSE 8000
 
     CMD [ \
         "gunicorn", \

@@ -23,4 +23,4 @@ We've got a variety of people from different backgrounds with different experien
 
 If you get stuck or encounter a problem, the first port of call is to message or chat to us in the Zoom call - we can talk through your problem and see what's going on.
 
-You can also comment on any of these tutorial sections using Disqus - any and all feedback, corrections or questions are very welcome!
+If you want to discuss your issue separately from the main Zoom call, we can create a breakout room and head in there.

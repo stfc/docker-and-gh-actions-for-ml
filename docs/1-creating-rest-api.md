@@ -20,7 +20,7 @@ In short, it's an NLP (Natural Language Processing) model that is a distilled (i
     The GPT-3 and GPT-3.5 models use colossally more parameters than GPT-2 which uses more than our distilled GPT-2 (GPT-3 has 175 billion parameters, GPT-2 has 1.5 billion and our distilled GPT-2 has 82 million), which is how they're able to give answers that are much more sophisticated. GPT-2 is still great for playing around with though - our model is only 350 MB while GPT-3 clocks in at an impressive 800 GB!
 
 !!! question "Where is the model?"
-    If you're looking at the code repository that we just forked, you might be thinking - "where is this ML model? I don't see it anymore in the repo".
+    If you're looking at the code repository that we just forked, you might be thinking - "where is this ML model? I don't see it any more in the repo".
 
     Even though the model is small compared to the other GPT goliaths, it's still enough to pretty quickly use up your Git LFS storage allocation on GitHub. To work around this, we download the model from the Hugging Face library within the code itself.
 

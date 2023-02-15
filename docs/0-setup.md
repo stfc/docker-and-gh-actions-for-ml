@@ -37,7 +37,7 @@ Go ahead and click on "Fork" and then "Create fork" to create your own version o
 
 ## 🧑‍💻 Setting up your codespace
 
-Once you've forked the repostory, you can create your codespace to get started editing the code. To do this, just click on the "Code" button to the left of the "About" section, click on the "Codespaces" tab and then click on "Create codespace on main" - this should automatically create your codespace and open it up in a new tab.
+Once you've forked the repository, you can create your codespace to get started editing the code. To do this, just click on the "Code" button to the left of the "About" section, click on the "Codespaces" tab and then click on "Create codespace on main" - this should automatically create your codespace and open it up in a new tab.
 
 ![screenshot of create codespace page](images/0-setup/create-codespace.png)
 

@@ -366,4 +366,4 @@ Take a look at your repository now. You should see something new under the "Pack
 !!! success "Your image has been continuously delivered!"
     Good job, you've successfully created your CI/CD pipeline with GitHub Actions.
 
-    You can now start harnessing the power of GitHub's runners to do the heavylifting for you, freeing you up to focus on doing more code and research.
+    You can now start harnessing the power of GitHub's runners to do the heavy lifting for you, freeing you up to focus on doing more code and research.
