@@ -91,47 +91,6 @@ az account set --subscription "$subscription_id"
     
     We're using one of these accounts for the purpose of this Explain course. This is basically just for convenience - if you're managing your Azure resources in real life, you'll be logged in with your email address instead of a service principal. Everything else is the same between them apart from your can't log into the Azure Portal in your browser using a service principal. We can still use the Azure CLI, though!
 
-### Creating a GitHub Personal Access Token (PAT)
-
-Before we link the Azure Web App we're going to create to our image in the GitHub Container Registry, we need to create a Personal Access Token (PAT) in GitHub to allow Azure to access our image manifest.
-
-Don't worry, this isn't as complicated as it sounds. Here's how to do it:
-
-TODO: Screenshot of hover over "Settings" button
-
-**Step 1: click on "Settings" button from dropdown after clicking on GitHub profile icon in top right.**
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
-TODO: Screenshot of hover over "Developer Settings" button
-
-**Step 2: click on "Developer Settings" button at the bottom of the menu on the left of the page.**
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
-TODO: Screenshot of hover over "Tokens (classic)" under "Personal access tokens"
-
-**Step 3: Click on "Personal access tokens" and then on "Tokens (classic)".**
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
-TODO: Screenshot of hover over "Generate new token (classic)" under "Generate new token".
-
-**Step 4: Under "Note", put a name to help you recognise what this PAT is for. Something like "Supercharge Azure App" would be good.**
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
-TODO: Screenshot of selecting "write:packages" under "Select scopes"
-
-**Step 5: **
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
-TODO: Screenshot of hover over "Generate token" button
-
-**Step 6: **
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
-TODO: Screenshot of page showing PAT token value.
-
-**Step 7: **
-{: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
-
 ### Creating the Azure App Service app
 
 Now that we're logged into Azure, let's create our app.
