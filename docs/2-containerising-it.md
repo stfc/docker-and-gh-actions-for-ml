@@ -113,8 +113,8 @@ We're going to start off by specifying a base image - this comes with Python bui
 
     COPY . .
 
-    ENTRYPOINT ["gunicorn"]
     CMD [ \
+        "gunicorn", \
         "distilgpt2_api.api:app", \
         "--worker-class", "uvicorn.workers.UvicornWorker", \
         "--workers", "1", \
@@ -126,7 +126,7 @@ This is pretty much as simple you can can get. It starts off with the official P
 
 Next, it copies all of our code from our repository into the image.
 
-Then, it specifies what command should be run when a container using this image is run. Specifically, `ENTRYPOINT` is the initial command and `CMD` are all the arguments to that initial command, so in this case running our Docker container will run the full command `gunicorn distilgpt2_api.api:app --worker-class uvicorn.workers.UvicornWorker --workers 1 --bind 0.0.0.0:8000`.
+Then, it specifies what command should be run when a container using this image is run.
 
 !!! note "Choosing a Python base image"
     There are loads of different base images you could use for Python, from "slim" to "bullseye" to "alpine" and plenty more if you're looking outside the offical python images.
@@ -165,8 +165,8 @@ Next, we're going to update our `Dockerfile` to install Poetry, the tool we're u
 
     COPY . .
 
-    ENTRYPOINT ["gunicorn"]
     CMD [ \
+        "gunicorn", \
         "distilgpt2_api.api:app", \
         "--worker-class", "uvicorn.workers.UvicornWorker", \
         "--workers", "1", \
@@ -205,8 +205,8 @@ Now that we've got Poetry installed, we're ready to install all of our applicati
     COPY . .
     RUN poetry install --no-dev
 
-    ENTRYPOINT ["gunicorn"]
     CMD [ \
+        "gunicorn", \
         "distilgpt2_api.api:app", \
         "--worker-class", "uvicorn.workers.UvicornWorker", \
         "--workers", "1", \
@@ -297,8 +297,8 @@ Next, let's update our Dockerfile so that we add and install all of our dependen
     RUN poetry install --no-dev
 
 
-    ENTRYPOINT ["gunicorn"]
     CMD [ \
+        "gunicorn", \
         "distilgpt2_api.api:app", \
         "--worker-class", "uvicorn.workers.UvicornWorker", \
         "--workers", "1", \
