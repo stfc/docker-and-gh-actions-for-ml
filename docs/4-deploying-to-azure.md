@@ -283,6 +283,4 @@ Once that's completed and you've waited a couple of minutes for the update to pr
 
     We really hope that you enjoyed this and learned a bit about FastAPI, Docker, GitHub Actions and Azure App Service.
 
-    If you get this far, **please do let us know!** We'd love to hear it.
-
-    *Remember to head over to the course page to give us some feedback!*
+    Head over to "Next steps" to see a few final remarks.

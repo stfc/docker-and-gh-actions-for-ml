@@ -362,3 +362,8 @@ Take a look at your repository now. You should see something new under the "Pack
 
 **You can see details about the tags, contributors, etc. all here.**
 {: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
+
+!!! success "Your image has been continuously delivered!"
+    Good job, you've successfully created your CI/CD pipeline with GitHub Actions.
+
+    You can now start harnessing the power of GitHub's runners to do the heavylifting for you, freeing you up to focus on doing more code and research.
