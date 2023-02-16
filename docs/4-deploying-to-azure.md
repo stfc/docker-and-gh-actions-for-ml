@@ -119,6 +119,12 @@ az webapp create --name "$my_app_name-app" \
     --resource-group "$resource_group" \
     --plan "$my_app_name-plan" \
     --deployment-container-image-name "ghcr.io/$my_github_username/distilgpt2-api:latest"
+
+# Tell Azure App Service that our API is listening on port 8000.
+az webapp config appsettings set \
+    --resource-group "$resource_group" \
+    --name "$my_app_name-app" \
+    --settings WEBSITES_PORT=8000
 ```
 
 This might take a couple of while to complete. This is because our Docker image is about 1.5 GB, mostly of which is pytorch runtime dependency files. Be patient with it and if you think it's actually stuck, just let us know and we can debug it together over Zoom. With our permissions we can see all the logging from the app which we can use to figure out what's going on.
