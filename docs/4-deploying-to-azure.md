@@ -130,6 +130,7 @@ Once it finishes, you should be able to access your API using the URL https://$m
 
     - *Forgetting to put `EXPOSE 8000` in the `Dockerfile`*. Without this command, Azure App Service doesn't know which port your application is running on, so it will default to 80. It'll keep waiting for your application to be healthy on port 80 which will obviously never happen because we're not using that port.
     - *I've updated my Docker image / App Service configuration but it hasn't changed anything!* Azure App Service is a complex system, and it can sometimes take a few minutes for changes to propagate. One tip is to stop the app, wait a few seconds and then start it again, then try to visit the web page in your browser again - this restart the app, causing it to check for new images and configurations, etc.
+    - You can update your app settings but it won't try to reload the image until you actually make a request to the app via the azurewebsites.net URL that's generated for you app.
 
 Try visiting https://$my_app_name-app.azurewebsites.net/Here's%20a%20story%20about and see what it shows. If you can see some successfully generated text, that means you've successfully deployed your app to Azure. Good job!
 
