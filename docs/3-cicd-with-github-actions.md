@@ -349,7 +349,7 @@ With our metadata generated, we can add another step to actually build and push 
 
 Before we push this up, we just need to make a quick modification in the repository settings in GitHub to allow the built-in `GITHUB_TOKEN` to push images to GHCR:
 
-- First, go to your repository in GitHub.
+- First, go to your repository in GitHub and click on "Settings".
 - Then click on "Actions" on the left-hand menu, under "Code and automation" and click on "General" under that.
 - Scroll down to "Workflow permissions" and select "Read and write permissions".
 - Click "Save" at the bottom of the page.

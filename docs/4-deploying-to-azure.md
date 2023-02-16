@@ -197,7 +197,7 @@ Let's update our GitHub Action workflow to add this in:
               labels: ${{ steps.meta.outputs.labels }}
 
         - name: Call Azure App Service webhook
-          run: curl -X POST '${{ secrets.AZURE_APP_WEBHOOK_URL }}'
+          run: curl -v -X POST '${{ secrets.AZURE_APP_WEBHOOK_URL }}'
     ```
 
 !!! warning "We don't want to commit our actual URL into the repository"
