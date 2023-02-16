@@ -352,6 +352,7 @@ Before we push this up, we just need to make a quick modification in the reposit
 - First, go to your repository in GitHub.
 - Then click on "Actions" on the left-hand menu, under "Code and automation" and click on "General" under that.
 - Scroll down to "Workflow permissions" and select "Read and write permissions".
+- Click "Save" at the bottom of the page.
 
 That's it! Commit that and push it up, and you should see your image pushed up to your container registry.
 
