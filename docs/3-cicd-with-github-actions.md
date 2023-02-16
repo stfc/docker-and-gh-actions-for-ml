@@ -354,6 +354,9 @@ Before we push this up, we just need to make a quick modification in the reposit
 - Scroll down to "Workflow permissions" and select "Read and write permissions".
 - Click "Save" at the bottom of the page.
 
+!!! warning "GitHub repo token weirdness"
+    GitHub have been making a lot of changes to the workflow token authorisation recently, and a few people have noticed some bugs where the workflow permissions aren't updated even though the setting has been changed. This shouldn't happen to you, but if it does, try renaming the repository to something else - this should fix the problem. Yes, it is weird.
+
 That's it! Commit that and push it up, and you should see your image pushed up to your container registry.
 
 Take a look at your repository now. You should see something new under the "Packages" section, underneath "Releases":
