@@ -209,10 +209,10 @@ Now that we've got Poetry installed, we're ready to install all of our applicati
 Great! Now we've got a working basic `Dockerfile`, let's try building and running it:
 
 ```bash
-docker build -t distilgpt2-api .
+docker build -t docker-and-github-actions-for-ml .
 ```
 
-This builds the Docker image for the current folder (`Dockerfile` is the default file to look for, but you can change this if you need to) and gives it the tag `distilgpt2-api` so that we can run it later.
+This builds the Docker image for the current folder (`Dockerfile` is the default file to look for, but you can change this if you need to) and gives it the tag `docker-and-github-actions-for-ml` so that we can run it later.
 
 !!! warning "Heads up for those running on Apple Silicon chips"
     If you're doing this workshop using your own laptop which happens to be a Mac using an ARM64 chip (a.k.a. Apple Silicon) and you are using Docker Desktop, you'll run into some problems because Docker will try to build for linux/arm64, which pytorch don't provide a wheel for.
@@ -224,10 +224,10 @@ This builds the Docker image for the current folder (`Dockerfile` is the default
 Once that has successfully completed, we can run our Docker image as a container. Kill your previous `uvicorn` command if it's still running and try this one:
 
 ```bash
-docker run --rm -p 8000:8000 distilgpt2-api
+docker run --rm -p 8000:8000 docker-and-github-actions-for-ml
 ```
 
-This runs the image with the tag `distilgpt2-api`. The `--rm` means that the container is removed after it has finished running, instead of leaving it lingering around to pointlessly use up space. The `-p 8000:8000` forwards the port from inside the Docker container and the running host. This is necessary to be able to access the API from outside of the running container.
+This runs the image with the tag `docker-and-github-actions-for-ml`. The `--rm` means that the container is removed after it has finished running, instead of leaving it lingering around to pointlessly use up space. The `-p 8000:8000` forwards the port from inside the Docker container and the running host. This is necessary to be able to access the API from outside of the running container.
 
 Follow the procedure outlined in the last section to open up the URL that GitHub Codespaces creates for the port forwarding and make sure you can hit the same endpoints that you could when we were running outside of the container using the simple `uvicorn` command.
 
@@ -294,7 +294,7 @@ Next, let's update our Dockerfile so that we add and install all of our dependen
 Let's quickly re-build our image - you should see `CACHED` appear in the output of the `docker build` command for most of these lines, indicating that Docker is using the build cache to skip re-running the command:
 
 ```bash
-docker build -t distilgpt2-api .
+docker build -t docker-and-github-actions-for-ml .
 ```
 
 !!! info "Production-ready Dockerfile"

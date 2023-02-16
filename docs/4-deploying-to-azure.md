@@ -118,7 +118,7 @@ my_github_username="put your GitHub username here"
 az webapp create --name "$my_app_name-app" \
     --resource-group "$resource_group" \
     --plan "$my_app_name-plan" \
-    --deployment-container-image-name "ghcr.io/$my_github_username/distilgpt2-api:latest"
+    --deployment-container-image-name "ghcr.io/$my_github_username/docker-and-github-actions-for-ml:latest"
 
 # Tell Azure App Service that our API is listening on port 8000.
 az webapp config appsettings set \
