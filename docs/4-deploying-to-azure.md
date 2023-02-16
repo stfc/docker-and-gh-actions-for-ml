@@ -125,6 +125,8 @@ az webapp config appsettings set \
     --resource-group "$resource_group" \
     --name "$my_app_name-app" \
     --settings WEBSITES_PORT=8000
+
+az webapp deployment container config --enable-cd=true -g hncdi-explain-supercharge -n $my_app_name-app
 ```
 
 This might take a couple of while to complete. This is because our Docker image is about 1.5 GB, mostly of which is pytorch runtime dependency files. Be patient with it and if you think it's actually stuck, just let us know and we can debug it together over Zoom. With our permissions we can see all the logging from the app which we can use to figure out what's going on.
@@ -195,7 +197,7 @@ Let's update our GitHub Action workflow to add this in:
               labels: ${{ steps.meta.outputs.labels }}
 
         - name: Call Azure App Service webhook
-          run: curl -X POST "$AZURE_APP_WEBHOOK_URL"
+          run: curl -X POST '${{ secrets.AZURE_APP_WEBHOOK_URL }}'
     ```
 
 !!! warning "We don't want to commit our actual URL into the repository"
