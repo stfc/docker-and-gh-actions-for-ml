@@ -301,8 +301,7 @@ Next, we're going to use another pre-built action to generate all the right meta
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
-                # set latest tag for default branch
-                type=raw,value=latest,enable={{is_default_branch}}
+                type=raw,value=latest
     ```
 
 With our metadata generated, we can add another step to actually build and push the Docker image. We can use another pre-built Action for this as well:
@@ -337,8 +336,7 @@ With our metadata generated, we can add another step to actually build and push 
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
-                # set latest tag for default branch
-                type=raw,value=latest,enable={{is_default_branch}}
+                type=raw,value=latest
 
           - name: Build and push Docker image
             uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc

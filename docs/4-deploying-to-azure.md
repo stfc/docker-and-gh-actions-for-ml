@@ -70,6 +70,7 @@ tenant_id="our tenant ID"
 subscription_id="our subscription ID"
 sp_app_id="your username"
 sp_password="your password"
+resource_group="hncdi-explain-supercharge"
 
 az login --service-principal --tenant "$tenant_id" -u "$sp_app_id" -p "$sp_password"
 ```
@@ -176,9 +177,7 @@ Let's update our GitHub Action workflow to add this in:
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
-                # set latest tag for default branch
-                type=raw,value=latest,enable={{is_default_branch}}
-                type=ref,event=branch
+                type=raw,value=latest
 
           - name: Build and push Docker image
             uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
