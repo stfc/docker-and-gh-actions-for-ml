@@ -68,11 +68,11 @@ You should've received or have access to a tenant, subscription, username and pa
 ```bash
 tenant_id="our tenant ID"
 subscription_id="our subscription ID"
-sp_app_id="your username"
+sp_username="your username"
 sp_password="your password"
 resource_group="hncdi-explain-supercharge"
 
-az login --service-principal --tenant "$tenant_id" -u "$sp_app_id" -p "$sp_password"
+az login --service-principal --tenant "$tenant_id" -u "$sp_username" -p "$sp_password"
 ```
 
 To verify that you're successfully logged in, run:
