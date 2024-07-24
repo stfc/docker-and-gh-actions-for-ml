@@ -47,7 +47,7 @@ There's no way that another container or process outside of the container runtim
 
 As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be just a few kilobytes instead of gigabytes. (As a rule of thumb, there's not generally any significant CPU overhead for running inside a container, but there is some overhead associated with the network stack. You can read some numbers for container performance characterisation [here](https://www.nginx.com/blog/comparing-nginx-performance-bare-metal-and-virtual-environments/){target="_blank" rel="noopener noreferrer"}.)
 
-![Virtual machines vs. containers](/images/2-containerising-it/vm-vs-container.png)
+![Virtual machines vs. containers](images/2-containerising-it/vm-vs-container.png)
 
 **From:** https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
@@ -60,7 +60,7 @@ As far as container tooling goes, there's a whale that dominates the market, but
 
 #### Docker
 
-![Docker logo](/images/2-containerising-it/docker.png){: style="height: 100px; float: right;"}
+![Docker logo](images/2-containerising-it/docker.png){: style="height: 100px; float: right;"}
 
 This is the main player in the container world, by far - the metaphorical whale. (It's also the one with the whale logo.) Docker was the company that popularised containerisation, which means the formats created by Docker had a massive impact on the container landscape.
 
@@ -72,7 +72,7 @@ While Docker is still the main tool, as most of the underlying technologies ([co
 
 #### Podman
 
-![Podman logo](/images/2-containerising-it/podman.svg){: style="height: 100px; float: right;"}
+![Podman logo](images/2-containerising-it/podman.svg){: style="height: 100px; float: right;"}
 
 Even though it dominates the market, Docker isn't the only container runtime around with a logo of a happy cute sea animal!
 
