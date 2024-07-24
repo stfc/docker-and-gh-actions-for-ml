@@ -1,6 +1,6 @@
 site_name: Introduction to Docker and GitHub Actions for ML apps
 site_author: Drew Silcock, STFC Hartree Centre
-copyright: Copyright &copy; 2023 - STFC Hartee Centre
+copyright: Copyright &copy; STFC Hartree Centre
 site_url: https://docker-and-gh-actions-for-ml.training.hartree.dev
 repo_name: docker-and-gh-actions-for-ml
 repo_url: https://github.com/stfc/docker-and-gh-actions-for-ml
@@ -9,7 +9,9 @@ edit_uri: ""
 theme:
   name: material
   features:
-    - instant
+    - navigation.instant
+    - navigation.footer
+    - content.code.copy
   palette:
     primary: "#1e5df8"
     accent: "#ff5a5a"
@@ -31,9 +33,9 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-  - pymdownx.inlinehilite
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight
   - pymdownx.magiclink
   - pymdownx.mark
   - pymdownx.smartsymbols
@@ -43,7 +45,6 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tabbed
   - pymdownx.tilde
-  - fontawesome_markdown
 
 plugins:
   - search
