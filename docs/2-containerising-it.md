@@ -103,7 +103,7 @@ Confusing, what was once called "Singularity" changed its name to "Apptainer" in
 
 ## Let's get containerised!
 
-The first step to containerising any application is to create a filled called `Dockerfile`. This is like a `Makefile` but for Docker and it tells Docker what steps it needs to run to create the full environment that your application is going to run in.
+The first step to containerising any application is to create a file called `Dockerfile`. This is like a `Makefile` but for Docker and it tells Docker what steps it needs to run to create the full environment that your application is going to run in.
 
 We're going to start off by specifying a base image - this comes with Python built-in, which means we don't have to worry about installing the right version of Python.
 
@@ -172,7 +172,7 @@ Next, we're going to update our `Dockerfile` to install Poetry, the tool we're u
     ]
     ```
 
-There's quite a lot going on here, but the important bit is really line 21. That's the bit that installs Poetry. The rest is pretty much just there to make sure the environment is all set up correctly with the version of Poetry, folder to install Poetry into, curl is installed to retrieve the Poetry installation script, etc.
+There's quite a lot going on here, but the important bit is really line 13. That's the bit that installs Poetry. The rest is pretty much just there to make sure the environment is all set up correctly with the version of Poetry, folder to install Poetry into, curl is installed to retrieve the Poetry installation script, etc.
 
 Now that we've got Poetry installed, we're ready to install all of our application dependencies:
 
