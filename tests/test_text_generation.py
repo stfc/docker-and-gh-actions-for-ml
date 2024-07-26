@@ -1,5 +1,4 @@
 import pytest
-
 from distilgpt2_api.text_generation import TextGenerator
 
 
