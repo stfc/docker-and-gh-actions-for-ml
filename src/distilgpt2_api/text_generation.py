@@ -1,4 +1,4 @@
-from os import PathLike
+from pathlib import Path
 from typing import TypedDict, cast
 
 from transformers import (
@@ -17,9 +17,7 @@ class GeneratedText(TypedDict):
 class TextGenerator:
     generator: TextGenerationPipeline
 
-    def __init__(
-        self, seed: int = 42, model_path: str | PathLike | None = None
-    ) -> None:
+    def __init__(self, seed: int = 42, model_path: str | Path | None = None) -> None:
         model = GPT2LMHeadModel.from_pretrained(
             model_path if model_path is not None else "distilgpt2"
         )
