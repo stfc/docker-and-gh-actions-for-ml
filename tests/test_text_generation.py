@@ -22,3 +22,6 @@ def test_text_generator_generates_text(text_generator: TextGenerator):
 
     # Results should include original text.
     assert all(r.startswith(prompt) and len(r) > len(prompt) for r in output)
+
+    print("Prompt:", prompt)
+    print("Responses:\n\t-", "\n\t- ".join(output))
