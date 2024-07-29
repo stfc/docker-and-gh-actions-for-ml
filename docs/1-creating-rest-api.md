@@ -210,7 +210,7 @@ We're re-creating the `TextGenerator` instance every time anyone makes a request
 We're going to create a new function, aptly called `get_model`. This model is going to going to be very simple - all it does is instantiate the `TextGenerator` class. The important thing is that we're going to decorate it with the [`functools.cache` decorator](https://docs.python.org/3/library/functools.html#functools.cache){target=_blank} - this caches the result of the function invocation so that when we run `get_model()` again, we don't actually re-instantiate the `TextGenerator` class - we return the already created instance. Here's what that looks like:
 
 !!! example "src/distilgpt2_api/api.py"
-    ```python linenums="1" hl_lines="2 11-14 28"
+    ```python linenums="1" hl_lines="1-2 9-12 29"
     import logging
     from functools import cache
 
@@ -218,13 +218,14 @@ We're going to create a new function, aptly called `get_model`. This model is go
 
     from .text_generation import TextGenerator
 
-    app = FastAPI()
-
 
     @cache
     def get_model() -> TextGenerator:
         logging.info("Loading DistilGPT2 model")
         return TextGenerator()
+
+
+    app = FastAPI()
 
 
     @app.get("/")
@@ -254,7 +255,7 @@ All we need to do is take advantage of some of FastAPI's built-in [application l
 Here's what that looks like:
 
 !!! example "src/distilgpt2_api/api.py"
-    ```python linenums="1" hl_lines="2 18-23"
+    ```python linenums="1" hl_lines="2 16-21 24"
     import logging
     from contextlib import asynccontextmanager
     from functools import cache
@@ -262,8 +263,6 @@ Here's what that looks like:
     from fastapi import FastAPI
 
     from .text_generation import TextGenerator
-
-    app = FastAPI()
 
 
     @cache
@@ -278,6 +277,9 @@ Here's what that looks like:
         get_model()
         yield
         # This happens when the server shuts down - any cleanup can go here.
+
+
+    app = FastAPI(lifespan=lifespan)
 
 
     @app.get("/")
