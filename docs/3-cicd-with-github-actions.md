@@ -30,7 +30,7 @@ Our first GitHub Action workflow is going to be a simple "lint" workflow.
 
 GitHub Actions workflows all live in the `.github/workflows` folder. Each workflow has it's own YAML file. Let's create our lint workflow YAML file:
 
-!!! example "`.github/workflows/lint.yml`"
+!!! example ".github/workflows/lint.yml"
     ```yaml linenums="1"
     name: Lint
 
@@ -51,7 +51,7 @@ By specifying `push` and `pull_request` under the `on` section, we're saying tha
 
 Now that we've got the boilerplate, let's add some actual steps. First, we're going to checkout the code into the Action runner:
 
-!!! example "`.github/workflows/lint.yml`"
+!!! example ".github/workflows/lint.yml"
     ```yaml linenums="1" hl_lines="12"
     name: Lint
 
@@ -64,10 +64,10 @@ Now that we've got the boilerplate, let's add some actual steps. First, we're go
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
     ```
 
-The `uses` here indicates that we're using a pre-built step from another repository. As we specify `actions/checkout` as the repository, we know that we are using the pre-built Action step specified in https://github.com/actions/checkout. The `@v3` means that we are using git tag `v3` of the action.
+The `uses` here indicates that we're using a pre-built step from another repository. As we specify `actions/checkout` as the repository, we know that we are using the pre-built Action step specified in https://github.com/actions/checkout. The `@v4` means that we are using git tag `v4` of the action, the latest major release at the time of writing.
 
 As you might expect, this is an official pre-built Action from GitHub. There are loads of different pre-built Actions you can use, though - some of them official and some of them unofficial.
 
@@ -75,7 +75,7 @@ There's even a marketplace where you can see all the different Actions you can t
 
 Next, let's set up Poetry and Python:
 
-!!! example "`.github/workflows/lint.yml`"
+!!! example ".github/workflows/lint.yml"
     ```yaml linenums="1" hl_lines="14-22"
     name: Lint
 
@@ -88,27 +88,27 @@ Next, let's set up Poetry and Python:
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
     
           - name: Install Poetry
             run: pipx install poetry
     
           - name: Set up Python
             id: setup-python
-            uses: actions/setup-python@v4
+            uses: actions/setup-python@v5
             with:
-              python-version: '3.10'
+              python-version: '3.11'
               cache: poetry
     ```
 
 The GitHub-hosted runners come with a load of packages pre-installed, so we don't need to worry about installing `pipx` - it's already there! We do want to have a special action for setting up Python, though, because:
 
-- It makes sure we are using the correct version of Python, i.e. 3.10 instead of 3.8 or 3.11.
+- It makes sure we are using the correct version of Python, i.e. 3.11 instead of 3.9 or 3.12.
 - It sets up the caching of dependencies for us to speed up subsequent builds.
 
 Now that we have Poetry and Python set up, we can install our dependencies:
 
-!!! example "`.github/workflows/lint.yml`"
+!!! example ".github/workflows/lint.yml"
     ```yaml linenums="1" hl_lines="24-26"
     name: Lint
 
@@ -121,25 +121,32 @@ Now that we have Poetry and Python set up, we can install our dependencies:
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
     
           - name: Install Poetry
             run: pipx install poetry
     
           - name: Set up Python
             id: setup-python
-            uses: actions/setup-python@v4
+            uses: actions/setup-python@v5
             with:
-              python-version: '3.10'
+              python-version: '3.11'
               cache: poetry
     
           - name: Install project
             run: poetry install --no-interaction
     ```
 
-It's as simple as that! Finally, we can add our command to lint our code. We've already added a task for this to the `pyproject.toml` configuration using [Taskipy](https://github.com/illBeRoy/taskipy), so we can go ahead and run that now:
+It's as simple as that!
 
-!!! example "`.github/workflows/lint.yml`"
+Finally, we can add our command to lint our code. We've already added a task for this to the `pyproject.toml` configuration using [Poe the Poet](https://poethepoet.natn.io/index.html). You can view all the configured tasks by running `poe --help`.
+
+!!! tip "Check your workflow locally first."
+    It takes a few minutes for the GitHub Actions runner to run your linting task which means the lint fail, fix, re-run loop is quite long. There's a task called `pre-commit` which you can run locally first before pushing using `poe pre-commit` - this will format your code and run the linter so that you can fix any issues before pushing the code up.
+
+Let's add our linting task to the workflow:
+
+!!! example ".github/workflows/lint.yml"
     ```yaml linenums="1" hl_lines="27-28"
     name: Lint
 
@@ -152,23 +159,23 @@ It's as simple as that! Finally, we can add our command to lint our code. We've 
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
     
           - name: Install Poetry
             run: pipx install poetry
     
           - name: Set up Python
             id: setup-python
-            uses: actions/setup-python@v4
+            uses: actions/setup-python@v5
             with:
-              python-version: '3.10'
+              python-version: '3.11'
               cache: poetry
     
           - name: Install project
             run: poetry install --no-interaction
     
           - name: Lint
-            run: poetry run task lint
+            run: poetry run poe lint
     ```
 
 That's all there is to it!
@@ -179,7 +186,7 @@ Go ahead and commit this and push it up, and take a look at the "Actions" tab in
 
 Now that we have a linting workflow, we're going to add another workflow for testing our code. We've already got our pytest test set up and ready to go, we just need to create our workflow YAML file. We can use 90% of the same code as the linting workflow with a couple of minor tweaks:
 
-!!! example "`.github/workflows/test.yaml`"
+!!! example ".github/workflows/test.yaml"
     ```yaml linenums="1" hl_lines="1 27-28"
     name: Test
 
@@ -192,23 +199,23 @@ Now that we have a linting workflow, we're going to add another workflow for tes
       test:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
     
           - name: Install Poetry
             run: pipx install poetry
 
           - name: Set up Python
             id: setup-python
-            uses: actions/setup-python@v4
+            uses: actions/setup-python@v5
             with:
-              python-version: '3.10'
+              python-version: '3.11'
               cache: poetry
 
           - name: Install project
             run: poetry install --no-interaction
 
           - name: Test
-            run: poetry run task test
+            run: poetry run poe test
     ```
 
 You can see here that there are only 3 lines different from the linting workflow - all the setup is the same.
@@ -219,7 +226,7 @@ Commit this and push it up, and you should see our new "Test" workflow running a
 
 Our final GitHub Actions workflow is going to build the Docker image for our FastAPI application and push it up to the GitHub Container Registry. This will link the pushed image with our repository so that it appears under the "Packages" section, beneath "Releases". We're going to make it publicly available so that our Azure App Service can easily find it later in the next section.
 
-!!! example "`.github/workflows/deploy.yml`"
+!!! example ".github/workflows/deploy.yml"
     ```yaml linenums="1"
     name: Deploy
 
@@ -234,7 +241,7 @@ Our final GitHub Actions workflow is going to build the Docker image for our Fas
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
     ```
 
 This is going to start out fairly similar to the lint and test workflows. There are a couple of differences, however:
@@ -244,7 +251,7 @@ This is going to start out fairly similar to the lint and test workflows. There 
 
 The first real step of the Docker build and push process is to log into the GitHub container registry. To do this, we're using a built-in called `secrets.GITHUB_TOKEN`:
 
-!!! example "`.github/workflows/deploy.yml`"
+!!! example ".github/workflows/deploy.yml"
     ```yaml linenums="1" hl_lines="16-21"
     name: Deploy
 
@@ -259,10 +266,10 @@ The first real step of the Docker build and push process is to log into the GitH
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
 
           - name: Log in to the Container registry
-            uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+            uses: docker/login-action@v3
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -271,7 +278,7 @@ The first real step of the Docker build and push process is to log into the GitH
 
 Next, we're going to use another pre-built action to generate all the right metadata for our Docker image. This does things like set the correct tag based on the tag and/or branch, set labels to indicate who created the image, what version it is, what the GitHub repository URL is, etc. This also links the image with the repository within the GitHub user interface so that the image is shown on the page for the repository.
 
-!!! example "`.github/workflows/deploy.yml`"
+!!! example ".github/workflows/deploy.yml"
     ```yaml linenums="1" hl_lines="23-30"
     name: Deploy
 
@@ -286,10 +293,10 @@ Next, we're going to use another pre-built action to generate all the right meta
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
 
           - name: Log in to the Container registry
-            uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+            uses: docker/login-action@v3
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -297,7 +304,7 @@ Next, we're going to use another pre-built action to generate all the right meta
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@v4.3.0
+            uses: docker/metadata-action@v5
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
@@ -306,8 +313,8 @@ Next, we're going to use another pre-built action to generate all the right meta
 
 With our metadata generated, we can add another step to actually build and push the Docker image. We can use another pre-built Action for this as well:
 
-!!! example "`.github/workflows/deploy.yml`"
-    ```yaml linenums="1" hl_lines="32-38"
+!!! example ".github/workflows/deploy.yml"
+    ```yaml linenums="1" hl_lines="31-38"
     name: Deploy
 
     on: [push]
@@ -321,10 +328,10 @@ With our metadata generated, we can add another step to actually build and push 
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
 
           - name: Log in to the Container registry
-            uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+            uses: docker/login-action@v3
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -332,14 +339,14 @@ With our metadata generated, we can add another step to actually build and push 
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@v4.3.0
+            uses: docker/metadata-action@v5
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
                 type=raw,value=latest
 
           - name: Build and push Docker image
-            uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+            uses: docker/build-push-action@v6
             with:
               context: .
               push: true
@@ -358,6 +365,13 @@ Before we push this up, we just need to make a quick modification in the reposit
     GitHub have been making a lot of changes to the workflow token authorisation recently, and a few people have noticed some bugs where the workflow permissions aren't updated even though the setting has been changed. This shouldn't happen to you, but if it does, try renaming the repository to something else - this should fix the problem. Yes, it is weird.
 
 That's it! Commit that and push it up, and you should see your image pushed up to your container registry.
+
+!!! tip "Be careful when caching Docker builds in your CI/CD"
+    It's possible to cache your CI/CD builds in GitHub Actions (or other CI/CD) by doing things like pulling the latest image from the registry and caching your builds from that.
+
+    You need to be careful doing this, because often upstream images will be constantly updated with security patches and minor updates to packages. If you're caching your builds, it's possible to go months without pulling in any of these updates, which can leave outdated and vulnerable software in your images.
+
+    In general, I would recommend doing completely fresh image builds every time in your CI/CD, even if that means it takes another minute or two.
 
 Take a look at your repository now. You should see something new under the "Packages" section, underneath "Releases":
 

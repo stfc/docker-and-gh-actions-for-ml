@@ -12,10 +12,10 @@ We're starting from an existing model here, so what exactly is it?
 
 You can view the model card on Hugging Face here: https://huggingface.co/distilgpt2
 
-In short, it's an NLP (Natural Language Processing) model that is a distilled (i.e. smaller) version of OpenAI's [GPT-2 model](https://openai.com/blog/gpt-2-1-5b-release/){target="_blank" rel="noopener noreferrer"}. We're using it as a fun and interactive model to use as a starting point for our exercises - it could be any model really, but this one is quite fun to play around with.
+In short, it's an NLP (Natural Language Processing) model that is a distilled (i.e. smaller) version of OpenAI's [GPT-2 model](https://openai.com/blog/gpt-2-1-5b-release/){target=_blank}. We're using it as a fun and interactive model to use as a starting point for our exercises - it could be any model really, but this one is quite fun to play around with.
 
 !!! info "What's the difference between GPT-2 and ChatGPT?"
-    [ChatGPT](https://openai.com/blog/chatgpt/){target="_blank" rel="noopener noreferrer"} is part of the same research efforts by OpenAI, but it uses a fine-tuned version of the [GPT-4o class of models](https://platform.openai.com/docs/models). The newer GPT models and ChatGPT, unlike GPT-2, are closed source which means we can't download them and use them ourselves - we have to use OpenAI's own API to access them.
+    [ChatGPT](https://openai.com/blog/chatgpt/){target=_blank} is part of the same research efforts by OpenAI, but it uses a fine-tuned version of the [GPT-4o class of models](https://platform.openai.com/docs/models). The newer GPT models and ChatGPT, unlike GPT-2, are closed source which means we can't download them and use them ourselves - we have to use OpenAI's own API to access them.
 
     The GPT-3 and GPT-4 models use colossally more parameters than GPT-2 which uses more than our distilled GPT-2 (GPT-3 has 175 billion parameters, GPT-2 has 1.5 billion and our distilled GPT-2 has 82 million), which is how they're able to give answers that are much more sophisticated. GPT-2 is still great for playing around with though - our model is only 350 MB while GPT-3 clocks in at an impressive 800 GB!
 
@@ -33,13 +33,13 @@ In short, it's an NLP (Natural Language Processing) model that is a distilled (i
 
 Most (but not all) ML models use Python, so that's what we're going to use.
 
-There are a bunch of different frameworks and libraries for creating APIs in Python - you might have used / heard of [Flask](https://flask.palletsprojects.com/en/2.2.x/){target="_blank" rel="noopener noreferrer"} and [Django](https://www.djangoproject.com/){target="_blank" rel="noopener noreferrer"} as the main ones. We are instead using a much newer and more modern framework called [FastAPI](https://fastapi.tiangolo.com/){target="_blank" rel="noopener noreferrer"}.
+There are a bunch of different frameworks and libraries for creating APIs in Python - you might have used / heard of [Flask](https://flask.palletsprojects.com/en/2.2.x/){target=_blank} and [Django](https://www.djangoproject.com/){target=_blank} as the main ones. We are instead using a much newer and more modern framework called [FastAPI](https://fastapi.tiangolo.com/){target=_blank}.
 
 You should already be familiar with this from the introductory talk - to summarise, here are the main selling points of FastAPI:
 
 - As the name suggests, it's super simple and quick to get set up and running - there's minimal boilerplate code and the documentation is excellent.
 - It is based on modern language features like type hints, meaning excellent editor support (i.e. completion everywhere) and less code to write.
-- It automatically creates and serves [interactive documentation](https://github.com/Redocly/redoc){target="_blank" rel="noopener noreferrer"} and an [API specification](https://github.com/OAI/OpenAPI-Specification){target="_blank" rel="noopener noreferrer"} for you.
+- It automatically creates and serves [interactive documentation](https://github.com/Redocly/redoc){target=_blank} and an [API specification](https://github.com/OAI/OpenAPI-Specification){target=_blank} for you.
 
 We're really only scratching the surface of what you can do with FastAPI here.
 
@@ -57,7 +57,7 @@ By convention, the code containing all the FastAPI endpoints is put in a file ca
 
 First, we create our FastAPI app instance and create an endpoint on the root of our API. We'll use this endpoint as a simple "health" check - commonly used for orchestration and cloud platforms to verify that your service is running as expected:
 
-!!! example "`src/distilgpt2_api/api.py`"
+!!! example "src/distilgpt2_api/api.py"
     ```python linenums="1"
     from fastapi import FastAPI
 
@@ -72,7 +72,7 @@ First, we create our FastAPI app instance and create an endpoint on the root of 
 Just with this, we've got a working API alongside automatically generated OpenAPI specification and documentation!
 
 !!! tip "What's that `async` doing there?"
-    You might notice that our endpoint has `async` at the front. You may or may not be familiar with the asynchronous programming in general or in Python and the async-await syntax introduced in [Python 3.7](https://docs.python.org/3.7/whatsnew/3.7.html){target="_blank" rel="noopener noreferrer"}.
+    You might notice that our endpoint has `async` at the front. You may or may not be familiar with the asynchronous programming in general or in Python and the async-await syntax introduced in [Python 3.7](https://docs.python.org/3.7/whatsnew/3.7.html){target=_blank}.
 
     All FastAPI endpoints are asynchronous, meaning that you can do await asynchronous functions inside the endpoint - this allows for significant efficiencies when doing things that are dependent on I/O or network calls. For instance, your endpoint can await a call to another network service or a await a call to read a large file. While the app is waiting for the network call / I/O to finish, it is free to do other things like handle other requests. The thread will be woken back up again once the async I/O or network call has finished and the endpoint will resume from where it left off.
 
@@ -101,7 +101,7 @@ Once that's done, we can run our API:
 uvicorn distilgpt2_api.api:app --reload
 ```
 
-This will use the [Uvicorn](https://www.uvicorn.org/){target="_blank" rel="noopener noreferrer"} ASGI server to run our FastAPI application on port 8000 and will automatically reload whenever we make any changes to the code. This means we can keep that running in the background and not worry about having to restart or recompile any code. Pretty neat! ✨
+This will use the [Uvicorn](https://www.uvicorn.org/){target=_blank} ASGI server to run our FastAPI application on port 8000 and will automatically reload whenever we make any changes to the code. This means we can keep that running in the background and not worry about having to restart or recompile any code. Pretty neat! ✨
 
 !!! info "What's this 'ASGI' all about then?"
     Traditionally, web servers serving up Python applications would use the Web Server Gateway Interface (WSGI, pronounced phonetically). This is a standard allowing web servers to call Python code synchronously.
@@ -159,7 +159,7 @@ On a more abstract semantic level, you can this of this endpoint as either *gett
 
 Here's what our new endpoint should look like:
 
-!!! example "`src/distilgpt2_api/api.py`"
+!!! example "src/distilgpt2_api/api.py"
     ```python linenums linenums="1" hl_lines="3 13-23"
     from fastapi import FastAPI
 
@@ -207,9 +207,9 @@ Now, this endpoint is fully working, but there's a problem.
 
 We're re-creating the `TextGenerator` instance every time anyone makes a request to the API, but if we look at the `src/distilgpt2_api/text_generation.py` file, we can see that this is loading the whole DistilGPT2 model in fresh each time. Now, pytorch does cache the model locally so that it doesn't have to download 350 MB each time, but it still takes a while to load the model into memory. We can fix this!
 
-We're going to create a new function, aptly called `get_model`. This model is going to going to be very simple - all it does is instantiate the `TextGenerator` class. The important thing is that we're going to decorate it with the [`functools.cache` decorator](https://docs.python.org/3/library/functools.html#functools.cache){target="_blank" rel="noopener noreferrer"} - this caches the result of the function invocation so that when we run `get_model()` again, we don't actually re-instantiate the `TextGenerator` class - we return the already created instance. Here's what that looks like:
+We're going to create a new function, aptly called `get_model`. This model is going to going to be very simple - all it does is instantiate the `TextGenerator` class. The important thing is that we're going to decorate it with the [`functools.cache` decorator](https://docs.python.org/3/library/functools.html#functools.cache){target=_blank} - this caches the result of the function invocation so that when we run `get_model()` again, we don't actually re-instantiate the `TextGenerator` class - we return the already created instance. Here's what that looks like:
 
-!!! example "`src/distilgpt2_api/api.py`"
+!!! example "src/distilgpt2_api/api.py"
     ```python linenums="1" hl_lines="2 11-14 28"
     import logging
     from functools import cache
@@ -249,11 +249,14 @@ As simple as that, we've reduce the time it takes to run a single text generatio
 
 In fact, we can improve it even further. For every subsequent request to the API, we're going to use the existing loaded model. That's great, but that first request will still take much longer because it has to load the model in fresh. This is confusing for an end-user where the request sometimes takes ages and sometimes is really quick. We can fix this too!
 
-All we need to do is take advantage of some of FastAPI's built-in application lifecycle events, namely the "startup" event. Here's what that looks like:
+All we need to do is take advantage of some of FastAPI's built-in [application lifespan](https://fastapi.tiangolo.com/advanced/events/#lifespan){target=_blank} which takes advantage of the built-in [`asynccontextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.asynccontextmanager){target=_blank} from `contextlib` which turns a generator function (i.e. a function with a `yield` in) into an asynchronous context manager which implements `__aenter__` and `__aexit__`. Don't worry too much about what this means if you're not familiar with generators and context managers – the important thing is that anything before the `yield` happens at startup and anything afterwards happens at shutdown.
 
-!!! example "`src/distilgpt2_api/api.py`"
-    ```python linenums="1" hl_lines="17-19"
+Here's what that looks like:
+
+!!! example "src/distilgpt2_api/api.py"
+    ```python linenums="1" hl_lines="2 18-23"
     import logging
+    from contextlib import asynccontextmanager
     from functools import cache
 
     from fastapi import FastAPI
@@ -269,9 +272,12 @@ All we need to do is take advantage of some of FastAPI's built-in application li
         return TextGenerator()
 
 
-    @app.on_event("startup")
-    async def on_startup():
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        # This happens when the server starts up - any initialisation can go here.
         get_model()
+        yield
+        # This happens when the server shuts down - any cleanup can go here.
 
 
     @app.get("/")

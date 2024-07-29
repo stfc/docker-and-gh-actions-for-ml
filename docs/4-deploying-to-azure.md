@@ -6,7 +6,7 @@ title: 4. Deploying to Azure
 
 Now that we've got a working continuous deployment pipeline taking changes to our code and pushing Docker images up into the GitHub Container Registry, we can deploy our application to the cloud as a cloud-native web service.
 
-To do this, we're going to use [Microsoft's Azure](https://azure.microsoft.com/en-gb){target="_blank" rel="noopener noreferrer"} cloud computing service - in particular, a service called [Azure App Service](https://azure.microsoft.com/en-us/products/app-service/){target="_blank" rel="noopener noreferrer"}.
+To do this, we're going to use [Microsoft's Azure](https://azure.microsoft.com/en-gb){target=_blank} cloud computing service - in particular, a service called [Azure App Service](https://azure.microsoft.com/en-us/products/app-service/){target=_blank}.
 
 ## Recap - cloud and Azure
 
@@ -156,7 +156,7 @@ This should show a little JSON object with a key called `CI_CD_URL` - this is th
 
 Let's update our GitHub Action workflow to add this in:
 
-!!! example "`.github/workflows/`"
+!!! example ".github/workflows/"
     ```yaml linenums="1"
     name: Deploy
 
@@ -171,10 +171,10 @@ Let's update our GitHub Action workflow to add this in:
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
 
           - name: Log in to the Container registry
-            uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+            uses: docker/login-action@v3
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -182,14 +182,14 @@ Let's update our GitHub Action workflow to add this in:
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@v4.3.0
+            uses: docker/metadata-action@v5
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
                 type=raw,value=latest
 
           - name: Build and push Docker image
-            uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+            uses: docker/build-push-action@v6
             with:
               context: .
               push: true
@@ -238,7 +238,7 @@ Now that we've got it all up and working, let's test it out!
 
 To try it out, let's make a minor change to our root endpoint. This will add the current application version to the health endpoint result:
 
-!!! example "`src/distilgpt2_api/api.py`"
+!!! example "src/distilgpt2_api/api.py"
     ```python linenums="1" hl_lines="3 25"
     import logging
     from functools import cache
