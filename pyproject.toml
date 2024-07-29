@@ -52,9 +52,11 @@ warn_unused_configs = true
 
 # Pydantic required config, see
 # https://docs.pydantic.dev/latest/integrations/mypy/#enabling-the-plugin
+# I've relaxed these a bit to make it less annoying to the workshop attendees who have
+# to fix them, which isn't the focus of the workshop.
 check_untyped_defs = true
-disallow_any_generics = true
-disallow_untyped_defs = true
+disallow_any_generics = false
+disallow_untyped_defs = false
 follow_imports = "silent"
 no_implicit_reexport = true
 plugins = ["pydantic.mypy"]
