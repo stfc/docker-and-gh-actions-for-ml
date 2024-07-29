@@ -79,6 +79,10 @@ _ruff_fix = "ruff check --fix-only --exit-zero src tests"
 _test = "pytest --verbose"
 _test_with_output = "pytest --verbose --capture=no"
 
+[tool.poe.tasks.api]
+help = "Run the API"
+cmd = "uvicorn distilgpt2_api.api:app --reload"
+
 [tool.poe.tasks.lint]
 help = "Run all linters"
 sequence = ["_black_check", "_ruff_check", "_mypy_check"]
