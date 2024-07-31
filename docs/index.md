@@ -2,7 +2,7 @@
 
 ## :wave: Welcome
 
-Welcome to the "Introduction to Docker and GitHub Actions for ML apps" workshop, part of the "Fundamentals of Cloud Computing" course within STFC Hartree Centre's [HNCDI Explain programme](https://www.hartree.stfc.ac.uk/digital-innovation/hartree-national-centre-for-digital-innovation/explain/){target="_blank" rel="noopener noreferrer"}.
+Welcome to the "Introduction to Docker and GitHub Actions for ML apps" workshop, part of the "Fundamentals of Cloud Computing" course within STFC Hartree Centre's [HNCDI Explain programme](https://www.hartree.stfc.ac.uk/digital-innovation/hartree-national-centre-for-digital-innovation/explain/){target=_blank}.
 
 In this workshop, we will be trying out the stuff we discussed in our introductory presentation by:
 

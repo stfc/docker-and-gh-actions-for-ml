@@ -25,11 +25,11 @@ First of all, let's reiterate a bit of terminology:
 
 **Container** - a running instance of a container image. You can run as many container instances as you want from a single image, and once the container is running you can access a shell in that container and run whatever commands you want like any other command line[^1]. This can be super useful for debugging any problems!
 
-[^1]: This assumes that the image you're working with has a shell installed - if you have an image using the [scratch](https://hub.docker.com/_/scratch){target="_blank" rel="noopener noreferrer"} image, you won't have *anything* like this. It's precisely for this reason that using this image isn't recommended unless you specifically need *very very* small Docker images.
+[^1]: This assumes that the image you're working with has a shell installed - if you have an image using the [scratch](https://hub.docker.com/_/scratch){target=_blank} image, you won't have *anything* like this. It's precisely for this reason that using this image isn't recommended unless you specifically need *very very* small Docker images.
 
 **Container engine** - The software that handles all the container-related tasks like building images, running containers, killing containers, etc.
 
-**Container registry** - This is a server that acts as a library for storing and retrieving images. There are public ones like [Docker Hub](https://hub.docker.com/){target="_blank" rel="noopener noreferrer"} and [Singularity Hub](https://singularityhub.com/){target="_blank" rel="noopener noreferrer"}. We're using GitHub's container registry, also called [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry){target="_blank" rel="noopener noreferrer"} or GHCR for short.
+**Container registry** - This is a server that acts as a library for storing and retrieving images. There are public ones like [Docker Hub](https://hub.docker.com/){target=_blank} and [Singularity Hub](https://singularityhub.com/){target=_blank}. We're using GitHub's container registry, also called [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry){target=_blank} or GHCR for short.
 
 **Tag** - This is a label that you apply to an image. This is usually a version but it can be anything you want! There's one special tag, though: `latest`. This is the default tag that's used if you don't specify a tag and should point to the latest, greatest version of your image. If you're looking for most up-to-date version of any other application's image, you can always look for that `latest` tag.
 
@@ -45,14 +45,14 @@ In fact, containers are really a collection of features of the Linux kernel that
 
 There's no way that another container or process outside of the container runtime can access anything inside your image because the kernel enforces the isolation. This is a really simple concept (the specifics of the implementation are not so simple) but the power and versatility that you can get out of this simple idea are pretty extraordinary!
 
-As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be just a few kilobytes instead of gigabytes. (As a rule of thumb, there's not generally any significant CPU overhead for running inside a container, but there is some overhead associated with the network stack. You can read some numbers for container performance characterisation [here](https://www.nginx.com/blog/comparing-nginx-performance-bare-metal-and-virtual-environments/){target="_blank" rel="noopener noreferrer"}.)
+As all the running containers on your machine share the same kernel, there's much less runtime overhead for containers vs. virtual machines and the container images themselves can be just a few kilobytes instead of gigabytes. (As a rule of thumb, there's not generally any significant CPU overhead for running inside a container, but there is some overhead associated with the network stack. You can read some numbers for container performance characterisation [here](https://www.nginx.com/blog/comparing-nginx-performance-bare-metal-and-virtual-environments/){target=_blank}.)
 
 ![Virtual machines vs. containers](images/2-containerising-it/vm-vs-container.png)
 
 **From:** https://blog.netapp.com/blogs/containers-vs-vms/
 {: style="font-size: small; margin-top: -30px; width: 100%; text-align: center;"}
 
-If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/){target="_blank" rel="noopener noreferrer"} and [zines](https://wizardzines.com/zines/containers/){target="_blank" rel="noopener noreferrer"} by [Julia Evans](https://twitter.com/b0rk){target="_blank" rel="noopener noreferrer"}.
+If you want to get a deeper understanding of how containers work under the hood, I'd highly recommend the [blog posts](https://jvns.ca/categories/containers/){target=_blank} and [zines](https://wizardzines.com/zines/containers/){target=_blank} by [Julia Evans](https://twitter.com/b0rk){target=_blank}.
 
 ### Container technologies
 
@@ -64,11 +64,11 @@ As far as container tooling goes, there's a whale that dominates the market, but
 
 This is the main player in the container world, by far - the metaphorical whale. (It's also the one with the whale logo.) Docker was the company that popularised containerisation, which means the formats created by Docker had a massive impact on the container landscape.
 
-While Docker Inc. is a private company, all of the code behind it is [Open Source](https://github.com/docker/){target="_blank" rel="noopener noreferrer"}. They also spun out their [core container runtime](https://containerd.io/){target="_blank" rel="noopener noreferrer"} functionality into a separate component and donated it to the care of the [Cloud Native Computing Foundation (ONCF)](https://www.cncf.io/){target="_blank" rel="noopener noreferrer"}, a part of the non-profit [Linux Foundation](https://www.linuxfoundation.org/){target="_blank" rel="noopener noreferrer"}.
+While Docker Inc. is a private company, all of the code behind it is [Open Source](https://github.com/docker/){target=_blank}. They also spun out their [core container runtime](https://containerd.io/){target=_blank} functionality into a separate component and donated it to the care of the [Cloud Native Computing Foundation (ONCF)](https://www.cncf.io/){target=_blank}, a part of the non-profit [Linux Foundation](https://www.linuxfoundation.org/){target=_blank}.
 
-In June 2015, Docker and other container companies established the [Open Container Initiative](https://www.opencontainers.org/){target="_blank" rel="noopener noreferrer"} - this organisation is also a Linux Foundation project and designs the specifications for the container runtime - [runtime-spec](https://github.com/opencontainers/runtime-spec){target="_blank" rel="noopener noreferrer"} and image format - [image-spec](https://github.com/opencontainers/image-spec){target="_blank" rel="noopener noreferrer"}.
+In June 2015, Docker and other container companies established the [Open Container Initiative](https://www.opencontainers.org/){target=_blank} - this organisation is also a Linux Foundation project and designs the specifications for the container runtime - [runtime-spec](https://github.com/opencontainers/runtime-spec){target=_blank} and image format - [image-spec](https://github.com/opencontainers/image-spec){target=_blank}.
 
-While Docker is still the main tool, as most of the underlying technologies ([containerd](https://github.com/containerd/containerd){target="_blank" rel="noopener noreferrer"}, [runc](https://github.com/opencontainers/runc){target="_blank" rel="noopener noreferrer"}) and specifications ([OCI Image Spec](https://github.com/opencontainers/image-spec){target="_blank" rel="noopener noreferrer"}, [OCI Runtime Spec](https://github.com/opencontainers/runtime-spec){target="_blank" rel="noopener noreferrer"}) are open source, there are plenty of alternative tools that you can use.
+While Docker is still the main tool, as most of the underlying technologies ([containerd](https://github.com/containerd/containerd){target=_blank}, [runc](https://github.com/opencontainers/runc){target=_blank}) and specifications ([OCI Image Spec](https://github.com/opencontainers/image-spec){target=_blank}, [OCI Runtime Spec](https://github.com/opencontainers/runtime-spec){target=_blank}) are open source, there are plenty of alternative tools that you can use.
 
 #### Podman
 
@@ -76,12 +76,12 @@ While Docker is still the main tool, as most of the underlying technologies ([co
 
 Even though it dominates the market, Docker isn't the only container runtime around with a logo of a happy cute sea animal!
 
-Enter [Podman](https://podman.io/){target="_blank" rel="noopener noreferrer"}.
+Enter [Podman](https://podman.io/){target=_blank}.
 
 The main differentiator between Docker and Podman is that Podman doesn't need a daemon running in the background (usually as root)[^3]. This makes it popular for security-conscious users or where root access to the underlying machine is not available (e.g. in HPC environments) or where you don't have root permissions on the machine.
 
 [^3]:
-    The Docker daemon *can* now run in [rootless mode](https://docs.docker.com/engine/security/rootless/){target="_blank" rel="noopener noreferrer"}. As of Docker Engine v20.10 this is no longer considered experimental, but even rootless Docker still runs with a daemon - it just runs the daemon inside a user namespace.
+    The Docker daemon *can* now run in [rootless mode](https://docs.docker.com/engine/security/rootless/){target=_blank}. As of Docker Engine v20.10 this is no longer considered experimental, but even rootless Docker still runs with a daemon - it just runs the daemon inside a user namespace.
 
 #### Apptainer / Singularity
 
@@ -107,9 +107,9 @@ The first step to containerising any application is to create a file called `Doc
 
 We're going to start off by specifying a base image - this comes with Python built-in, which means we don't have to worry about installing the right version of Python.
 
-!!! example "`Dockerfile`"
+!!! example "Dockerfile"
     ```dockerfile linenums="1"
-    FROM python:3.10-slim
+    FROM python:3.11-slim
 
     COPY . .
 
@@ -124,7 +124,7 @@ We're going to start off by specifying a base image - this comes with Python bui
     ]
     ```
 
-This is pretty much as simple you can can get. It starts off with the official Python 3.10 image (the slim version, meaning it's slightly smaller than the default image).
+This is pretty much as simple you can can get. It starts off with the official Python 3.11 image (the slim version, meaning it's slightly smaller than the default image).
 
 Next, it copies all of our code from our repository into the image.
 
@@ -143,12 +143,12 @@ Now, we can build this image and run it right now if we want to, but we're not g
 
 Next, we're going to update our `Dockerfile` to install Poetry, the tool we're using for managing our Python dependencies.
 
-!!! example "`Dockerfile`"
+!!! example "Dockerfile"
     ```dockerfile linenums="1" hl_lines="3-13"
-    FROM python:3.10-slim
+    FROM python:3.11-slim
 
     ENV \
-        POETRY_VERSION="1.3.2" \
+        POETRY_VERSION="1.8.3" \
         POETRY_VIRTUALENVS_IN_PROJECT=true \
         POETRY_NO_INTERACTION=1 \
         VENV_PATH="/app/.venv"
@@ -176,12 +176,12 @@ There's quite a lot going on here, but the important bit is really line 13. That
 
 Now that we've got Poetry installed, we're ready to install all of our application dependencies:
 
-!!! example "`Dockerfile`"
+!!! example "Dockerfile"
     ```dockerfile linenums="1" hl_lines="16"
-    FROM python:3.10-slim
+    FROM python:3.11-slim
 
     ENV \
-        POETRY_VERSION="1.3.2" \
+        POETRY_VERSION="1.8.3" \
         POETRY_VIRTUALENVS_IN_PROJECT=true \
         POETRY_NO_INTERACTION=1 \
         VENV_PATH="/app/.venv"
@@ -193,7 +193,7 @@ Now that we've got Poetry installed, we're ready to install all of our applicati
     RUN pip install pipx && pipx install poetry==$POETRY_VERSION
 
     COPY . .
-    RUN poetry install --no-dev
+    RUN poetry install --only main
 
     EXPOSE 8000
 
@@ -243,7 +243,7 @@ cp .gitignore .dockerignore
 
 There's a few extra things you can ignore from Docker that you can't from git - let's add these to the beginning of the `.dockerignore`:
 
-!!! example "`.dockerignore`"
+!!! example ".dockerignore"
     ```bash linenums="1"
     .dockerignore
     .gitignore
@@ -257,12 +257,12 @@ There's a few extra things you can ignore from Docker that you can't from git - 
 
 Next, let's update our Dockerfile so that we add and install all of our dependencies before adding our actual application code. What this means is that if we are only updating our application code but not updating any dependencies, when we re-build our Docker image, we don't need to re-install the dependencies in the build process - Docker will use the build cache that it maintains to speed up the build process massively.
 
-!!! example "`Dockerfile`"
+!!! example "Dockerfile"
     ```dockerfile linenums="1" hl_lines="15-20"
-    FROM python:3.10-slim
+    FROM python:3.11-slim
 
     ENV \
-        POETRY_VERSION="1.3.2" \
+        POETRY_VERSION="1.8.3" \
         POETRY_VIRTUALENVS_IN_PROJECT=true \
         POETRY_NO_INTERACTION=1 \
         VENV_PATH="/app/.venv"
@@ -274,11 +274,11 @@ Next, let's update our Dockerfile so that we add and install all of our dependen
     RUN pip install pipx && pipx install poetry==$POETRY_VERSION
 
     COPY ./pyproject.toml ./poetry.lock ./
-    RUN poetry install --no-dev --no-root
+    RUN poetry install --only main --no-root
 
     COPY README.md ./
     COPY src ./src
-    RUN poetry install --no-dev
+    RUN poetry install --only main
 
     EXPOSE 8000
 
