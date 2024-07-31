@@ -6,80 +6,103 @@ name = "distilgpt2-api"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
-fastapi = "^0.85.1"
-gunicorn = "^20.1.0"
-python = "~3.10"
-transformers = "^4.23.1"
-uvicorn = {extras = ["standard"], version = "^0.19.0"}
+fastapi = "^0.111.1"
+gunicorn = "^22.0.0"
+python = "~3.11"
+transformers = "^4.43.2"
+uvicorn = {extras = ["standard"], version = "^0.30.3"}
 
 [[tool.poetry.dependencies.torch]]
 markers = "sys_platform == 'linux'"
-url = "https://download.pytorch.org/whl/cpu/torch-1.13.0%2Bcpu-cp310-cp310-linux_x86_64.whl"
+url = "https://download.pytorch.org/whl/cpu/torch-2.4.0%2Bcpu-cp311-cp311-linux_x86_64.whl"
 
 [[tool.poetry.dependencies.torch]]
 markers = "sys_platform == 'win32'"
-url = "https://download.pytorch.org/whl/cpu/torch-1.13.0%2Bcpu-cp310-cp310-win_amd64.whl"
+url = "https://download.pytorch.org/whl/cpu/torch-2.4.0%2Bcpu-cp311-cp311-win_amd64.whl"
 
 [[tool.poetry.dependencies.torch]]
 markers = "sys_platform == 'darwin' and platform_machine == 'x86_64'"
-url = "https://download.pytorch.org/whl/cpu/torch-1.13.0-cp310-none-macosx_10_9_x86_64.whl"
+# Last pytorch version to support x86_64 on macOS is 2.2.2.
+url = "https://download.pytorch.org/whl/cpu/torch-2.2.2-cp311-none-macosx_10_9_x86_64.whl"
 
 [[tool.poetry.dependencies.torch]]
 markers = "sys_platform == 'darwin' and platform_machine == 'arm64'"
-url = "https://download.pytorch.org/whl/cpu/torch-1.13.0-cp310-none-macosx_11_0_arm64.whl"
+url = "https://download.pytorch.org/whl/cpu/torch-2.4.0-cp311-none-macosx_11_0_arm64.whl"
 
-[tool.poetry.dev-dependencies]
-black = "^22.10.0"
-# Stuck on 4.x until prospector updates mccabe & pycodestyle
-flake8 = "^4.0.1"
-isort = "^5.10.1"
-mypy = "^0.982"
-prospector = "^1.7.7"
-pytest = "^7.2.0"
-taskipy = "^1.10.3"
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+mypy = "^1.11.0"
+pytest = "^8.3.2"
+ruff = "^0.5.5"
+poethepoet = "^0.27.0"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
 
-[tool.isort]
-extend_skip = [".python_packages"]
-profile = "black"
-
-[tool.pylint.messages_control]
-disable = [
-  "bad-continuation",
-  "bad-whitespace",
-  "too-many-arguments",
-  "too-many-statements",
-  "too-many-locals",
-]
-
-[tool.pylint.format]
-max-line-length = 160
+[tool.ruff.lint]
+ignore = ["E501"]
+select = ["I", "E", "N"]
 
 [tool.mypy]
-exclude = ['\.venv']
 python_version = "3.10"
+exclude = ['\.venv']
 warn_return_any = true
 warn_unused_configs = true
+
+# Pydantic required config, see
+# https://docs.pydantic.dev/latest/integrations/mypy/#enabling-the-plugin
+# I've relaxed these a bit to make it less annoying to the workshop attendees who have
+# to fix them, which isn't the focus of the workshop.
+check_untyped_defs = true
+disallow_any_generics = false
+disallow_untyped_defs = false
+follow_imports = "silent"
+no_implicit_reexport = true
+plugins = ["pydantic.mypy"]
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.poe.tasks]
+_black_check = "black --check src tests"
+_mypy_check = "mypy src tests"
+_ruff_check = "ruff check src tests"
+
+_black_fix = "black src tests"
+_ruff_fix = "ruff check --fix-only --exit-zero src tests"
+
+_test = "pytest --verbose"
+_test_with_output = "pytest --verbose --capture=no"
+
+[tool.poe.tasks.api]
+help = "Run the API"
+cmd = "uvicorn distilgpt2_api.api:app --reload"
+
+[tool.poe.tasks.lint]
+help = "Run all linters"
+sequence = ["_black_check", "_ruff_check", "_mypy_check"]
+
+[tool.poe.tasks.format]
+help = "Run all formatters"
+sequence = ["_ruff_fix", "_black_fix"]
+
+[tool.poe.tasks.test]
+help = "Run all tests"
+sequence = ["_test"]
+
+[tool.poe.tasks.test-with-output]
+help = "Run all tests (show output from tests)"
+sequence = ["_test_with_output"]
+
+[tool.poe.tasks.pre-commit]
+help = "Run all formatting tasks followed by all linting tasks."
+sequence = ["format", "lint"]
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
 module = ["transformers"]
-
-[tool.taskipy.tasks]
-lint = """\
-    black --check . \
-    && flake8 . \
-    && isort --check . \
-    && mypy . \
-    && prospector
-"""
-
-format = """\
-    black . \
-    && isort .
-"""
-
-test = "pytest --verbose"

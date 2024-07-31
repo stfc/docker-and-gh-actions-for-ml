@@ -1,14 +1,13 @@
 import pytest
-
 from distilgpt2_api.text_generation import TextGenerator
 
 
 @pytest.fixture
-def text_generator():
+def text_generator() -> TextGenerator:
     return TextGenerator()
 
 
-def test_text_generator_generates_text(text_generator: TextGenerator):
+def test_text_generator_generates_text(text_generator: TextGenerator) -> None:
     max_new_tokens = 25
     num_results = 5
     prompt = "Once upon a time there was a"
@@ -22,3 +21,6 @@ def test_text_generator_generates_text(text_generator: TextGenerator):
 
     # Results should include original text.
     assert all(r.startswith(prompt) and len(r) > len(prompt) for r in output)
+
+    print("Prompt:", prompt)
+    print("Responses:\n\t-", "\n\t- ".join(output))
