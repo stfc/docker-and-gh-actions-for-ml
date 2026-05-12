@@ -96,7 +96,7 @@ sequence = ["_test"]
 help = "Run all tests (show output from tests)"
 sequence = ["_test_with_output"]
 
-[tool.poe.tasks.pre-commit]
+[tool.poe.tasks.precommit]
 help = "Run all formatting tasks followed by all linting tasks."
 sequence = ["format", "lint"]
 
