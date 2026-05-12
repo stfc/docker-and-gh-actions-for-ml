@@ -171,10 +171,10 @@ Let's update our GitHub Action workflow to add this in:
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
 
           - name: Log in to the Container registry
-            uses: docker/login-action@v3
+            uses: docker/login-action@v4
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -182,14 +182,14 @@ Let's update our GitHub Action workflow to add this in:
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@v5
+            uses: docker/metadata-action@v6
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
                 type=raw,value=latest
 
           - name: Build and push Docker image
-            uses: docker/build-push-action@v6
+            uses: docker/build-push-action@v7
             with:
               context: .
               push: true

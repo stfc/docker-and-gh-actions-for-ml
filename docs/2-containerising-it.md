@@ -141,23 +141,20 @@ We're using Gunicorn here on top of Uvicorn here - Gunicorn provides an extra la
 
 Now, we can build this image and run it right now if we want to, but we're not going to get very far. That's because we haven't installed our dependencies yet! We don't have Gunicorn or Uvicorn or even FastAPI installed.
 
-Next, we're going to update our `Dockerfile` to install Poetry, the tool we're using for managing our Python dependencies.
+Next, we're going to update our `Dockerfile` to install [uv](https://docs.astral.sh/uv/), the tool we're using for managing our Python dependencies.
 
 !!! example "Dockerfile"
-    ```dockerfile linenums="1" hl_lines="3-13"
+    ```dockerfile linenums="1" hl_lines="3-11"
     FROM python:3.11-slim
 
-    ENV \
-        POETRY_VERSION="1.8.3" \
-        POETRY_VIRTUALENVS_IN_PROJECT=true \
-        POETRY_NO_INTERACTION=1 \
-        VENV_PATH="/app/.venv"
+    COPY --from=ghcr.io/astral-sh/uv:0.11.13 /uv /uvx /bin/
 
-    ENV PATH="$VENV_PATH/bin:/root/.local/bin:$PATH"
-    RUN mkdir -p "$VENV_PATH"
+    ENV UV_COMPILE_BYTECODE=1 \
+        UV_LINK_MODE=copy \
+        UV_PROJECT_ENVIRONMENT="/app/.venv"
+
+    ENV PATH="/app/.venv/bin:$PATH"
     WORKDIR "/app"
-
-    RUN pip install pipx && pipx install poetry==$POETRY_VERSION
 
     COPY . .
 
@@ -172,28 +169,25 @@ Next, we're going to update our `Dockerfile` to install Poetry, the tool we're u
     ]
     ```
 
-There's quite a lot going on here, but the important bit is really line 13. That's the bit that installs Poetry. The rest is pretty much just there to make sure the environment is all set up correctly with the version of Poetry, folder to install Poetry into, curl is installed to retrieve the Poetry installation script, etc.
+There's quite a lot going on here, but the important bit is really line 3. That's the bit that installs uv by copying the `uv` and `uvx` binaries out of the official `ghcr.io/astral-sh/uv` image - much simpler than running an installer script. The rest is just there to make sure the environment is set up correctly: telling uv to compile bytecode and copy (rather than hardlink) files into the virtual environment, pointing it at `/app/.venv`, and adding that environment's `bin/` to the `PATH` so we can run installed commands directly.
 
-Now that we've got Poetry installed, we're ready to install all of our application dependencies:
+Now that we've got uv installed, we're ready to install all of our application dependencies:
 
 !!! example "Dockerfile"
-    ```dockerfile linenums="1" hl_lines="16"
+    ```dockerfile linenums="1" hl_lines="13"
     FROM python:3.11-slim
 
-    ENV \
-        POETRY_VERSION="1.8.3" \
-        POETRY_VIRTUALENVS_IN_PROJECT=true \
-        POETRY_NO_INTERACTION=1 \
-        VENV_PATH="/app/.venv"
+    COPY --from=ghcr.io/astral-sh/uv:0.11.13 /uv /uvx /bin/
 
-    ENV PATH="$VENV_PATH/bin:/root/.local/bin:$PATH"
-    RUN mkdir -p "$VENV_PATH"
+    ENV UV_COMPILE_BYTECODE=1 \
+        UV_LINK_MODE=copy \
+        UV_PROJECT_ENVIRONMENT="/app/.venv"
+
+    ENV PATH="/app/.venv/bin:$PATH"
     WORKDIR "/app"
 
-    RUN pip install pipx && pipx install poetry==$POETRY_VERSION
-
     COPY . .
-    RUN poetry install --only main
+    RUN uv sync --frozen --no-dev
 
     EXPOSE 8000
 
@@ -258,27 +252,24 @@ There's a few extra things you can ignore from Docker that you can't from git - 
 Next, let's update our Dockerfile so that we add and install all of our dependencies before adding our actual application code. What this means is that if we are only updating our application code but not updating any dependencies, when we re-build our Docker image, we don't need to re-install the dependencies in the build process - Docker will use the build cache that it maintains to speed up the build process massively.
 
 !!! example "Dockerfile"
-    ```dockerfile linenums="1" hl_lines="15-20"
+    ```dockerfile linenums="1" hl_lines="12-17"
     FROM python:3.11-slim
 
-    ENV \
-        POETRY_VERSION="1.8.3" \
-        POETRY_VIRTUALENVS_IN_PROJECT=true \
-        POETRY_NO_INTERACTION=1 \
-        VENV_PATH="/app/.venv"
+    COPY --from=ghcr.io/astral-sh/uv:0.11.13 /uv /uvx /bin/
 
-    ENV PATH="$VENV_PATH/bin:/root/.local/bin:$PATH"
-    RUN mkdir -p "$VENV_PATH"
+    ENV UV_COMPILE_BYTECODE=1 \
+        UV_LINK_MODE=copy \
+        UV_PROJECT_ENVIRONMENT="/app/.venv"
+
+    ENV PATH="/app/.venv/bin:$PATH"
     WORKDIR "/app"
 
-    RUN pip install pipx && pipx install poetry==$POETRY_VERSION
-
-    COPY ./pyproject.toml ./poetry.lock ./
-    RUN poetry install --only main --no-root
+    COPY ./pyproject.toml ./uv.lock ./
+    RUN uv sync --frozen --no-install-project --no-dev
 
     COPY README.md ./
     COPY src ./src
-    RUN poetry install --only main
+    RUN uv sync --frozen --no-dev
 
     EXPOSE 8000
 
@@ -301,7 +292,7 @@ docker build -t docker-and-github-actions-for-ml .
     This Dockerfile is still fairly basic. When you're containerising applications in a production-ready setting, you will want to put a bit more time into doing some of the "best practices" for Dockerfiles that we don't have time to fully explore today, such as:
 
     - Restricting the image so that the container runs as an unprivileged user instead of the default root user.
-    - Splitting the Dockerfile into separate builder and app stages, so that we can install all our dependencies in the builder and then copy the built files into our app stage. This means that our final app image doesn't need to have things like curl or Poetry installed - it just has the installed dependencies and the application code. This can significantly reduce image sizes.
+    - Splitting the Dockerfile into separate builder and app stages, so that we can install all our dependencies in the builder and then copy the built files into our app stage. This means that our final app image doesn't need to have things like curl or uv installed - it just has the installed dependencies and the application code. This can significantly reduce image sizes.
 
 !!! success "Well containerised!"
     You have now successfully containerised your application!
