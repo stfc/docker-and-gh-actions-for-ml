@@ -10,7 +10,7 @@ dependencies = [
     "gunicorn>=22.0.0,<23",
     "transformers>=4.43.2,<5",
     "uvicorn[standard]>=0.30.3,<0.31",
-    "torch",
+    "torch>=2.4.0,<2.5",
 ]
 
 [dependency-groups]
