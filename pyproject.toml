@@ -3,7 +3,14 @@ name = "distilgpt2-api"
 version = "0.2.0"
 description = "Text generation with DistilGPT2 as a REST API."
 license = { text = "MIT" }
-authors = [{ name = "Drew Silcock", email = "drew.silcock@stfc.ac.uk" }, { name = "Daniel Clayton", email = "daniel.clayton@stfc.ac.uk" }]
+authors = [
+    { name = "Drew Silcock", email = "drew.silcock@stfc.ac.uk" },
+    { name = "Daniel Clayton", email = "daniel.clayton@stfc.ac.uk" },
+]
+maintainers = [
+    { name = "Drew Silcock", email = "drew.silcock@stfc.ac.uk" },
+    { name = "Daniel Clayton", email = "daniel.clayton@stfc.ac.uk" },
+]
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "fastapi>=0.111.1,<0.112",
