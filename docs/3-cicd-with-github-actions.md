@@ -64,7 +64,7 @@ Now that we've got the boilerplate, let's add some actual steps. First, we're go
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@v6
     ```
 
 The `uses` here indicates that we're using a pre-built step from another repository. As we specify `actions/checkout` as the repository, we know that we are using the pre-built Action step specified in https://github.com/actions/checkout. The `@v4` means that we are using git tag `v4` of the action, the latest major release at the time of writing.
@@ -73,10 +73,10 @@ As you might expect, this is an official pre-built Action from GitHub. There are
 
 There's even a marketplace where you can see all the different Actions you can take advantage of - take a look: https://github.com/marketplace?type=actions.
 
-Next, let's set up Poetry and Python:
+Next, let's set up uv and Python:
 
 !!! example ".github/workflows/lint.yml"
-    ```yaml linenums="1" hl_lines="14-22"
+    ```yaml linenums="1" hl_lines="14-20"
     name: Lint
 
     on:
@@ -88,28 +88,23 @@ Next, let's set up Poetry and Python:
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@v6
     
-          - name: Install Poetry
-            run: pipx install poetry
+          - name: Install uv
+            uses: astral-sh/setup-uv@v8
+            with:
+              enable-cache: true
     
           - name: Set up Python
-            id: setup-python
-            uses: actions/setup-python@v5
-            with:
-              python-version: '3.11'
-              cache: poetry
+            run: uv python install
     ```
 
-The GitHub-hosted runners come with a load of packages pre-installed, so we don't need to worry about installing `pipx` - it's already there! We do want to have a special action for setting up Python, though, because:
+The `astral-sh/setup-uv` action installs uv on the runner and, with `enable-cache: true`, automatically caches the uv dependency cache between runs to speed up subsequent builds. We then use uv to install Python - `uv python install`.
 
-- It makes sure we are using the correct version of Python, i.e. 3.11 instead of 3.9 or 3.12.
-- It sets up the caching of dependencies for us to speed up subsequent builds.
-
-Now that we have Poetry and Python set up, we can install our dependencies:
+Now that we have uv and Python set up, we can install our dependencies:
 
 !!! example ".github/workflows/lint.yml"
-    ```yaml linenums="1" hl_lines="24-26"
+    ```yaml linenums="1" hl_lines="22-23"
     name: Lint
 
     on:
@@ -121,33 +116,31 @@ Now that we have Poetry and Python set up, we can install our dependencies:
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@v6
     
-          - name: Install Poetry
-            run: pipx install poetry
+          - name: Install uv
+            uses: astral-sh/setup-uv@v8
+            with:
+              enable-cache: true
     
           - name: Set up Python
-            id: setup-python
-            uses: actions/setup-python@v5
-            with:
-              python-version: '3.11'
-              cache: poetry
+            run: uv python install
     
           - name: Install project
-            run: poetry install --no-interaction
+            run: uv sync --frozen
     ```
 
 It's as simple as that!
 
-Finally, we can add our command to lint our code. We've already added a task for this to the `pyproject.toml` configuration using [Poe the Poet](https://poethepoet.natn.io/index.html). You can view all the configured tasks by running `poe --help`.
+Finally, we can add our command to lint our code. We've already added a task for this to the `pyproject.toml` configuration using [Poe the Poet](https://poethepoet.natn.io/index.html). You can view all the configured tasks by running `uv run poe --help`.
 
 !!! tip "Check your workflow locally first."
-    It takes a few minutes for the GitHub Actions runner to run your linting task which means the lint fail, fix, re-run loop is quite long. There's a task called `pre-commit` which you can run locally first before pushing using `poe pre-commit` - this will format your code and run the linter so that you can fix any issues before pushing the code up.
+    It takes a few minutes for the GitHub Actions runner to run your linting task which means the lint fail, fix, re-run loop is quite long. There's a task called `precommit` which you can run locally first before pushing using `uv run poe precommit` - this will format your code and run the linter so that you can fix any issues before pushing the code up.
 
 Let's add our linting task to the workflow:
 
 !!! example ".github/workflows/lint.yml"
-    ```yaml linenums="1" hl_lines="27-28"
+    ```yaml linenums="1" hl_lines="25-26"
     name: Lint
 
     on:
@@ -159,23 +152,21 @@ Let's add our linting task to the workflow:
       lint:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@v6
     
-          - name: Install Poetry
-            run: pipx install poetry
+          - name: Install uv
+            uses: astral-sh/setup-uv@v8
+            with:
+              enable-cache: true
     
           - name: Set up Python
-            id: setup-python
-            uses: actions/setup-python@v5
-            with:
-              python-version: '3.11'
-              cache: poetry
+            run: uv python install
     
           - name: Install project
-            run: poetry install --no-interaction
+            run: uv sync --frozen
     
           - name: Lint
-            run: poetry run poe lint
+            run: uv run poe lint
     ```
 
 That's all there is to it!
@@ -187,7 +178,7 @@ Go ahead and commit this and push it up, and take a look at the "Actions" tab in
 Now that we have a linting workflow, we're going to add another workflow for testing our code. We've already got our pytest test set up and ready to go, we just need to create our workflow YAML file. We can use 90% of the same code as the linting workflow with a couple of minor tweaks:
 
 !!! example ".github/workflows/test.yaml"
-    ```yaml linenums="1" hl_lines="1 27-28"
+    ```yaml linenums="1"
     name: Test
 
     on:
@@ -199,23 +190,21 @@ Now that we have a linting workflow, we're going to add another workflow for tes
       test:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@v6
     
-          - name: Install Poetry
-            run: pipx install poetry
+          - name: Install uv
+            uses: astral-sh/setup-uv@v8
+            with:
+              enable-cache: true
 
           - name: Set up Python
-            id: setup-python
-            uses: actions/setup-python@v5
-            with:
-              python-version: '3.11'
-              cache: poetry
+            run: uv python install
 
           - name: Install project
-            run: poetry install --no-interaction
+            run: uv sync --frozen
 
           - name: Test
-            run: poetry run poe test
+            run: uv run poe test
     ```
 
 You can see here that there are only 3 lines different from the linting workflow - all the setup is the same.
@@ -241,7 +230,7 @@ Our final GitHub Actions workflow is going to build the Docker image for our Fas
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
     ```
 
 This is going to start out fairly similar to the lint and test workflows. There are a couple of differences, however:
@@ -266,10 +255,10 @@ The first real step of the Docker build and push process is to log into the GitH
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
 
           - name: Log in to the Container registry
-            uses: docker/login-action@v3
+            uses: docker/login-action@v4
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -293,10 +282,10 @@ Next, we're going to use another pre-built action to generate all the right meta
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
 
           - name: Log in to the Container registry
-            uses: docker/login-action@v3
+            uses: docker/login-action@v4
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -304,7 +293,7 @@ Next, we're going to use another pre-built action to generate all the right meta
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@v5
+            uses: docker/metadata-action@v6
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
@@ -328,10 +317,10 @@ With our metadata generated, we can add another step to actually build and push 
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v6
 
           - name: Log in to the Container registry
-            uses: docker/login-action@v3
+            uses: docker/login-action@v4
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -339,14 +328,14 @@ With our metadata generated, we can add another step to actually build and push 
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@v5
+            uses: docker/metadata-action@v6
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
               tags: |
                 type=raw,value=latest
 
           - name: Build and push Docker image
-            uses: docker/build-push-action@v6
+            uses: docker/build-push-action@v7
             with:
               context: .
               push: true
@@ -389,3 +378,22 @@ Take a look at your repository now. You should see something new under the "Pack
     Good job, you've successfully created your CI/CD pipeline with GitHub Actions.
 
     You can now start harnessing the power of GitHub's runners to do the heavy lifting for you, freeing you up to focus on doing more code and research.
+
+## Section post-script: securing your GitHub Actions
+
+Recently, there have been *many* examples of companies involved in serious cybersecurity incidents due to supply chain attacks which use GitHub Actions. This happens because:
+
+- GitHub Actions is relatively insecure by default
+- GitHub Actions strongly encourages using actions from other users, which most people pin to major versions instead of specific commits
+
+Together, this means that GitHub Actions is a common attack vector for exploits, and that an exploit targeting one repository can potentially infect many thousands of other repos and the millions of people using them.
+
+If this sounds like a remote chance that you don't need to worry about, I [assure](https://tanstack.com/blog/npm-supply-chain-compromise-postmortem#packages-affected) [you](https://github.com/mistralai/client-ts/issues/217) [that](https://github.com/opensearch-project/opensearch-js/issues/1116) [it](https://github.com/guardrails-ai/guardrails/issues/1473) [is](https://www.wiz.io/blog/six-accounts-one-actor-inside-the-prt-scan-supply-chain-campaign) [in](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23) [fact](https://www.microsoft.com/en-us/security/blog/2026/04/01/mitigating-the-axios-npm-supply-chain-compromise/) [not](https://checkmarx.com/blog/ongoing-security-updates/).
+
+Fully securing your GitHub Actions it outside the scope of this course (it could be a whole course in itself), but we highly recommend you read some of the recent articles written on how to harden your GitHub Actions pipelines, such as:
+
+- [Wiz - How to Harden GitHub Actions: An Updated Guide](https://www.wiz.io/blog/github-actions-security-guide)
+- [GitHub - Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [GitHub - Security for GitHub Actions](https://docs.github.com/en/actions/how-tos/secure-your-work)
+- [OpenSSF - Mitigating Attack Vectors in GitHub Workflows](https://openssf.org/blog/2024/08/12/mitigating-attack-vectors-in-github-workflows/)
+- [Binary Security - GitHub Actions: A Cloudy Day for Security - Part 1](https://www.binarysecurity.no/posts/2025/08/securing-gh-actions-part1)

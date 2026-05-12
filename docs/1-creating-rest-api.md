@@ -83,9 +83,8 @@ To run this, open the terminal in Codespaces.
 Next, create our virtual environment and install the dependencies:
 
 ```bash
-python -m venv .venv
+uv sync
 source ./.venv/bin/activate
-poetry install
 ```
 
 This may take a couple of minutes, as it has to download all the dependencies, including pytorch which is quite big.

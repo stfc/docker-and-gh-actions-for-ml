@@ -1,6 +1,7 @@
 [project]
 authors = [
-    { name = "Drew Silcock", email = "drew.silcock@stfc.ac.uk" }
+    { name = "Drew Silcock", email = "drew.silcock@stfc.ac.uk" },
+    { name = "Daniel Clayton", email = "daniel.clayton@stfc.ac.uk" },
 ]
 description = "Site for 'Docker and GitHub Actions for ML Apps' workshop."
 license = "MIT"
@@ -8,7 +9,7 @@ name = "docker-and-gh-actions-for-ml-site"
 version = "0.1.0"
 
 dependencies = [
-    "mkdocs>=1.6.0",
+    "mkdocs>=1.6.0,<2.0.0",
     "mkdocs-git-revision-date-localized-plugin>=1.2.6",
     "mkdocs-material>=9.5.28",
     "mkdocs-minify-plugin>=0.8.0",
@@ -20,13 +21,6 @@ requires-python = ">= 3.12"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.rye]
-managed = true
-dev-dependencies = []
-
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/docs_template"]

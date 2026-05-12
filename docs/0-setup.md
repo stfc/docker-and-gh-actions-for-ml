@@ -11,10 +11,16 @@ Throughout this tutorial we will be using [GitHub Codespaces](https://github.com
 **©️ GitHub, Inc.**
 {: style="font-size: small; margin-top: -25px; width: 100%; text-align: center;"}
 
-If you prefer to do this all on your local machine and you've got Docker all set up and installed, feel free - it doesn't make any difference to the course, it just means that you use your preferred code editor to make your changes and your own local terminal to run commands instead of GitHub Codespaces.
+!!! tip
+    You don't have to use GitHub Codespaces, it just makes the initial setup a bit easier.
+
+    If you prefer to do this all on your local machine and you've got Docker all set up and installed, feel free - it doesn't make any difference to the course, it just means that you use your preferred code editor to make your changes and your own local terminal to run commands instead of GitHub Codespaces.
 
 !!! note
     GitHub Codespaces has a generous free tier allowing you to have 60 free hours of Codespaces use on a 2-core codespace per month - you shouldn't get anywhere near this just from this course. In the unlikely event that you've already used up all of your free hours from prior use, you'll just have to run it locally instead.
+
+!!! warning
+    Some corporate networks block GitHub Codespaces. If Codespaces is not working for you, this may be why - panic not! Just let us know and we can get you sorted out with a local setup or a cloud-based VM to work on.
 
 ## 🍴 Forking the repository
 
