@@ -8,16 +8,7 @@ The recommended way to follow the tutorial is using GitHub Codespaces to ensure 
 
 ## Getting started
 
-If you're using GitHub Codespaces, you should already have all the necessary dependencies installed. If not, make sure you've got [Python 3.11](https://www.python.org/downloads/) and [uv](https://docs.astral.sh/uv/getting-started/installation/) installed:
-
-```bash
-python --version
-uv --version
-```
-
-If not, follow the links above to install them.
-
-Next, create the virtual environment and install the dependencies with uv:
+If you're using GitHub Codespaces, you should already have all the necessary dependencies installed. If not, make sure you've got [uv](https://docs.astral.sh/uv/getting-started/installation/) installed and run:
 
 ```bash
 uv sync
@@ -27,4 +18,4 @@ Now you're ready to get coding to turn this template into a fully working GPT2-t
 
 ## About the model
 
-The model we're wrapping up as part of the workshop is the [distilgpt2 model](https://huggingface.co/distilgpt2), short for "Distilled GPT-2". This is a distilled (i.e. smaller) version of the GPT-2 model which is itself a precursor to more recent closed-source models such as GPT-3 and GPT-3.5 (the latter being used for Chat-GPT).
+The model we're wrapping up as part of the workshop is the [distilgpt2 model](https://huggingface.co/distilgpt2), short for "Distilled GPT-2". This is a distilled (i.e. smaller) version of the GPT-2 model which is itself a precursor to more recent closed-source models GPT-3 up to GPT-5.5.
