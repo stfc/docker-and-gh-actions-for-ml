@@ -76,7 +76,7 @@ There's even a marketplace where you can see all the different Actions you can t
 Next, let's set up uv and Python:
 
 !!! example ".github/workflows/lint.yml"
-    ```yaml linenums="1" hl_lines="14-19"
+    ```yaml linenums="1" hl_lines="14-20"
     name: Lint
 
     on:
@@ -96,15 +96,15 @@ Next, let's set up uv and Python:
               enable-cache: true
     
           - name: Set up Python
-            run: uv python install 3.11
+            run: uv python install
     ```
 
-The `astral-sh/setup-uv` action installs uv on the runner and, with `enable-cache: true`, automatically caches the uv dependency cache between runs to speed up subsequent builds. We then use `uv python install` to make sure we are using the correct version of Python, i.e. 3.11 instead of 3.9 or 3.12.
+The `astral-sh/setup-uv` action installs uv on the runner and, with `enable-cache: true`, automatically caches the uv dependency cache between runs to speed up subsequent builds. We then use uv to install Python - `uv python install`.
 
 Now that we have uv and Python set up, we can install our dependencies:
 
 !!! example ".github/workflows/lint.yml"
-    ```yaml linenums="1" hl_lines="21-22"
+    ```yaml linenums="1" hl_lines="22-23"
     name: Lint
 
     on:
@@ -124,7 +124,7 @@ Now that we have uv and Python set up, we can install our dependencies:
               enable-cache: true
     
           - name: Set up Python
-            run: uv python install 3.11
+            run: uv python install
     
           - name: Install project
             run: uv sync --frozen
@@ -135,12 +135,12 @@ It's as simple as that!
 Finally, we can add our command to lint our code. We've already added a task for this to the `pyproject.toml` configuration using [Poe the Poet](https://poethepoet.natn.io/index.html). You can view all the configured tasks by running `uv run poe --help`.
 
 !!! tip "Check your workflow locally first."
-    It takes a few minutes for the GitHub Actions runner to run your linting task which means the lint fail, fix, re-run loop is quite long. There's a task called `pre-commit` which you can run locally first before pushing using `uv run poe pre-commit` - this will format your code and run the linter so that you can fix any issues before pushing the code up.
+    It takes a few minutes for the GitHub Actions runner to run your linting task which means the lint fail, fix, re-run loop is quite long. There's a task called `precommit` which you can run locally first before pushing using `uv run poe precommit` - this will format your code and run the linter so that you can fix any issues before pushing the code up.
 
 Let's add our linting task to the workflow:
 
 !!! example ".github/workflows/lint.yml"
-    ```yaml linenums="1" hl_lines="24-25"
+    ```yaml linenums="1" hl_lines="25-26"
     name: Lint
 
     on:
@@ -160,7 +160,7 @@ Let's add our linting task to the workflow:
               enable-cache: true
     
           - name: Set up Python
-            run: uv python install 3.11
+            run: uv python install
     
           - name: Install project
             run: uv sync --frozen
@@ -178,7 +178,7 @@ Go ahead and commit this and push it up, and take a look at the "Actions" tab in
 Now that we have a linting workflow, we're going to add another workflow for testing our code. We've already got our pytest test set up and ready to go, we just need to create our workflow YAML file. We can use 90% of the same code as the linting workflow with a couple of minor tweaks:
 
 !!! example ".github/workflows/test.yaml"
-    ```yaml linenums="1" hl_lines="1 24-25"
+    ```yaml linenums="1"
     name: Test
 
     on:
@@ -198,7 +198,7 @@ Now that we have a linting workflow, we're going to add another workflow for tes
               enable-cache: true
 
           - name: Set up Python
-            run: uv python install 3.11
+            run: uv python install
 
           - name: Install project
             run: uv sync --frozen
@@ -378,3 +378,22 @@ Take a look at your repository now. You should see something new under the "Pack
     Good job, you've successfully created your CI/CD pipeline with GitHub Actions.
 
     You can now start harnessing the power of GitHub's runners to do the heavy lifting for you, freeing you up to focus on doing more code and research.
+
+## Section post-script: securing your GitHub Actions
+
+Recently, there have been *many* examples of companies involved in serious cybersecurity incidents due to supply chain attacks which use GitHub Actions. This happens because:
+
+- GitHub Actions is relatively insecure by default
+- GitHub Actions strongly encourages using actions from other users, which most people pin to major versions instead of specific commits
+
+Together, this means that GitHub Actions is a common attack vector for exploits, and that an exploit targeting one repository can potentially infect many thousands of other repos and the millions of people using them.
+
+If this sounds like a remote chance that you don't need to worry about, I [assure](https://tanstack.com/blog/npm-supply-chain-compromise-postmortem#packages-affected) [you](https://github.com/mistralai/client-ts/issues/217) [that](https://github.com/opensearch-project/opensearch-js/issues/1116) [it](https://github.com/guardrails-ai/guardrails/issues/1473) [is](https://www.wiz.io/blog/six-accounts-one-actor-inside-the-prt-scan-supply-chain-campaign) [in](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23) [fact](https://www.microsoft.com/en-us/security/blog/2026/04/01/mitigating-the-axios-npm-supply-chain-compromise/) [not](https://checkmarx.com/blog/ongoing-security-updates/).
+
+Fully securing your GitHub Actions it outside the scope of this course (it could be a whole course in itself), but we highly recommend you read some of the recent articles written on how to harden your GitHub Actions pipelines, such as:
+
+- [Wiz - How to Harden GitHub Actions: An Updated Guide](https://www.wiz.io/blog/github-actions-security-guide)
+- [GitHub - Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [GitHub - Security for GitHub Actions](https://docs.github.com/en/actions/how-tos/secure-your-work)
+- [OpenSSF - Mitigating Attack Vectors in GitHub Workflows](https://openssf.org/blog/2024/08/12/mitigating-attack-vectors-in-github-workflows/)
+- [Binary Security - GitHub Actions: A Cloudy Day for Security - Part 1](https://www.binarysecurity.no/posts/2025/08/securing-gh-actions-part1)
