@@ -390,7 +390,7 @@ Together, this means that GitHub Actions is a common attack vector for exploits,
 
 If this sounds like a remote chance that you don't need to worry about, I [assure](https://tanstack.com/blog/npm-supply-chain-compromise-postmortem#packages-affected) [you](https://github.com/mistralai/client-ts/issues/217) [that](https://github.com/opensearch-project/opensearch-js/issues/1116) [it](https://github.com/guardrails-ai/guardrails/issues/1473) [is](https://www.wiz.io/blog/six-accounts-one-actor-inside-the-prt-scan-supply-chain-campaign) [in](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23) [fact](https://www.microsoft.com/en-us/security/blog/2026/04/01/mitigating-the-axios-npm-supply-chain-compromise/) [not](https://checkmarx.com/blog/ongoing-security-updates/).
 
-Fully securing your GitHub Actions it outside the scope of this course (it could be a whole course in itself), but we highly recommend you read some of the recent articles written on how to harden your GitHub Actions pipelines, such as:
+Fully securing your GitHub Actions is outside the scope of this course (it could be a whole course in itself), but we highly recommend you read some of the recent articles written on how to harden your GitHub Actions pipelines, such as:
 
 - [Wiz - How to Harden GitHub Actions: An Updated Guide](https://www.wiz.io/blog/github-actions-security-guide)
 - [GitHub - Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
