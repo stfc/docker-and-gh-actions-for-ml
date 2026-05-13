@@ -22,7 +22,7 @@ There are various dependencies in the code and documentation that should be peri
 
 ### Python version
 
-The code is currently using Python 3.11 because that's the latest that PyTorch officially recommends, although they seem to be deploying packages for 3.12. As new Python versions are released, we should update the code to use the latest stable version supported by PyTorch.
+The code is currently using Python 3.14 because that's the latest stable version supported by PyTorch. As new Python versions are released, we should update the code to use the latest stable version supported by PyTorch.
 
 Updating
 
