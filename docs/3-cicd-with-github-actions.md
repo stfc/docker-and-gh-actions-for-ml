@@ -91,7 +91,7 @@ Next, let's set up uv and Python:
           - uses: actions/checkout@v6
     
           - name: Install uv
-            uses: astral-sh/setup-uv@v8
+            uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
             with:
               enable-cache: true
     
@@ -119,7 +119,7 @@ Now that we have uv and Python set up, we can install our dependencies:
           - uses: actions/checkout@v6
     
           - name: Install uv
-            uses: astral-sh/setup-uv@v8
+            uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
             with:
               enable-cache: true
     
@@ -155,7 +155,7 @@ Let's add our linting task to the workflow:
           - uses: actions/checkout@v6
     
           - name: Install uv
-            uses: astral-sh/setup-uv@v8
+            uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
             with:
               enable-cache: true
     
@@ -193,7 +193,7 @@ Now that we have a linting workflow, we're going to add another workflow for tes
           - uses: actions/checkout@v6
     
           - name: Install uv
-            uses: astral-sh/setup-uv@v8
+            uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
             with:
               enable-cache: true
 

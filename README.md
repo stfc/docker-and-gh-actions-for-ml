@@ -35,7 +35,7 @@ It's a good idea to periodically update the project dependencies to the latest v
 There are a few actions that are used in the docs that should be periodically checked for updates. These are:
 
 - [`actions/checkout`](https://github.com/actions/checkout){target=_blank} (currently **@v6**)
-- [`astral-sh/setup-uv`](https://github.com/astral-sh/setup-uv){target=_blank} (currently **@v8**)
+- [`astral-sh/setup-uv`](https://github.com/astral-sh/setup-uv){target=_blank} (currently **08807647e7069bb48b6ef5acd8ec9567f424441b**  – v8.1.0)
 - [`docker/login-action`](https://github.com/docker/login-action){target=_blank} (currently **@v4**)
 - [`docker/metadata-action`](https://github.com/docker/metadata-action){target=_blank} (currently **@v6**)
 - [`docker/build-push-action`](https://github.com/docker/build-push-action){target=_blank} (currently **@v7**)
