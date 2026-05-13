@@ -4,7 +4,7 @@ This repository contains the code and docs for the "Supercharge your Cloud Devel
 
 To follow along with the workshop, head over to https://supercharge.training.hartree.dev and follow the walkthrough.
 
-The recommended way to follow the tutorial is using GitHub Codespaces to ensure that the development environment is consistent across all attendees - you're welcome to work on your local machine instead, you just need to make sure you install all the necessary dependencies like Docker, Python 3.11 and uv.
+The recommended way to follow the tutorial is using GitHub Codespaces to ensure that the development environment is consistent across all attendees - you're welcome to work on your local machine instead, you just need to make sure you install all the necessary dependencies like Docker and uv.
 
 ## Getting started
 
