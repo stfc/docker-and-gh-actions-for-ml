@@ -109,7 +109,7 @@ We're going to start off by specifying a base image - this comes with Python bui
 
 !!! example "Dockerfile"
     ```dockerfile linenums="1"
-    FROM python:3.11-slim
+    FROM python:3.14-slim
 
     COPY . .
 
@@ -124,7 +124,7 @@ We're going to start off by specifying a base image - this comes with Python bui
     ]
     ```
 
-This is pretty much as simple you can can get. It starts off with the official Python 3.11 image (the slim version, meaning it's slightly smaller than the default image).
+This is pretty much as simple you can can get. It starts off with the official Python 3.14 image (the slim version, meaning it's slightly smaller than the default image).
 
 Next, it copies all of our code from our repository into the image.
 
@@ -145,7 +145,7 @@ Next, we're going to update our `Dockerfile` to install [uv](https://docs.astral
 
 !!! example "Dockerfile"
     ```dockerfile linenums="1" hl_lines="3-11"
-    FROM python:3.11-slim
+    FROM python:3.14-slim
 
     COPY --from=ghcr.io/astral-sh/uv:0.11.13 /uv /uvx /bin/
 
@@ -175,7 +175,7 @@ Now that we've got uv installed, we're ready to install all of our application d
 
 !!! example "Dockerfile"
     ```dockerfile linenums="1" hl_lines="13"
-    FROM python:3.11-slim
+    FROM python:3.14-slim
 
     COPY --from=ghcr.io/astral-sh/uv:0.11.13 /uv /uvx /bin/
 
@@ -253,7 +253,7 @@ Next, let's update our Dockerfile so that we add and install all of our dependen
 
 !!! example "Dockerfile"
     ```dockerfile linenums="1" hl_lines="12-17"
-    FROM python:3.11-slim
+    FROM python:3.14-slim
 
     COPY --from=ghcr.io/astral-sh/uv:0.11.13 /uv /uvx /bin/
 
