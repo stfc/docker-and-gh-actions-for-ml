@@ -146,13 +146,35 @@ Try visiting https://$my_app_name-app.azurewebsites.net/Here's%20a%20story%20abo
 
 There's only one thing left to do, and that is update our GitHub Action to tell our Azure App Service app that we have deployed a new image and that they should go get it.
 
-This is pretty simple - App Service provides a URL that you can send a POST request to that'll do exactly this. All we have to do is retrieve this special URL and put it into the GitHub Action.
+This is pretty simple - App Service provides a URL that you can send a POST request to that'll do exactly this. Before we pull the CD URL from Azure, we need to enable deployment using basic authentication credentials.
+
+!!! note
+    Basic auth is fine for what we're doing, but in a production environment you may want to consider using [user-assigned identities](https://learn.microsoft.com/en-us/azure/app-service/deploy-continuous-deployment?tabs=github) instead.
+
+    By default, Azure want you to connect your Azure account to your GitHub login so that Azure can create the GitHub Action for you, but we don't do that because it's a lot of faff for our specific setup and if we do that, you wouldn't really learn how the actual GitHub Actions works.
 
 ```bash
-az webapp deployment container show-cd-url -g hncdi-explain-supercharge -n $my_app_name-app
+az resource update --resource-group hncdi-explain-supercharge \
+    --name scm \
+    --namespace Microsoft.Web \
+    --resource-type basicPublishingCredentialsPolicies \
+    --parent sites/$my_app_name-app \
+    --set properties.allow=true
+```
+
+Next, we have to retrieve the special CD URL and put it into the GitHub Action.
+
+```bash
+az webapp deployment container show-cd-url \
+    -g hncdi-explain-supercharge -n $my_app_name-app
 ```
 
 This should show a little JSON object with a key called `CI_CD_URL` - this is the URL we need. Go ahead and copy that value. It should look something like `https://$my-lovely-api-app:{long password}@my-lovely-api-app.scm.azurewebsites.net/docker/hook`.
+
+!!! tip
+    If you see `REDACTED:REDACTED` instead of the username and password in the CD URL, i means that basic auth deployment isn't enabled for your web app. Try running the `az resource update` command above again.
+
+    If you're still having issues with this, let us know and we can take a look.
 
 Let's update our GitHub Action workflow to add this in:
 
