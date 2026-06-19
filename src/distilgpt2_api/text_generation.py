@@ -24,10 +24,7 @@ class TextGenerator:
         tokeniser = GPT2Tokenizer.from_pretrained(
             model_path if model_path is not None else "distilgpt2"
         )
-        self.generator = cast(
-            TextGenerationPipeline,
-            pipeline("text-generation", model=model, tokenizer=tokeniser),
-        )
+        self.generator = pipeline("text-generation", model=model, tokenizer=tokeniser)
         set_seed(seed)
 
     def generate(
